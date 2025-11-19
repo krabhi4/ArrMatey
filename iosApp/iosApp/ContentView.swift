@@ -3,6 +3,8 @@ import Shared
 
 struct ContentView: View {
     @State private var showContent = false
+    @ObservedObject private(set) var viewModel: ViewModel
+
     var body: some View {
         VStack {
             Button("Click me!") {
@@ -16,7 +18,8 @@ struct ContentView: View {
                     Image(systemName: "swift")
                         .font(.system(size: 200))
                         .foregroundColor(.accentColor)
-                    Text("SwiftUI: \(Greeting().greet())")
+                    ListView(phrases: viewModel.greetings)
+                        .task { await self.viewModel.startObserving() }
                 }
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
@@ -25,9 +28,25 @@ struct ContentView: View {
         .padding()
     }
 }
+extension ContentView {
+    @MainActor
+    class ViewModel : ObservableObject {
+        @Published var greetings: Array<String> = []
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+        func startObserving() async {
+            for await phrase in Greeting().greet() {
+                self.greetings.append(phrase)
+            }
+        }
+    }
+}
+
+struct ListView : View {
+    let phrases: Array<String>
+
+    var body: some View {
+        List(phrases, id: \.self) {
+            Text($0)
+        }
     }
 }
