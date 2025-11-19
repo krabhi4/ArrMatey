@@ -1,6 +1,7 @@
 package com.dnfapps.arrmatey.di
 
 import com.dnfapps.arrmatey.Greeting
+import com.dnfapps.arrmatey.api.sonarr.SonarrClient
 import com.dnfapps.arrmatey.ktor.demo.RocketComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -28,6 +29,8 @@ val networkModules = module {
             }
         }
     }
+
+    single { SonarrClient() }
 
     single { RocketComponent() }
     single { Greeting() }
