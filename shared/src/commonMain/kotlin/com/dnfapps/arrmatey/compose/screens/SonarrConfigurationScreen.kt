@@ -3,6 +3,7 @@ package com.dnfapps.arrmatey.compose.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,11 +47,15 @@ fun SonarrConfigurationScreen() {
         ) {
             TextField(
                 value = apiEndpoint,
-                onValueChange = { apiEndpoint = it }
+                onValueChange = { apiEndpoint = it },
+                label = { Text("Host") },
+                modifier = Modifier.fillMaxWidth()
             )
             TextField(
                 value = apiKey,
-                onValueChange = { apiKey = it }
+                onValueChange = { apiKey = it },
+                label = { Text("API Key") },
+                modifier = Modifier.fillMaxWidth()
             )
             Button(
                 onClick = {
