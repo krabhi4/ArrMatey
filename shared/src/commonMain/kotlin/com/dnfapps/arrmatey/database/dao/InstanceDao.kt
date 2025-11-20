@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.dnfapps.arrmatey.model.Instance
 import kotlinx.coroutines.flow.Flow
 
@@ -15,6 +16,9 @@ interface InstanceDao {
 
     @Delete
     suspend fun delete(instance: Instance)
+
+    @Update
+    suspend fun update(instance: Instance)
 
     @Query("SELECT * FROM instances")
     fun getAllAsFlow(): Flow<List<Instance>>

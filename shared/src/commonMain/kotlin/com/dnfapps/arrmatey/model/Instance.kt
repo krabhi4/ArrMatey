@@ -9,7 +9,8 @@ data class Instance(
     val type: InstanceType,
     var label: String,
     var url: String,
-    var apiKey: String
+    var apiKey: String,
+    var enabled: Boolean = true
 )
 
 enum class InstanceType {
