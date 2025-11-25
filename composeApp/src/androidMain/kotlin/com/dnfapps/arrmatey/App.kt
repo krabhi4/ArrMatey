@@ -1,16 +1,16 @@
 package com.dnfapps.arrmatey
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.dnfapps.arrmatey.compose.screens.SonarrConfigurationScreen
+import com.dnfapps.arrmatey.navigation.AppNavHost
+import com.dnfapps.arrmatey.ui.theme.ArrMateyTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun App(mainViewModel: MainViewModel = viewModel()) {
-    MaterialTheme {
-        SonarrConfigurationScreen()
+fun App() {
+    ArrMateyTheme {
+        AppNavHost()
+//        SonarrConfigurationScreen()
 //        var showContent by remember { mutableStateOf(false) }
 //        val greetings by mainViewModel.greetingsList.collectAsStateWithLifecycle()
 //

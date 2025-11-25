@@ -4,12 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.dnfapps.arrmatey.api.sonarr.SonarrClient
 import org.koin.compose.koinInject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SonarrConfigurationScreen() {
     MaterialTheme {
@@ -39,36 +45,41 @@ fun SonarrConfigurationScreen() {
             }
         }
 
-        Column(
+        Scaffold(
             modifier = Modifier
                 .safeContentPadding()
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            topBar = { TopAppBar(title = { Text("Settings") }) }
         ) {
-            TextField(
-                value = apiEndpoint,
-                onValueChange = { apiEndpoint = it },
-                label = { Text("Host") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            TextField(
-                value = apiKey,
-                onValueChange = { apiKey = it },
-                label = { Text("API Key") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Button(
-                onClick = {
-                    testing = true
-                },
-                enabled = !testing
+            Column(
+                modifier = Modifier.fillMaxSize().padding(it),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (testing) CircularProgressIndicator() else Text("Test")
-            }
+                OutlinedTextField(
+                    value = apiEndpoint,
+                    onValueChange = { apiEndpoint = it },
+                    label = { Text("Host") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = apiKey,
+                    onValueChange = { apiKey = it },
+                    label = { Text("API Key") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Button(
+                    onClick = {
+                        testing = true
+                    },
+                    enabled = !testing
+                ) {
+                    if (testing) CircularProgressIndicator() else Text("Test")
+                }
 
 
-            result?.let {
-                Text(if (it) "Success" else "Failure")
+                result?.let {
+                    Text(if (it) "Success" else "Failure")
+                }
             }
         }
     }
