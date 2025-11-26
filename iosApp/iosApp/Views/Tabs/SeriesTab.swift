@@ -6,7 +6,13 @@ import Foundation
 import SwiftUI
 
 struct SeriesTab: View {
+    let five = 5
+    let one = 1
     var body: some View {
-
+        VStack {
+            Text("\(five) test")
+            Text("\(one) test")
+            Text("latest \("AKHFSD") \("SLDKFH")")
+        }
     }
 }

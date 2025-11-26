@@ -11,5 +11,6 @@
         <item quantity="one">%1$d test</item>
         <item quantity="other">%1$d tests</item>
     </plurals>
+    <string name="latest">%1$s Last seen in %2$s</string>
 
 </resources>

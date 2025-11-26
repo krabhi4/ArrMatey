@@ -34,7 +34,7 @@
         }
       }
     },
-    "%d plural_test": {
+    "%lld tests": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -43,13 +43,13 @@
               "one": {
                 "stringUnit": {
                   "state": "translated",
-                  "value": "%1$d test"
+                  "value": "%1$lld test"
                 }
               },
               "other": {
                 "stringUnit": {
                   "state": "translated",
-                  "value": "%1$d tests"
+                  "value": "%1$lld tests"
                 }
               }
             }
@@ -61,16 +61,27 @@
               "one": {
                 "stringUnit": {
                   "state": "translated",
-                  "value": "%1$d french test"
+                  "value": "%1$lld french test"
                 }
               },
               "other": {
                 "stringUnit": {
                   "state": "translated",
-                  "value": "%1$d french tests"
+                  "value": "%1$lld french tests"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "latest %@ %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ Last seen in %2$@"
           }
         }
       }

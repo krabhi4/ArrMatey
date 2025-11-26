@@ -10,6 +10,8 @@ const ANDROID_DIR = "../composeApp/src/androidMain/res";
 const STRINGS_FILE = "./strings.txt";
 const CLEAR_ON_RUN = true;
 
+const RESERVED_KEYWORDS = ["comment", "iosKey"];
+
 if (CLEAR_ON_RUN) {
   removeExistingStrings();
 }
@@ -89,6 +91,9 @@ function convertToIosStrings(input) {
     version: "1.1",
   };
 
+  const replaceModifiers = (str) =>
+    str.replace("$d", "$lld").replace("%d", "%lld");
+
   for (const sectionKey in input) {
     if (!input.hasOwnProperty(sectionKey)) continue;
 
@@ -103,18 +108,20 @@ function convertToIosStrings(input) {
         localizations: {},
       };
 
+      const iosKeyOverride = subSection.iosKey || undefined;
+
       // Detect is this key is plural at all
       const locales = Object.keys(subSection).filter(
-        (k) => k !== "comment" && !k.startsWith("plural_"),
+        (k) => !RESERVED_KEYWORDS.includes(k) && !k.endsWith("_plural"),
       );
       const hasAnyPlural = locales.some(
-        (l) => subSection["plural_" + l] !== undefined,
+        (l) => subSection[l + "_plural"] !== undefined,
       );
 
       if (hasAnyPlural) {
         // Validate for every locale that a base value and plural exist
         for (const locale of locales) {
-          const pluralKey = "plural_" + locale;
+          const pluralKey = locale + "_plural";
           if (
             subSection[locale] != undefined &&
             subSection[pluralKey] === undefined
@@ -127,7 +134,7 @@ function convertToIosStrings(input) {
 
         // Build plural structure
         for (const locale of locales) {
-          const pluralKey = "plural_" + locale;
+          const pluralKey = locale + "_plural";
           if (subSection[locale] === undefined) continue; // skip stray plural-only langs
           obj.localizations[locale] = {
             variations: {
@@ -135,32 +142,33 @@ function convertToIosStrings(input) {
                 one: {
                   stringUnit: {
                     state: "translated",
-                    value: subSection[locale],
+                    value: replaceModifiers(subSection[locale]),
                   },
                 },
                 other: {
                   stringUnit: {
                     state: "translated",
-                    value: subSection[pluralKey],
+                    value: replaceModifiers(subSection[pluralKey]),
                   },
                 },
               },
             },
           };
         }
-        const iosKey = `%d ${subKey}`;
+        const iosKey = iosKeyOverride || subKey;
         output.strings[iosKey] = obj;
       } else {
         for (const locale of Object.keys(subSection)) {
-          if (locale === "comment") continue;
+          if (RESERVED_KEYWORDS.includes(locale)) continue;
           obj.localizations[locale] = {
             stringUnit: {
               state: "translated",
-              value: subSection[locale],
+              value: replaceModifiers(subSection[locale]),
             },
           };
         }
-        output.strings[subKey] = obj;
+        const iosKey = iosKeyOverride || subKey;
+        output.strings[iosKey] = obj;
       }
     }
   }
@@ -177,18 +185,19 @@ function generateAndroidStringsXML(json) {
   for (const category in json) {
     for (const key in json[category]) {
       Object.keys(json[category][key]).forEach((lang) => {
-        if (lang !== "comment" && !lang.startsWith("plural_")) {
+        if (!RESERVED_KEYWORDS.includes(lang) && !lang.endsWith("_plural")) {
           supportedLangs.add(lang);
         }
       });
     }
   }
-  console.log("Supported langs: ", supportedLangs);
 
   const langFiles = {};
 
   const escapeXml = (str) =>
     str
+      .replace(/%(\d+)\$@/g, "%$1$s")
+      .replace("%@", "%s")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -217,7 +226,7 @@ function generateAndroidStringsXML(json) {
 
       keysForLang.forEach((key) => {
         const entry = json[category][key];
-        const pluralKey = "plural_" + lang;
+        const pluralKey = lang + "_plural";
         const hasPlural = entry[pluralKey] !== undefined;
 
         if (hasPlural) {

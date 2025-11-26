@@ -10,7 +10,11 @@
 
 [[Test]]
     [plural_test]
+        iosKey = %lld tests
         en = %1$d test
-        plural_en = %1$d tests
+        en_plural = %1$d tests
         fr = %1$d french test
-        plural_fr = %1$d french tests
+        fr_plural = %1$d french tests
+    [latest]
+        iosKey = latest %@ %@
+        en = %1$@ Last seen in %2$@

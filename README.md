@@ -41,7 +41,48 @@ in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and r
 
 ### Adding Localized String
 
-Strings are generated for each platform from a shared source of truth. Strings can be added to [strings/strings.txt](./strings/strings.txt). To generate platform specfic files, run
+Strings are generated for each platform from a shared source of truth. Strings can be added to [strings/strings.txt](./strings/strings.txt). Entries in [strings/strings.txt](./strings/strings.txt) follow these rules:
+
+`[[Category]]` - purely organizational, will be displayed as a comment in Android strings.xml and ignored on iOS
+
+`[key]` - the value to be used as the key for this string
+
+Each `[key]` can have the following properties:
+
+- `iosKey = {value}` - Allows you to specific a different key for the iOS `Localizeable.xcstrings` file. Because of how SwiftUI handles localization, you may want to use a key specifically for iOS, particularily if using plurals or variables.
+
+- `comment = {value}` - {value} will be added as a comment to the entry is `Localizeable.xcstrings`, will also be show as an XML comment in Android `strings.xml` eg. `<string name="distance">%1$d-%2$d m</strimg> <!-- Represent a distance range -->`
+
+- `{lang} = {value}` - the actual string and any translations, eg.
+
+```
+en = Hello
+fr = Bonjour
+es = Hola
+```
+
+- `{lang}_plural = {value}` is also supported for plurals. A `_plural` must be specified all languages or generation will fail. You will likely also want to set an `isoKey` for any plural entries, eg.
+
+```
+[items]
+iosKey = %lld items
+en = %d item
+en_plural = %d items
+fr = %d article
+fr_plural = %d articles
+```
+
+- `variables` - The follow variables are supported
+
+| Variable | Type   | iOS  | Android | Example   |
+| -------- | ------ | ---- | ------- | --------- |
+| %@       | String | %@   | %s      | Hello %@! |
+| %d       | Int    | %lld | %d      | %d elk    |
+| %f       | Float  | %f   | %f      | %.2f Kb   |
+
+You can also specify the order of variables using the same format as native Android and iOS strings. eg. `en = Today is %1$d %2$@`
+
+To generate platform specfic files, run
 
 ```
 node generate-strings.js
