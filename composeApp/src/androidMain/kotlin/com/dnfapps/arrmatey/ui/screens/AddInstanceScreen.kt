@@ -28,6 +28,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,10 +48,14 @@ import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.navigation.NavigationViewModel
 import com.dnfapps.arrmatey.ui.components.DropdownPicker
+import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddInstanceScreen() {
+    val scope = rememberCoroutineScope()
+
     val navigationViewModel = viewModel<NavigationViewModel>()
     val addInstanceViewModel = viewModel<AddInstanceScreenViewModel>()
 
@@ -85,7 +90,12 @@ fun AddInstanceScreen() {
                 },
                 actions = {
                     Button(
-                        onClick = {},
+                        onClick = {
+                            scope.launch {
+                                addInstanceViewModel.saveInstance(selectedInstanceType)
+                                navigationViewModel.settingsTabBackStack.removeLastOrNull()
+                            }
+                        },
                         enabled = saveButtonEnabled,
                         modifier = Modifier.padding(end = 12.dp)
                     ) {
@@ -177,7 +187,7 @@ fun AddInstanceScreen() {
 
             when (selectedInstanceType) {
                 InstanceType.Sonarr -> ArrConfigurationScreen(InstanceType.Sonarr)// { saveButtonEnabled = it == true }
-                InstanceType.Radarr -> ArrConfigurationScreen(InstanceType.Radarr)// { saveButtonEnabled = it == true }
+//                InstanceType.Radarr -> ArrConfigurationScreen(InstanceType.Radarr)// { saveButtonEnabled = it == true }
             }
         }
     }

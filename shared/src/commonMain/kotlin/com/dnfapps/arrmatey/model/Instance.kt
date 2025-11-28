@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class Instance(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val type: InstanceType,
-    var label: String,
+    var label: String?,
     var url: String,
     var apiKey: String,
     var enabled: Boolean = true

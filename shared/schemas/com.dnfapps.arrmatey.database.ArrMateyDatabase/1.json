@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "571f5aaaef82c9aa7717d828e6944340",
+    "identityHash": "f54361a6d3a8d6a8684cfa293ff40435",
     "entities": [
       {
         "tableName": "instances",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `label` TEXT NOT NULL, `url` TEXT NOT NULL, `apiKey` TEXT NOT NULL, `enabled` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `label` TEXT, `url` TEXT NOT NULL, `apiKey` TEXT NOT NULL, `enabled` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -23,8 +23,7 @@
           {
             "fieldPath": "label",
             "columnName": "label",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "url",
@@ -55,7 +54,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '571f5aaaef82c9aa7717d828e6944340')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f54361a6d3a8d6a8684cfa293ff40435')"
     ]
   }
 }
