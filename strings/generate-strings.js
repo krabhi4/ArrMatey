@@ -8,16 +8,13 @@ const DEFAULT_LANG = "en";
 const PROJECT_ROOT = "/Users/owen.lejeune/AndroidStudioProjects/ArrMatey";
 const IOS_FILE = `${PROJECT_ROOT}/iosApp/Localizable.xcstrings`;
 const ANDROID_DIR = `${PROJECT_ROOT}/composeApp/src/androidMain/res`;
+const SHARED_DIR = `${PROJECT_ROOT}/shared/src/commonMain/composeResources`;
 const STRINGS_FILE = `${PROJECT_ROOT}/strings/strings.txt`;
 const CLEAR_ON_RUN = true;
 
 const RESERVED_KEYWORDS = ["comment", "iosKey"];
 
-if (CLEAR_ON_RUN) {
-  removeExistingStrings();
-}
-
-console.log("Reading strings file...");
+console.log("↩️ Reading strings file...");
 const stringsData = fs.readFileSync(STRINGS_FILE, { encoding: "utf8" });
 
 const stringsJson = parseStringsFile(stringsData);
@@ -25,22 +22,37 @@ const iOS_Strings = convertToIosStrings(stringsJson);
 const iosJsonString = JSON.stringify(iOS_Strings, null, 2);
 const androidFiles = generateAndroidStringsXML(stringsJson);
 
+if (CLEAR_ON_RUN) {
+  removeExistingStrings();
+}
+
 try {
   fs.writeFileSync(IOS_FILE, iosJsonString);
   console.log(`✅ iOS strings file written to ${IOS_FILE}`);
 } catch (err) {
-  console.error("Error writing iOS file", err);
+  console.error("⚠️ Error writing iOS file", err);
 }
 
 for (const [output, content] of Object.entries(androidFiles)) {
+  const androidPath = `${ANDROID_DIR}/${output}`;
+  const sharedPath = `${SHARED_DIR}/${output}`;
   try {
-    if (!fs.existsSync(output)) {
-      fs.mkdirSync(output, { recursive: true });
+    if (!fs.existsSync(androidPath)) {
+      fs.mkdirSync(androidPath, { recursive: true });
     }
-    fs.writeFileSync(`${output}/strings.xml`, content);
-    console.log(`✅ Android strings written to ${output}`);
+    fs.writeFileSync(`${androidPath}/strings.xml`, content);
+    console.log(`✅ Android strings written to ${androidPath}`);
   } catch (err) {
-    console.error("Filed to write Android file: ", output, err);
+    console.error("⚠️ Filed to write Android file: ", androidPath, err);
+  }
+  try {
+    if (!fs.existsSync(sharedPath)) {
+      fs.mkdirSync(sharedPath, { recursive: true });
+    }
+    fs.writeFileSync(`${sharedPath}/strings.xml`, content);
+    console.log(`✅ Android shared strings written to ${sharedPath}`);
+  } catch (err) {
+    console.error("⚠️Filed to write Android file: ", sharedPath, err);
   }
 }
 
@@ -85,15 +97,14 @@ function parseStringsFile(text) {
 }
 
 function convertToIosStrings(input) {
-  console.log("Generating iOS strings");
+  console.log("🔨 Generating iOS strings");
   const output = {
-    sourceLanguage: "en",
+    sourceLanguage: DEFAULT_LANG,
     strings: {},
-    version: "1.1",
+    version: VERSION,
   };
 
-  const replaceModifiers = (str) =>
-    str.replace("$d", "$lld").replace("%d", "%lld");
+  const replaceModifiers = (str) => str.replace("$d", "%lld");
 
   for (const sectionKey in input) {
     if (!input.hasOwnProperty(sectionKey)) continue;
@@ -174,12 +185,12 @@ function convertToIosStrings(input) {
     }
   }
 
-  console.log("iOS Strings generated");
+  console.log(" iOS Strings generated");
   return output;
 }
 
 function generateAndroidStringsXML(json) {
-  console.log("Generating Android strings files...");
+  console.log("🔨 Generating Android strings files...");
   const supportedLangs = new Set();
 
   // Gather all supported languages (except comments)
@@ -197,8 +208,10 @@ function generateAndroidStringsXML(json) {
 
   const escapeXml = (str) =>
     str
+      .replace(/%(\d+)\$lld/g, "%$1$d")
       .replace(/%(\d+)\$@/g, "%$1$s")
-      .replace("%@", "%s")
+      .replace("%@", "%1$s")
+      .replace("%lld", "%1$d")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -206,10 +219,7 @@ function generateAndroidStringsXML(json) {
       .replace(/'/g, "&apos;");
 
   supportedLangs.forEach((lang) => {
-    const dir =
-      lang === DEFAULT_LANG
-        ? `${ANDROID_DIR}/values`
-        : `${ANDROID_DIR}/values-${lang}`;
+    const dir = lang === DEFAULT_LANG ? `values` : `values-${lang}`;
     let xmlContent = `<resources>\n`;
 
     for (const category in json) {
@@ -265,18 +275,17 @@ function generateAndroidStringsXML(json) {
 
     xmlContent += `</resources>\n`;
     langFiles[dir] = xmlContent;
-    console.log(`Android file generated for ${lang}`);
+    console.log(`✔︎ Android file generated for ${lang}`);
   });
 
-  console.log("Android string files generated");
+  console.log("🤖 Android string files generated");
   return langFiles;
 }
 
 function removeExistingStrings() {
-  console.log("Removing existing strings");
+  console.log("🗑️ Removing existing strings");
 
   const androidEntries = fs.readdirSync(ANDROID_DIR, { withFileTypes: true });
-
   androidEntries.forEach((entry) => {
     if (entry.isDirectory()) {
       const folderName = entry.name;
@@ -287,7 +296,24 @@ function removeExistingStrings() {
           fs.rmSync(fullPath, { recursive: true, force: true });
           console.log(`⌦ Deleted android values: ${fullPath}`);
         } catch (err) {
-          console.error(`Failed to delete folder ${fullPath};`, err);
+          console.error(`Failed to delete folder ${fullPath}`, err);
+        }
+      }
+    }
+  });
+
+  const sharedEntries = fs.readdirSync(SHARED_DIR, { withFileTypes: true });
+  sharedEntries.forEach((entry) => {
+    if (entry.isDirectory()) {
+      const folderName = entry.name;
+
+      if (folderName === "values" || /^values-\w+$/.test(folderName)) {
+        const fullPath = path.join(SHARED_DIR, folderName);
+        try {
+          fs.rmSync(fullPath, { recursive: true, force: true });
+          console.log(`⌦ Deleted android values: ${fullPath}`);
+        } catch (err) {
+          console.error(`Failure to delete folder ${fullPath}`, err);
         }
       }
     }

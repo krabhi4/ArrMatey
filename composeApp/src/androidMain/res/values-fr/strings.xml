@@ -1,8 +1,0 @@
-<resources>
-    <!-- Test -->
-    <plurals name="plural_test">
-        <item quantity="one">%1$d french test</item>
-        <item quantity="other">%1$d french tests</item>
-    </plurals>
-
-</resources>

@@ -8,13 +8,46 @@
     [settings]
         en = Settings
 
-[[Test]]
-    [plural_test]
-        iosKey = %lld tests
-        en = %1$d test
-        en_plural = %1$d tests
-        fr = %1$d french test
-        fr_plural = %1$d french tests
-    [latest]
-        iosKey = latest %@ %@
-        en = %1$@ Last seen in %2$@
+[[Titles]]
+    [add_instance]
+        en = Add instance
+
+[[Actions]]
+    [close]
+        en = Close
+    [back]
+        en = Back
+    [save]
+        en = Save
+
+[[Labels]]
+    [label]
+        en = Label
+    [host]
+        en = Host
+    [host_description]
+        en = The URL used of the %@ web interface.\nMUST be prefixed with "http://" or "https://".
+    [host_placeholder]
+        en = eg. http://10.0.0.1:%lld
+    [api_key]
+        en = API Key
+    [api_key_placeholder]
+        en = 0a1b2c3d4e...
+    [test]
+        en = Test
+    [success]
+        en = Success
+    [failure]
+        en = Failure
+    [instance_type]
+        en = Instance type
+    [github]
+        en = GitHub
+    [website]
+        en = Website
+
+[[Instances]]
+    [sonarr_description]
+        en = Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
+    [radarr_description]
+        en = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available

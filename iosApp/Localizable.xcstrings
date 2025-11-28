@@ -34,54 +34,200 @@
         }
       }
     },
-    "%lld tests": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld test"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld tests"
-                }
-              }
-            }
-          }
-        },
-        "fr": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld french test"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld french tests"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "latest %@ %@": {
+    "add_instance": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ Last seen in %2$@"
+            "value": "Add instance"
+          }
+        }
+      }
+    },
+    "close": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        }
+      }
+    },
+    "back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "save": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        }
+      }
+    },
+    "label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Label"
+          }
+        }
+      }
+    },
+    "host": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Host"
+          }
+        }
+      }
+    },
+    "host_description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The URL used of the %@ web interface.\\nMUST be prefixed with \"http://\" or \"https://\"."
+          }
+        }
+      }
+    },
+    "host_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "eg. http://10.0.0.1:%lld"
+          }
+        }
+      }
+    },
+    "api_key": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API Key"
+          }
+        }
+      }
+    },
+    "api_key_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "0a1b2c3d4e..."
+          }
+        }
+      }
+    },
+    "test": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test"
+          }
+        }
+      }
+    },
+    "success": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Success"
+          }
+        }
+      }
+    },
+    "failure": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failure"
+          }
+        }
+      }
+    },
+    "instance_type": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instance type"
+          }
+        }
+      }
+    },
+    "github": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub"
+          }
+        }
+      }
+    },
+    "website": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Website"
+          }
+        }
+      }
+    },
+    "sonarr_description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available."
+          }
+        }
+      }
+    },
+    "radarr_description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available"
           }
         }
       }

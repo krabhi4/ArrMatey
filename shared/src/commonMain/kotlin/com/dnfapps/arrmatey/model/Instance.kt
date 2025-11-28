@@ -13,6 +13,25 @@ data class Instance(
     var enabled: Boolean = true
 )
 
-enum class InstanceType {
-    Sonarr
+enum class InstanceType(
+    val descriptionKey: String,
+    val iconKey: String,
+    val github: String,
+    val website: String,
+    val defaultPort: Int
+) {
+    Sonarr(
+        descriptionKey = "sonarr_description",
+        github = "https://github.com/Sonarr/Sonarr",
+        website = "https://sonarr.tv/",
+        iconKey = "sonarr",
+        defaultPort = 8989
+    ),
+//    Radarr(
+//        descriptionKey = "radarr_description",
+//        github = "https://github.com/Radarr/Radarr",
+//        website = "https://radarr.video/",
+//        iconKey = "radarr",
+//        defaultPort = 7878
+//    )
 }

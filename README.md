@@ -76,9 +76,9 @@ fr_plural = %d articles
 
 | Variable | Type   | iOS  | Android | Example   |
 | -------- | ------ | ---- | ------- | --------- |
-| %@       | String | %@   | %s      | Hello %@! |
-| %d       | Int    | %lld | %d      | %d elk    |
-| %f       | Float  | %f   | %f      | %.2f Kb   |
+| %@       | String | %@   | $s      | Hello %@! |
+| %d       | Int    | %lld | $d      | %d elk    |
+| %f       | Float  | %f   | $f      | %.2f Kb   |
 
 You can also specify the order of variables using the same format as native Android and iOS strings. eg. `en = Today is %1$d %2$@`
 

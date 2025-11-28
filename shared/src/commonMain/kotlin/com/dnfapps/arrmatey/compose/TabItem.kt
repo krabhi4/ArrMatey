@@ -10,7 +10,7 @@ enum class TabItem(
     val androidIcon: ImageVector,
     val textKey: String
 ) {
-    SHOWS("tv", Icons.Default.Tv, "shows"),
+    SHOWS("tv", Icons.Default.Tv, "series"),
     SETTINGS("gear", Icons.Default.Settings, "settings");
 
     companion object {

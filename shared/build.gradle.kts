@@ -56,6 +56,7 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
+            implementation(compose.components.resources)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -107,7 +108,7 @@ room {
 }
 
 afterEvaluate {
-    tasks.matching { it.name.startsWith("compile") && it.name.contains("Kotlin") }
+    tasks.matching { (it.name.startsWith("compile") && it.name.contains("Kotlin")) || it.name.contains("build") }
         .configureEach {
             dependsOn(tasks.named("generateLocalization"))
         }

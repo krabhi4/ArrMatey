@@ -12,9 +12,13 @@ class SonarrClient : KoinComponent {
     private val httpClient: HttpClient by inject()
 
     suspend fun test(endpoint: String, apiKey: String): Boolean {
-        val response = httpClient.get("$endpoint/api") {
-            header("X-Api-Key", apiKey)
+        try {
+            val response = httpClient.get("$endpoint/api") {
+                header("X-Api-Key", apiKey)
+            }
+            return response.status.value == 200
+        } catch (e: Exception) {
+            return false
         }
-        return response.status.value == 200
     }
 }

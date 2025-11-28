@@ -10,3 +10,8 @@ sealed interface HomeTab : NavKey {
     object SeriesTab : HomeTab
     object SettingsTab : HomeTab
 }
+
+sealed interface SettingsScreen : NavKey {
+    object Landing : SettingsScreen
+    object AddInstance : SettingsScreen
+}
