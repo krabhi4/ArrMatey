@@ -11,9 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,14 +30,11 @@ import arrmatey.shared.generated.resources.host_placeholder
 import arrmatey.shared.generated.resources.label
 import arrmatey.shared.generated.resources.success
 import arrmatey.shared.generated.resources.test
-import com.dnfapps.arrmatey.api.sonarr.SonarrClient
 import com.dnfapps.arrmatey.compose.components.AMOutlinedTextField
 import com.dnfapps.arrmatey.compose.screens.viewmodel.AddInstanceScreenViewModel
 import com.dnfapps.arrmatey.compose.utils.requiredStringResource
 import com.dnfapps.arrmatey.model.InstanceType
-import com.dnfapps.arrmatey.utils.isValidUrl
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

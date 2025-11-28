@@ -34,6 +34,17 @@
         }
       }
     },
+    "movies": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Movies"
+          }
+        }
+      }
+    },
     "add_instance": {
       "extractionState": "manual",
       "localizations": {

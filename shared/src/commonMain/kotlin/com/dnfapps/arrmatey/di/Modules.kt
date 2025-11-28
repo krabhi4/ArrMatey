@@ -1,7 +1,7 @@
 package com.dnfapps.arrmatey.di
 
 import com.dnfapps.arrmatey.Greeting
-import com.dnfapps.arrmatey.api.sonarr.SonarrClient
+import com.dnfapps.arrmatey.api.arr.BaseArrClient
 import com.dnfapps.arrmatey.database.ArrMateyDatabase
 import com.dnfapps.arrmatey.database.getRoomDatabase
 import com.dnfapps.arrmatey.ktor.demo.RocketComponent
@@ -33,7 +33,7 @@ val networkModule = module {
         }
     }
 
-    single { SonarrClient() }
+    single { BaseArrClient() }
 
     single { RocketComponent() }
     single { Greeting() }

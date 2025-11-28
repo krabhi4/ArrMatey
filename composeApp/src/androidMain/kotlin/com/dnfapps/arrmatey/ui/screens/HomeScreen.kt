@@ -38,7 +38,8 @@ fun HomeScreen() {
         when (navigationViewModel.homeTabBackStack.lastOrNull()) {
             HomeTab.SeriesTab -> TabItem.SHOWS
             HomeTab.SettingsTab -> TabItem.SETTINGS
-            else -> TabItem.SHOWS
+            HomeTab.MoviesTab -> TabItem.MOVIES
+            null -> TabItem.entries.first()
         }
     }}
 
@@ -66,32 +67,4 @@ fun HomeScreen() {
             }
         }
     }
-
-//    Scaffold(
-//        modifier = Modifier.fillMaxSize(),
-//        topBar = {},
-//        bottomBar = {
-//            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-//                TabItem.entries.forEach { entry ->
-//                    NavigationBarItem(
-//                        selected = entry == selectedTab,
-//                        onClick = {
-//                            navigationViewModel.navigateToHomeTab(entry)
-//                        },
-//                        icon = {
-//                            Icon(
-//                                imageVector = entry.androidIcon,
-//                                contentDescription = null
-//                            )
-//                        },
-//                        label = { Text(text = context.getString(entry.textKey)) }
-//                    )
-//                }
-//            }
-//        }
-//    ) {
-//        Box(modifier = Modifier.padding(it).fillMaxSize()) {
-//            HomeScreenNavHost()
-//        }
-//    }
 }

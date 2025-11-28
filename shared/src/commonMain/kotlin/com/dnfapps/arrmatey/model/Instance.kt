@@ -27,11 +27,11 @@ enum class InstanceType(
         iconKey = "sonarr",
         defaultPort = 8989
     ),
-//    Radarr(
-//        descriptionKey = "radarr_description",
-//        github = "https://github.com/Radarr/Radarr",
-//        website = "https://radarr.video/",
-//        iconKey = "radarr",
-//        defaultPort = 7878
-//    )
+    Radarr(
+        descriptionKey = "radarr_description",
+        github = "https://github.com/Radarr/Radarr",
+        website = "https://radarr.video/",
+        iconKey = "radarr",
+        defaultPort = 7878
+    )
 }

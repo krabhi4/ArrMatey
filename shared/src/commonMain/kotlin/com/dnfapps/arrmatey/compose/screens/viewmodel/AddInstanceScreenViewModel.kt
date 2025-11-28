@@ -2,7 +2,7 @@ package com.dnfapps.arrmatey.compose.screens.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.dnfapps.arrmatey.api.sonarr.SonarrClient
+import com.dnfapps.arrmatey.api.arr.BaseArrClient
 import com.dnfapps.arrmatey.database.dao.InstanceDao
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
@@ -18,7 +18,7 @@ import org.koin.core.component.inject
 
 class AddInstanceScreenViewModel : ViewModel(), KoinComponent {
 
-    val client: SonarrClient by inject()
+    val client: BaseArrClient by inject()
     val instanceDao: InstanceDao by inject()
 
     private val _saveButtonEnabled = MutableStateFlow(false)

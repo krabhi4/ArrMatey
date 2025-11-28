@@ -29,7 +29,7 @@ fun SettingsTab() {
     Scaffold {
         Column(modifier = Modifier.padding(it)) {
             allInstances.forEach {
-                Text(text = "${it.type.toString()} instance - ${it.url}")
+                Text(text = "${it.type} instance - ${it.url}")
             }
             Button(
                 onClick = {

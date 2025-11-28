@@ -5,6 +5,7 @@
     <!-- Tabs -->
     <string name="series">Series</string>
     <string name="settings">Settings</string>
+    <string name="movies">Movies</string>
 
     <!-- Titles -->
     <string name="add_instance">Add instance</string>

@@ -1,13 +1,12 @@
-package com.dnfapps.arrmatey.api.sonarr
+package com.dnfapps.arrmatey.api.arr
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.http.headers
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class SonarrClient : KoinComponent {
+class BaseArrClient : KoinComponent {
 
     private val httpClient: HttpClient by inject()
 

@@ -8,6 +8,7 @@ sealed interface RootScreen : NavKey {
 
 sealed interface HomeTab : NavKey {
     object SeriesTab : HomeTab
+    object MoviesTab: HomeTab
     object SettingsTab : HomeTab
 }
 

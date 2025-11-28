@@ -12,6 +12,7 @@ class NavigationViewModel: ViewModel() {
     fun navigateToHomeTab(tab: TabItem) {
         val navKey = when (tab) {
             TabItem.SHOWS -> HomeTab.SeriesTab
+            TabItem.MOVIES -> HomeTab.MoviesTab
             TabItem.SETTINGS -> HomeTab.SettingsTab
         }
         homeTabBackStack.add(navKey)
