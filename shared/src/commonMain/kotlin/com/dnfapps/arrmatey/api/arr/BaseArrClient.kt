@@ -1,14 +1,17 @@
 package com.dnfapps.arrmatey.api.arr
 
+import com.dnfapps.arrmatey.model.Instance
+import com.dnfapps.arrmatey.model.InstanceType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 
-class BaseArrClient : KoinComponent {
+open class BaseArrClient(instance: Instance? = null): KoinComponent {
 
-    private val httpClient: HttpClient by inject()
+    protected val httpClient: HttpClient by inject { parametersOf(instance) }
 
     suspend fun test(endpoint: String, apiKey: String): Boolean {
         try {

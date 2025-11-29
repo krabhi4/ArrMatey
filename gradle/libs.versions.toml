@@ -22,6 +22,8 @@ sqlite = "2.6.2"
 ksp = "2.3.2"
 foundationLayout = "1.9.5"
 navigation3 = "1.0.0"
+m3Alpha = "1.5.0-alpha09"
+coil = "3.3.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -55,6 +57,9 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+androidx-compose-material3-alpha = { module = "androidx.compose.material3:material3", version.ref = "m3Alpha" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
