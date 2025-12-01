@@ -1,6 +1,7 @@
 package com.dnfapps.arrmatey.di
 
 import com.dnfapps.arrmatey.api.arr.BaseArrClient
+import com.dnfapps.arrmatey.api.arr.RadarrClient
 import com.dnfapps.arrmatey.api.arr.SonarrClient
 import com.dnfapps.arrmatey.api.arr.client.createInstanceClient
 import com.dnfapps.arrmatey.database.ArrMateyDatabase
@@ -15,6 +16,7 @@ val networkModule = module {
 
     single { BaseArrClient() }
     factory<SonarrClient> { (instance: Instance) -> SonarrClient(instance) }
+    factory<RadarrClient> { (instance: Instance) -> RadarrClient(instance) }
 }
 
 val databaseModule = module {

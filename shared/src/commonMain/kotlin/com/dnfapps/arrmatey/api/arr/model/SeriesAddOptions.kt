@@ -3,7 +3,7 @@ package com.dnfapps.arrmatey.api.arr.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AddOptions(
+data class SeriesAddOptions(
     val monitor: String,
     val ignoreEpisodesWithFiles: Boolean = false,
     val ignoreEpisodesWithoutFiles: Boolean = false,

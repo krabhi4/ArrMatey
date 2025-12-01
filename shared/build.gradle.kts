@@ -50,7 +50,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.koin.android)
-//            implementation(libs.koin.core)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -77,6 +76,8 @@ kotlin {
             implementation(libs.koin.compose.viewmodel.navigation)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

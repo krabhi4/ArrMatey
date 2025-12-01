@@ -221,6 +221,149 @@
         }
       }
     },
+    "sort": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort"
+          }
+        }
+      }
+    },
+    "filter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter"
+          }
+        }
+      }
+    },
+    "title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Title"
+          }
+        }
+      }
+    },
+    "year": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Year"
+          }
+        }
+      }
+    },
+    "added": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added"
+          }
+        }
+      }
+    },
+    "rating": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rating"
+          }
+        }
+      }
+    },
+    "file_size": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File Size"
+          }
+        }
+      }
+    },
+    "grabbed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grabbed"
+          }
+        }
+      }
+    },
+    "digital_release": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digital Release"
+          }
+        }
+      }
+    },
+    "next_airing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next Airing"
+          }
+        }
+      }
+    },
+    "previous_airing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous Airing"
+          }
+        }
+      }
+    },
+    "sort_ascending": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ascending"
+          }
+        }
+      }
+    },
+    "sort_descending": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descending"
+          }
+        }
+      }
+    },
     "sonarr_description": {
       "extractionState": "manual",
       "localizations": {

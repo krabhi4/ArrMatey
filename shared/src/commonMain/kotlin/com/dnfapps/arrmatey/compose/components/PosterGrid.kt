@@ -1,4 +1,4 @@
-package com.dnfapps.arrmatey.ui.components
+package com.dnfapps.arrmatey.compose.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,17 +14,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
-import com.dnfapps.arrmatey.api.arr.model.ArrSeries
+import com.dnfapps.arrmatey.api.arr.model.ArrMedia
+import com.dnfapps.arrmatey.api.arr.model.CoverType
 
 @Composable
-fun PosterGrid(
-    items: List<ArrSeries>,
-    onItemClick: (ArrSeries) -> Unit,
+fun <T: ArrMedia<*,*,*,*>> PosterGrid(
+    items: List<T>,
+    onItemClick: (T) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -34,8 +35,8 @@ fun PosterGrid(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         items(items) { item ->
-            val url = item.images.firstOrNull { it.coverType == "poster" }?.remoteUrl
-            val model = ImageRequest.Builder(LocalContext.current)
+            val url = item.images.firstOrNull { it.coverType == CoverType.Poster }?.remoteUrl
+            val model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(url)
                 .diskCacheKey(url)
                 .networkCachePolicy(CachePolicy.ENABLED)
@@ -47,6 +48,7 @@ fun PosterGrid(
                     .padding(8.dp)
                     .clip(RoundedCornerShape(5.dp))
                     .clickable {
+                        onItemClick(item)
                     }
             ) {
                 AsyncImage(

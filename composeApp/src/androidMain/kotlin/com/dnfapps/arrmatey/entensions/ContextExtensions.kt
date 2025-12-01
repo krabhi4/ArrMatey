@@ -3,8 +3,6 @@ package com.dnfapps.arrmatey.entensions
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
-import org.jetbrains.compose.resources.DrawableResource
 
 fun Context.getString(key: String): String {
     val id = resources.getIdentifier(key, "string", packageName)

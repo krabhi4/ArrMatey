@@ -8,7 +8,8 @@ data class SeriesStatistics(
     val episodeFileCount: Int,
     val episodeCount: Int,
     val totalEpisodeCount: Int,
-    val sizeOnDisk: Long,
     val percentOfEpisodes: Double,
-    val releaseGroups: List<String> = emptyList()
-)
+
+    override val sizeOnDisk: Long,
+    override val releaseGroups: List<String> = emptyList()
+): ArrStatistics()

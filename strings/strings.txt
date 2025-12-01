@@ -47,6 +47,32 @@
         en = GitHub
     [website]
         en = Website
+    [sort]
+        en = Sort
+    [filter]
+        en = Filter
+    [title]
+        en = Title
+    [year]
+        en = Year
+    [added]
+        en = Added
+    [rating]
+        en = Rating
+    [file_size]
+        en = File Size
+    [grabbed]
+        en = Grabbed
+    [digital_release]
+        en = Digital Release
+    [next_airing]
+        en = Next Airing
+    [previous_airing]
+        en = Previous Airing
+    [sort_ascending]
+        en = Ascending
+    [sort_descending]
+        en = Descending
 
 [[Instances]]
     [sonarr_description]

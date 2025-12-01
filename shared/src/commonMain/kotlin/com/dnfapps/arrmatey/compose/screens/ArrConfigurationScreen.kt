@@ -39,33 +39,8 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArrConfigurationScreen(
-    instanceType: InstanceType,
-//    onTestResult: (Boolean?) -> Unit
+    instanceType: InstanceType
 ) {
-//    val sonarrClient = koinInject<SonarrClient>()
-//
-//    var invalidEndpoint by remember { mutableStateOf(false) }
-//
-//    var apiEndpoint by remember { mutableStateOf("") }
-//    var apiKey by remember { mutableStateOf("") }
-//    var instanceLabel by remember { mutableStateOf("") }
-//
-//    var testing by remember { mutableStateOf(false) }
-//    var result: Boolean? by remember { mutableStateOf(null) }
-
-//    LaunchedEffect(testing) {
-//        if (testing) {
-//            invalidEndpoint = false
-//            if (apiEndpoint.isValidUrl()) {
-//                result = sonarrClient.test(apiEndpoint, apiKey)
-//                testing = false
-//                onTestResult(result)
-//            } else {
-//                testing = false
-//                invalidEndpoint = true
-//            }
-//        }
-//    }
     val viewModel = viewModel<AddInstanceScreenViewModel>()
 
     val apiEndpoint by viewModel.apiEndpoint.collectAsStateWithLifecycle()

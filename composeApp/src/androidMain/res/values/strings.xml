@@ -28,6 +28,19 @@
     <string name="instance_type">Instance type</string>
     <string name="github">GitHub</string>
     <string name="website">Website</string>
+    <string name="sort">Sort</string>
+    <string name="filter">Filter</string>
+    <string name="title">Title</string>
+    <string name="year">Year</string>
+    <string name="added">Added</string>
+    <string name="rating">Rating</string>
+    <string name="file_size">File Size</string>
+    <string name="grabbed">Grabbed</string>
+    <string name="digital_release">Digital Release</string>
+    <string name="next_airing">Next Airing</string>
+    <string name="previous_airing">Previous Airing</string>
+    <string name="sort_ascending">Ascending</string>
+    <string name="sort_descending">Descending</string>
 
     <!-- Instances -->
     <string name="sonarr_description">Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.</string>

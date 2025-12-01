@@ -3,7 +3,7 @@ package com.dnfapps.arrmatey.api.arr.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AlternateTitle(
+data class SeriesAlternateTitle(
     val title: String? = null,
     val seasonNumber: Int? = null,
     val sceneSeasonNumber: Int? = null,

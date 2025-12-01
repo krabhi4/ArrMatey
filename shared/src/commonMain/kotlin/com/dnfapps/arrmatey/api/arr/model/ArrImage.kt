@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ArrImage(
-    val coverType: String,
+    val coverType: CoverType,
     val url: String? = null,
     val remoteUrl: String? = null
 )
