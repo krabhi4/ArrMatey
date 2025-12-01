@@ -1,5 +1,11 @@
 package com.dnfapps.arrmatey.api.arr.model
 
+import androidx.compose.ui.graphics.Color
+import com.dnfapps.arrmatey.ui.theme.RadarrDownloadedMonitored
+import com.dnfapps.arrmatey.ui.theme.RadarrDownloadedUnmonitored
+import com.dnfapps.arrmatey.ui.theme.RadarrMissingMonitored
+import com.dnfapps.arrmatey.ui.theme.RadarrMissingUnmonitored
+import com.dnfapps.arrmatey.ui.theme.RadarrUnreleased
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -68,5 +74,18 @@ data class ArrMovie(
         val avail = listOfNotNull(imdb, rt, tmdb, mtc, trakt)
         return avail.sum() / avail.size
     }
+
+    override val statusProgress: Float
+        get() = 1f
+
+    override val statusColor: Color
+        get() = when {
+            status == MovieStatus.Tba || status == MovieStatus.Announced -> RadarrUnreleased
+            movieFile != null && monitored -> RadarrDownloadedMonitored
+            movieFile != null && !monitored -> RadarrDownloadedUnmonitored
+            movieFile == null && monitored -> RadarrMissingMonitored
+            movieFile == null && !monitored -> RadarrMissingUnmonitored
+            else -> Color.Unspecified
+        }
 
 }

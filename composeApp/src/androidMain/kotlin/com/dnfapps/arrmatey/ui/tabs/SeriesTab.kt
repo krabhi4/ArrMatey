@@ -50,28 +50,32 @@ fun SeriesTab() {
     var selectedSortOrder by remember { mutableStateOf(SortOrder.Asc) }
     var selectedFilter by remember { mutableStateOf(FilterBy.All) }
 
+    var loading by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.series)) },
                 actions = {
                     instance?.let {
-                        FilterMenuButton(
-                            InstanceType.Sonarr,
-                            selectedFilter = selectedFilter,
-                            onFilterChange = { selectedFilter = it }
-                        )
-                        SortMenuButton(
-                            InstanceType.Sonarr,
-                            onSortChanged = {
-                                selectedSortOption = it
-                            },
-                            onOrderChanged = {
-                                selectedSortOrder = it
-                            },
-                            sortBy = selectedSortOption,
-                            sortOrder = selectedSortOrder
-                        )
+                        if (!loading) {
+                            FilterMenuButton(
+                                InstanceType.Sonarr,
+                                selectedFilter = selectedFilter,
+                                onFilterChange = { selectedFilter = it }
+                            )
+                            SortMenuButton(
+                                InstanceType.Sonarr,
+                                onSortChanged = {
+                                    selectedSortOption = it
+                                },
+                                onOrderChanged = {
+                                    selectedSortOrder = it
+                                },
+                                sortBy = selectedSortOption,
+                                sortOrder = selectedSortOrder
+                            )
+                        }
                     }
                 }
             )
@@ -82,7 +86,6 @@ fun SeriesTab() {
                 .padding(paddingValues.copy(bottom = 0.dp))
                 .fillMaxSize()
         ) {
-            var loading by remember { mutableStateOf(false) }
             instance?.let { instance ->
                 val viewModel = rememberSonarrViewModel(instance)
                 val library by viewModel.library.collectAsStateWithLifecycle()

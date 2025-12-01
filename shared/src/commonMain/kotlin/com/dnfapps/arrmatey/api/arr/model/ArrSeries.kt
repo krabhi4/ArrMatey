@@ -1,5 +1,10 @@
 package com.dnfapps.arrmatey.api.arr.model
 
+import androidx.compose.ui.graphics.Color
+import com.dnfapps.arrmatey.ui.theme.SonarrContinuingAllDownloaded
+import com.dnfapps.arrmatey.ui.theme.SonarrEndedAllDownloaded
+import com.dnfapps.arrmatey.ui.theme.SonarrMissingEpsSeriesMonitored
+import com.dnfapps.arrmatey.ui.theme.SonarrMissingEpsSeriesUnmonitored
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -62,5 +67,17 @@ data class ArrSeries(
 
     val episodeCount: Int
         get() = statistics.episodeCount
+
+    override val statusProgress: Float
+        get() = statistics.percentOfEpisodes.toFloat()
+
+    override val statusColor: Color
+        get() = when {
+            status == SeriesStatus.Ended && statistics.percentOfEpisodes == 100.toDouble() -> SonarrEndedAllDownloaded
+            status == SeriesStatus.Continuing && statistics.percentOfEpisodes == 100.toDouble() -> SonarrContinuingAllDownloaded
+            statistics.percentOfEpisodes != 100.toDouble() && monitored -> SonarrMissingEpsSeriesMonitored
+            statistics.percentOfEpisodes != 100.toDouble() && !monitored -> SonarrMissingEpsSeriesUnmonitored
+            else -> Color.Unspecified
+        }
 
 }

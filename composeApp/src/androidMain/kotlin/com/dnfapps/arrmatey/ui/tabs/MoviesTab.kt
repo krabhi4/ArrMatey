@@ -51,28 +51,32 @@ fun MoviesTab() {
     var selectedSortOrder by remember { mutableStateOf(SortOrder.Asc) }
     var selectedFilter by remember { mutableStateOf(FilterBy.All) }
 
+    var loading by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.movies)) },
                 actions = {
                     instance?.let {
-                        FilterMenuButton(
-                            InstanceType.Radarr,
-                            selectedFilter = selectedFilter,
-                            onFilterChange = { selectedFilter = it }
-                        )
-                        SortMenuButton(
-                            InstanceType.Radarr,
-                            onSortChanged = {
-                                selectedSortOption = it
-                            },
-                            onOrderChanged = {
-                                selectedSortOrder = it
-                            },
-                            sortBy = selectedSortOption,
-                            sortOrder = selectedSortOrder
-                        )
+                        if (!loading) {
+                            FilterMenuButton(
+                                InstanceType.Radarr,
+                                selectedFilter = selectedFilter,
+                                onFilterChange = { selectedFilter = it }
+                            )
+                            SortMenuButton(
+                                InstanceType.Radarr,
+                                onSortChanged = {
+                                    selectedSortOption = it
+                                },
+                                onOrderChanged = {
+                                    selectedSortOrder = it
+                                },
+                                sortBy = selectedSortOption,
+                                sortOrder = selectedSortOrder
+                            )
+                        }
                     }
                 }
             )
@@ -83,7 +87,6 @@ fun MoviesTab() {
                 .padding(paddingValues.copy(bottom = 0.dp))
                 .fillMaxSize()
         ) {
-            var loading by remember { mutableStateOf(false) }
             instance?.let { instance ->
                 val viewModel = rememberRadarrViewModel(instance)
                 val library by viewModel.library.collectAsStateWithLifecycle()
