@@ -52,8 +52,8 @@ import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.LibraryUiError
 import com.dnfapps.arrmatey.ui.viewmodel.LibraryUiState
+import com.dnfapps.arrmatey.ui.viewmodel.NetworkConnectivityViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.rememberArrViewModel
-import com.dnfapps.arrmatey.utils.NetworkConnectivityViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)

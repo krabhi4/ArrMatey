@@ -8,6 +8,7 @@ import com.dnfapps.arrmatey.database.ArrMateyDatabase
 import com.dnfapps.arrmatey.database.getRoomDatabase
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.utils.NetworkConnectivityObserverFactory
+import com.dnfapps.arrmatey.utils.NetworkConnectivityRepository
 import io.ktor.client.HttpClient
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -20,6 +21,8 @@ val networkModule = module {
     factory<RadarrClient> { (instance: Instance) -> RadarrClient(instance) }
 
     single { NetworkConnectivityObserverFactory().create() }
+
+    factory { NetworkConnectivityRepository() }
 }
 
 val databaseModule = module {
