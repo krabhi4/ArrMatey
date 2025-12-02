@@ -54,6 +54,11 @@
     <string name="custom_timeout_seconds">Custom timeout (seconds)</string>
     <string name="cache_on_disk">Cache library on disk</string>
 
+    <!-- Errors -->
+    <string name="instance_connect_error">Failed to connect to instance at %1$s</string>
+    <string name="showing_cached_library">Showing cached library</string>
+    <string name="no_network">No network connectivity</string>
+
     <!-- Instances -->
     <string name="sonarr_description">Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.</string>
     <string name="radarr_description">Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available</string>

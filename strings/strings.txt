@@ -98,6 +98,14 @@
     [cache_on_disk]
         en = Cache library on disk
 
+[[Errors]]
+    [instance_connect_error]
+        en = Failed to connect to instance at %@
+    [showing_cached_library]
+        en = Showing cached library
+    [no_network]
+        en = No network connectivity
+
 [[Instances]]
     [sonarr_description]
         en = Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.

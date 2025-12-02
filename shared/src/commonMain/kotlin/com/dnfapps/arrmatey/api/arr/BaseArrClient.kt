@@ -1,5 +1,7 @@
 package com.dnfapps.arrmatey.api.arr
 
+import com.dnfapps.arrmatey.api.client.NetworkResult
+import com.dnfapps.arrmatey.api.client.safeGet
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
 import io.ktor.client.HttpClient
@@ -15,10 +17,10 @@ open class BaseArrClient(instance: Instance? = null): KoinComponent {
 
     suspend fun test(endpoint: String, apiKey: String): Boolean {
         try {
-            val response = httpClient.get("$endpoint/api") {
+            val response = httpClient.safeGet<Any>("$endpoint/api") {
                 header("X-Api-Key", apiKey)
             }
-            return response.status.value == 200
+            return response is NetworkResult.Success
         } catch (e: Exception) {
             return false
         }

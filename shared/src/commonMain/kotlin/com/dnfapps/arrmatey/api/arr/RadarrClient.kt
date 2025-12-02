@@ -1,14 +1,14 @@
 package com.dnfapps.arrmatey.api.arr
 
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
+import com.dnfapps.arrmatey.api.client.NetworkResult
+import com.dnfapps.arrmatey.api.client.safeGet
 import com.dnfapps.arrmatey.model.Instance
-import io.ktor.client.call.body
-import io.ktor.client.request.get
 
 class RadarrClient(instance: Instance): BaseArrClient(instance), IArrClient<ArrMovie> {
 
-    override suspend fun getLibrary(): List<ArrMovie> {
-        val resp: List<ArrMovie> = httpClient.get("api/v3/movie").body()
+    override suspend fun getLibrary(): NetworkResult<List<ArrMovie>> {
+        val resp = httpClient.safeGet<List<ArrMovie>>("api/v3/movie")
         return resp
     }
 

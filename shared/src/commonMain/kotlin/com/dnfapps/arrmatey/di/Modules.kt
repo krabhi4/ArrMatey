@@ -3,10 +3,11 @@ package com.dnfapps.arrmatey.di
 import com.dnfapps.arrmatey.api.arr.BaseArrClient
 import com.dnfapps.arrmatey.api.arr.RadarrClient
 import com.dnfapps.arrmatey.api.arr.SonarrClient
-import com.dnfapps.arrmatey.api.arr.client.createInstanceClient
+import com.dnfapps.arrmatey.api.client.createInstanceClient
 import com.dnfapps.arrmatey.database.ArrMateyDatabase
 import com.dnfapps.arrmatey.database.getRoomDatabase
 import com.dnfapps.arrmatey.model.Instance
+import com.dnfapps.arrmatey.utils.NetworkConnectivityObserverFactory
 import io.ktor.client.HttpClient
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -17,6 +18,8 @@ val networkModule = module {
     single { BaseArrClient() }
     factory<SonarrClient> { (instance: Instance) -> SonarrClient(instance) }
     factory<RadarrClient> { (instance: Instance) -> RadarrClient(instance) }
+
+    single { NetworkConnectivityObserverFactory().create() }
 }
 
 val databaseModule = module {

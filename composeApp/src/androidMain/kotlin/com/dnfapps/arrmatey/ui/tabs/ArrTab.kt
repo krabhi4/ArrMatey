@@ -1,13 +1,24 @@
 package com.dnfapps.arrmatey.ui.tabs
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.SignalWifiOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -17,9 +28,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,13 +47,22 @@ import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.compose.utils.applyFiltering
 import com.dnfapps.arrmatey.compose.utils.applySorting
 import com.dnfapps.arrmatey.entensions.copy
+import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
+import com.dnfapps.arrmatey.ui.viewmodel.LibraryUiError
+import com.dnfapps.arrmatey.ui.viewmodel.LibraryUiState
 import com.dnfapps.arrmatey.ui.viewmodel.rememberArrViewModel
+import com.dnfapps.arrmatey.utils.NetworkConnectivityViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArrTab(type: InstanceType) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val networkViewModel = viewModel<NetworkConnectivityViewModel>()
     val instanceViewModel = viewModel<InstanceViewModel>()
     val instance by instanceViewModel.getFirstInstance(type).collectAsState(null)
 
@@ -48,17 +70,63 @@ fun ArrTab(type: InstanceType) {
     var selectedSortOrder by remember { mutableStateOf(SortOrder.Asc) }
     var selectedFilter by remember { mutableStateOf(FilterBy.All) }
 
-    var loading by remember { mutableStateOf(false) }
-
     val title = when (type) {
         InstanceType.Sonarr -> stringResource(R.string.series)
         InstanceType.Radarr -> stringResource(R.string.movies)
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    var hasServerConnetivityError by remember { mutableStateOf(false) }
+    val hasNetworkConnection by networkViewModel.isConnected.collectAsStateWithLifecycle()
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        },
         topBar = {
             TopAppBar(
-                title = { Text(text = title) },
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = title)
+                        if (hasServerConnetivityError) {
+                            Icon(
+                                imageVector = Icons.Default.CloudOff,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.clickable {
+                                    scope.launch {
+                                        var message = context.getString(R.string.instance_connect_error, instance?.url ?: "")
+                                        if (instance?.cacheOnDisk == true) {
+                                            message += ". ${context.getString(R.string.showing_cached_library)}"
+                                        }
+                                        snackbarHostState.showSnackbarImmediately(message = message)
+                                    }
+                                }
+                            )
+                        }
+                        if (!hasNetworkConnection) {
+                            Icon(
+                                imageVector = Icons.Default.SignalWifiOff,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.clickable {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbarImmediately(message = context.getString(R.string.no_network))
+                                    }
+                                }
+                            )
+                        }
+                    }
+                },
                 actions = {
                     instance?.let {
                         FilterMenuButton(
@@ -89,45 +157,72 @@ fun ArrTab(type: InstanceType) {
         ) {
             instance?.let { instance ->
                 val viewModel = rememberArrViewModel(instance)
-                val library by viewModel.library.collectAsStateWithLifecycle()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-                var isRefreshing by remember { mutableStateOf(false) }
-
-                LaunchedEffect(loading, library) {
-                    isRefreshing = loading && library.isNotEmpty()
-                }
-
-                LaunchedEffect(isRefreshing) {
-                    if (isRefreshing && !loading) {
-                        viewModel.refreshLibrary()
-                        isRefreshing = false
-                    }
-                }
-
-                LaunchedEffect(Unit) {
-                    loading = true
-                    viewModel.refreshLibrary()
-                    loading = false
-                }
-
-                if (loading && library.isEmpty()) {
-                    LoadingIndicator(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .align(Alignment.Center)
-                    )
-                } else {
-                    PullToRefreshBox(
-                        isRefreshing = isRefreshing,
-                        onRefresh = { isRefreshing = true }
-                    ) {
-                        PosterGrid(
-                            items = library
-                                .applyFiltering(type, selectedFilter)
-                                .applySorting(type, selectedSortOption, selectedSortOrder),
-                            onItemClick = {},
-                            modifier = Modifier.fillMaxSize()
+                when (val state = uiState) {
+                    is LibraryUiState.Initial,
+                    is LibraryUiState.Loading -> {
+                        LoadingIndicator(
+                            modifier = Modifier
+                                .size(96.dp)
+                                .align(Alignment.Center)
                         )
+                    }
+
+                    is LibraryUiState.Success -> {
+                        PullToRefreshBox(
+                            isRefreshing = state.isRefreshing,
+                            onRefresh = {
+                                scope.launch {
+                                    viewModel.refreshLibrary()
+                                }
+                            }
+                        ) {
+                            PosterGrid(
+                                items = state.items
+                                    .applyFiltering(type, selectedFilter)
+                                    .applySorting(type, selectedSortOption, selectedSortOrder),
+                                onItemClick = {},
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+
+                    is LibraryUiState.Error -> {
+                        LaunchedEffect(state.error) {
+                            snackbarHostState.showSnackbarImmediately(state.error.message)
+                        }
+
+                        hasServerConnetivityError = state.type == LibraryUiError.Network
+
+                        var isRefreshing by remember { mutableStateOf(false) }
+
+                        LaunchedEffect(state) {
+                            isRefreshing = false
+                        }
+
+                        PullToRefreshBox(
+                            isRefreshing = isRefreshing,
+                            onRefresh = {
+                                isRefreshing = true
+                                scope.launch {
+                                    viewModel.refreshLibrary()
+                                }
+                            }
+                        ) {
+                            if (state.cachedItems.isNotEmpty()) {
+                                PosterGrid(
+                                    items = state.cachedItems
+                                        .applyFiltering(type, selectedFilter)
+                                        .applySorting(type, selectedSortOption, selectedSortOrder),
+                                    onItemClick = {},
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            } else {
+                                // todo - error screen
+                                Text(text = "error occurred")
+                            }
+                        }
                     }
                 }
             } ?: run {
