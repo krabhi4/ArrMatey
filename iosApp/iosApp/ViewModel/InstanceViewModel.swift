@@ -32,7 +32,7 @@ class InstanceViewModel: ObservableObject {
     
     @MainActor
     func getFirstInstance() async {
-        for await instance in instanceRepository.getFirstInstance(instanceType: instanceType) {
+        if let instance = await instanceRepository.getFirstInstance(instanceType: instanceType).first(where: { _ in true }) {
             self.firstInstance = instance
         }
     }

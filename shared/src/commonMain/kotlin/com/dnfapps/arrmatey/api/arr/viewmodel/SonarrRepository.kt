@@ -7,9 +7,8 @@ import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
-import kotlin.getValue
 
-class SonarrViewModel(instance: Instance): BaseArrViewModel<ArrSeries>(instance) {
+class SonarrRepository(instance: Instance): BaseArrRepository<ArrSeries>(instance) {
 
     override val client: SonarrClient by inject { parametersOf(instance) }
     override val dao: SeriesDao by inject()

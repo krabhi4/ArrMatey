@@ -1,11 +1,11 @@
 package com.dnfapps.arrmatey.api.arr.viewmodel
 
-import androidx.lifecycle.ViewModel
 import com.dnfapps.arrmatey.api.arr.IArrClient
 import com.dnfapps.arrmatey.api.arr.model.ArrMedia
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.database.dao.BaseArrDao
 import com.dnfapps.arrmatey.model.Instance
+import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.utils.getCurrentSystemTimeMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,15 +17,22 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 
-abstract class BaseArrViewModel<T: ArrMedia<*,*,*,*,*>>(
+fun createInstanceRepository(instance: Instance): BaseArrRepository<out ArrMedia<*,*,*,*,*>> {
+    return when (instance.type) {
+        InstanceType.Sonarr -> SonarrRepository(instance)
+        InstanceType.Radarr -> RadarrRepository(instance)
+    }
+}
+
+abstract class BaseArrRepository<T: ArrMedia<*,*,*,*,*>>(
     protected val instance: Instance
-): ViewModel(), KoinComponent, IArrViewModel {
+): KoinComponent, IArrRepository<T> {
 
     abstract val client: IArrClient<T>
     abstract val dao: BaseArrDao<T>
 
     protected val _uiState = MutableStateFlow<LibraryUiState<T>>(LibraryUiState.Initial)
-    val uiState: StateFlow<LibraryUiState<T>> = _uiState.asStateFlow()
+    override val uiState: StateFlow<LibraryUiState<T>> = _uiState.asStateFlow()
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -99,18 +106,18 @@ abstract class BaseArrViewModel<T: ArrMedia<*,*,*,*,*>>(
 
 }
 
-sealed class LibraryUiState<out T> {
-    data object Initial: LibraryUiState<Nothing>()
-    data object Loading: LibraryUiState<Nothing>()
+sealed interface LibraryUiState<out T> {
+    data object Initial: LibraryUiState<Nothing>
+    data object Loading: LibraryUiState<Nothing>
     data class Success<T>(
         val items: List<T>,
         val isRefreshing: Boolean = false
-    ): LibraryUiState<T>()
+    ): LibraryUiState<T>
     data class Error<T>(
         val error: ErrorEvent,
         val type: LibraryUiError,
         val cachedItems: List<T> = emptyList()
-    ): LibraryUiState<T>()
+    ): LibraryUiState<T>
 }
 
 data class ErrorEvent(

@@ -3,6 +3,9 @@ package com.dnfapps.arrmatey.di
 import com.dnfapps.arrmatey.api.arr.BaseArrClient
 import com.dnfapps.arrmatey.api.arr.RadarrClient
 import com.dnfapps.arrmatey.api.arr.SonarrClient
+import com.dnfapps.arrmatey.api.arr.model.ArrMedia
+import com.dnfapps.arrmatey.api.arr.viewmodel.BaseArrRepository
+import com.dnfapps.arrmatey.api.arr.viewmodel.createInstanceRepository
 import com.dnfapps.arrmatey.api.client.createInstanceClient
 import com.dnfapps.arrmatey.database.ArrMateyDatabase
 import com.dnfapps.arrmatey.database.InstanceRepository
@@ -34,8 +37,12 @@ val databaseModule = module {
     single { get<ArrMateyDatabase>().getMoviesDao() }
 
     single { InstanceRepository() }
+
+    factory<BaseArrRepository<out ArrMedia<*,*,*,*,*>>> {
+        (instance: Instance) -> createInstanceRepository(instance)
+    }
 }
 
-expect fun platformModule(): Module
+expect fun platformModules(): List<Module>
 
-fun appModules() = listOf(networkModule, databaseModule, platformModule())
+fun appModules() = listOf(networkModule, databaseModule) + platformModules()

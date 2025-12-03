@@ -53,7 +53,8 @@ import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.NetworkConnectivityViewModel
-import com.dnfapps.arrmatey.ui.viewmodel.rememberArrViewModel
+import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModel
+import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModelFactory
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -156,7 +157,10 @@ fun ArrTab(type: InstanceType) {
                 .fillMaxSize()
         ) {
             instance?.let { instance ->
-                val arrViewModel = rememberArrViewModel(instance)
+                val arrViewModel: ArrViewModel = viewModel(
+                    key = instance.id.toString(),
+                    factory = ArrViewModelFactory(instance)
+                )
                 val uiState by arrViewModel.uiState.collectAsStateWithLifecycle()
 
                 when (val state = uiState) {

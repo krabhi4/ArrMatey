@@ -26,12 +26,33 @@ class InstanceViewModel: ViewModel(), KoinComponent {
             initialValue = emptyList()
         )
 
+//    private val _firstInstances = mutableMapOf<InstanceType, MutableStateFlow<Instance?>>()
+//
+//    fun getFirstInstance(type: InstanceType): StateFlow<Instance?> =
+//        _firstInstances.getOrPut(type) {
+//            MutableStateFlow<Instance?>(null).also {
+//                loadFirstInstance(type, it)
+//            }
+//        }
+//
+//    private fun loadFirstInstance(type: InstanceType, flow: MutableStateFlow<Instance?>) {
+//        viewModelScope.launch {
+//            flow.value = repository.getFirstInstance(type)
+//        }
+//    }
+//
+//    fun refreshInstance(type: InstanceType) {
+//        viewModelScope.launch {
+//            _firstInstances[type]?.value = repository.getFirstInstance(type)
+//        }
+//    }
+
     fun newInstance(instance: Instance) {
         viewModelScope.launch {
             repository.newInstance(instance)
         }
     }
 
-    fun getFirstInstance(instanceType: InstanceType) = repository.getFirstInstance(instanceType)
+    fun getFirstInstance(type: InstanceType) = repository.getFirstInstance(type)
 
 }

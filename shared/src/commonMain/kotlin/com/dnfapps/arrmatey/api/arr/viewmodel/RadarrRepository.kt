@@ -8,7 +8,7 @@ import com.dnfapps.arrmatey.model.InstanceType
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 
-class RadarrViewModel(instance: Instance): BaseArrViewModel<ArrMovie>(instance) {
+class RadarrRepository(instance: Instance): BaseArrRepository<ArrMovie>(instance) {
 
     override val client: RadarrClient by inject { parametersOf(instance) }
     override val dao: MovieDao by inject()
