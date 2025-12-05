@@ -48,7 +48,7 @@ suspend inline fun <reified T> HttpClient.safeCall(
         NetworkResult.NetworkError("Failed to connect to server", e)
     } catch (e: Throwable) {
         if (e.isNoConnectionError()) {
-            NetworkResult.NetworkError(message = e.message, e)
+            NetworkResult.NetworkError(message = e.cause?.message ?: e.message, e)
         } else {
             NetworkResult.UnexpectedError(e)
         }

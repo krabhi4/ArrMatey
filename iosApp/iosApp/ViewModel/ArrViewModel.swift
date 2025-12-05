@@ -20,5 +20,13 @@ class ArrViewModel {
         self.instance = instance
         self.repository = BaseArrRepositoryKt.createInstanceRepository(instance: instance)
     }
+    
+    func refreshLibrary() async {
+        do {
+            try await repository.refreshLibrary()
+        } catch {
+            return
+        }
+    }
 
 }

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Shared
+import ToastViewSwift
 
 struct ArrTab: View {
     let type: InstanceType
@@ -41,11 +42,25 @@ struct ArrTab: View {
                     toolbarOptions
                 }
             }
+            .refreshable {
+                await arrViewModel?.refreshLibrary()
+            }
     }
     
     private var sortedAndFilteredItems: [GenericArrMedia] {
         guard case let success = uiState as? LibraryUiStateSuccess<AnyObject>,
               let items = success?.items as? [GenericArrMedia] else { return [] }
+        
+        guard let sorted = SortByKt.applySorting(items, type: type, sortBy: sortBy, order: sortOrder) as? [GenericArrMedia] else { return [] }
+        
+        guard let filtered = FilterByKt.applyFiltering(sorted, type: type, filterBy: filterBy) as? [GenericArrMedia] else { return [] }
+        
+        return filtered
+    }
+    
+    private var sortedAndFilteredCacheItems: [GenericArrMedia] {
+        guard case let error = uiState as? LibraryUiStateError<AnyObject>,
+              let items = error?.cachedItems as? [GenericArrMedia] else { return [] }
         
         guard let sorted = SortByKt.applySorting(items, type: type, sortBy: sortBy, order: sortOrder) as? [GenericArrMedia] else { return [] }
         
@@ -63,7 +78,8 @@ struct ArrTab: View {
             }
         case is LibraryUiStateLoading:
             ZStack {
-                Text("loading")
+                ProgressView()
+                    .progressViewStyle(.circular)
             }
         case let success as LibraryUiStateSuccess<AnyObject>:
             if sortedAndFilteredItems.isEmpty {
@@ -79,8 +95,27 @@ struct ArrTab: View {
                 .ignoresSafeArea(edges: .bottom)
             }
         case let error as LibraryUiStateError<AnyObject>:
-            VStack {
-                Text("error: \(error)")
+            ZStack {
+                // Show cached items if available, otherwise show error message
+                if !error.cachedItems.isEmpty {
+                    PosterGridView(items: sortedAndFilteredCacheItems) { media in
+                        print("tapped: \(media.title)")
+                    }
+                    .ignoresSafeArea(edges: .bottom)
+                } else {
+                    VStack {
+                        Text("An error occurred")
+                            .font(.headline)
+                        Text(error.error.message)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .onAppear {
+                print("GOT ERROR \(error.error.message)")
+                let toast = Toast.text(error.error.message)
+                toast.show()
             }
         default:
             VStack {
