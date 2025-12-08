@@ -59,3 +59,5 @@ val SwipeRemoveBackground = WatchlistSelected
 
 val LightActionButton = Color(0xFF48C9B0)
 val DarkActionButton = Color(0xFF17A589)
+
+val TranslucentBlack = Color(0x99000000)

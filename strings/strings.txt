@@ -102,6 +102,10 @@
         en = Cache library on disk
     [cache_on_disk_description]
         en = Cache the contents of this library on device for offline access.
+    [season]
+        iosKey = %d seasons
+        en = Season
+        en_plural = Seasons
 
 [[Errors]]
     [instance_connect_error]

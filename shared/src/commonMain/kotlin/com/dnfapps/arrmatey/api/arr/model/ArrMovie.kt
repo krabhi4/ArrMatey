@@ -65,7 +65,7 @@ data class ArrMovie(
     val inCinemas: String? = null,
     val physicalRelease: String? = null,
     @Contextual val digitalRelease: Instant? = null,
-    val releaseDate: String? = null,
+    val releaseDate: Instant? = null,
     val physicalReleaseNote: String? = null,
     val website: String,
     val remotePoster: String? = null,
@@ -105,6 +105,21 @@ data class ArrMovie(
             movieFile == null && monitored -> RadarrMissingMonitored
             movieFile == null && !monitored -> RadarrMissingUnmonitored
             else -> Color.Unspecified
+        }
+
+    val runtimeString: String
+        get() {
+            val hours = runtime / 60
+            val minutes = runtime % 60
+
+            return buildString {
+                if (hours > 0) append("$hours${if (hours == 1) "h" else "h"}")
+                if (minutes > 0) {
+                    if (hours > 0) append(" ")
+                    append("$minutes${if (minutes == 1) "m" else "m"}")
+                }
+                if (hours == 0 && minutes == 0) append("0m")
+            }
         }
 
 }

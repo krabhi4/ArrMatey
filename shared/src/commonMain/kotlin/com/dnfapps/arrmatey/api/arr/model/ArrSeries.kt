@@ -87,6 +87,9 @@ data class ArrSeries(
     val episodeCount: Int
         get() = statistics.episodeCount
 
+    val seasonCount: Int
+        get() = seasons.size
+
     override val statusProgress: Float
         get() = statistics.percentOfEpisodes.toFloat()
 

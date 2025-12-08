@@ -55,6 +55,10 @@
     <string name="custom_timeout_seconds">Custom timeout (s)</string>
     <string name="cache_on_disk">Cache library on disk</string>
     <string name="cache_on_disk_description">Cache the contents of this library on device for offline access.</string>
+    <plurals name="season">
+        <item quantity="one">Season</item>
+        <item quantity="other">Seasons</item>
+    </plurals>
 
     <!-- Errors -->
     <string name="instance_connect_error">Failed to connect to instance at %1$s</string>

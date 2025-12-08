@@ -9,6 +9,7 @@ import arrmatey.shared.generated.resources.missing
 import arrmatey.shared.generated.resources.monitored
 import arrmatey.shared.generated.resources.unmonitored
 import arrmatey.shared.generated.resources.wanted
+import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
@@ -42,7 +43,7 @@ enum class FilterBy(
     }
 }
 
-private fun List<ArrMedia<*,*,*,*,*>>.applyBaseFiltering(filterBy: FilterBy) = when (filterBy) {
+private fun List<AnyArrMedia>.applyBaseFiltering(filterBy: FilterBy) = when (filterBy) {
     FilterBy.All -> this
     FilterBy.Monitored -> filter { it.monitored }
     FilterBy.Unmonitored -> filter {!it.monitored }
@@ -63,7 +64,7 @@ fun List<ArrMovie>.applyMovieFiltering(filterBy: FilterBy) = when(filterBy) {
     else -> applyBaseFiltering(filterBy) as List<ArrMovie>
 }
 
-fun List<ArrMedia<*,*,*,*,*>>.applyFiltering(type: InstanceType, filterBy: FilterBy) = when(type) {
+fun List<AnyArrMedia>.applyFiltering(type: InstanceType, filterBy: FilterBy) = when(type) {
     InstanceType.Sonarr -> (this as List<ArrSeries>).applySeriesFiltering(filterBy)
     InstanceType.Radarr -> (this as List<ArrMovie>).applyMovieFiltering(filterBy)
 }

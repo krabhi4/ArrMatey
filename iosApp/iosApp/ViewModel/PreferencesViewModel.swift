@@ -17,6 +17,7 @@ class PreferencesViewModel: ObservableObject {
     @Published var sortOrder: Shared.SortOrder = .asc
     @Published var filterBy: FilterBy = .all
     @Published var showInfoCardMap: [InstanceType:Bool] = [:]
+    @Published var viewTypeMap: [InstanceType:ViewType] = [:]
     
     init() {
         observeFlows()
@@ -49,6 +50,17 @@ class PreferencesViewModel: ObservableObject {
                 self.showInfoCardMap = swiftMap
             }
         }
+        Task {
+            for await map in preferenceStore.viewType {
+                var swiftMap: [InstanceType:ViewType] = [:]
+                for (key, value) in map {
+                    if let instanceType = key as? InstanceType {
+                        swiftMap[instanceType] = value
+                    }
+                }
+                self.viewTypeMap = swiftMap
+            }
+        }
     }
     
     func saveSortBy(_ value: SortBy) {
@@ -65,6 +77,10 @@ class PreferencesViewModel: ObservableObject {
     
     func setInfoCardVisibility(type: InstanceType, visible: Bool) {
         preferenceStore.setInfoCardVisibility(type: type, value: visible)
+    }
+    
+    func saveViewType(type: InstanceType, viewType: ViewType) {
+        preferenceStore.saveViewType(instanceType: type, viewType: viewType)
     }
     
 }

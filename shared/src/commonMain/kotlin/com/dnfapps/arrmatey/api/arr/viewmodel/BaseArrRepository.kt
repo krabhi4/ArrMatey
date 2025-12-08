@@ -1,6 +1,7 @@
 package com.dnfapps.arrmatey.api.arr.viewmodel
 
 import com.dnfapps.arrmatey.api.arr.IArrClient
+import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMedia
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.database.dao.BaseArrDao
@@ -17,14 +18,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 
-fun createInstanceRepository(instance: Instance): BaseArrRepository<out ArrMedia<*,*,*,*,*>> {
+fun createInstanceRepository(instance: Instance): BaseArrRepository<out AnyArrMedia> {
     return when (instance.type) {
         InstanceType.Sonarr -> SonarrRepository(instance)
         InstanceType.Radarr -> RadarrRepository(instance)
     }
 }
 
-abstract class BaseArrRepository<T: ArrMedia<*,*,*,*,*>>(
+abstract class BaseArrRepository<T: AnyArrMedia>(
     protected val instance: Instance
 ): KoinComponent, IArrRepository<T> {
 

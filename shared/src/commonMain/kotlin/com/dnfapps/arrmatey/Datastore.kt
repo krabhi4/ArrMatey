@@ -8,11 +8,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.dnfapps.arrmatey.compose.utils.FilterBy
 import com.dnfapps.arrmatey.compose.utils.SortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.model.InstanceType
+import com.dnfapps.arrmatey.ui.theme.ViewType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -40,12 +40,19 @@ class PreferencesStore(): KoinComponent {
     private val SORT_BY_KEY = intPreferencesKey("sortBy")
     private val SORT_ORDER_KEY = intPreferencesKey("sortOrder")
     private val FILTER_BY_KEY = intPreferencesKey("filterBy")
-    private val SONARR_KEY = booleanPreferencesKey("sonarrType")
-    private val RADARR_KEY = booleanPreferencesKey("radarrType")
+    private val SONARR_INFO_CARD_KEY = booleanPreferencesKey("sonarrInfoCard")
+    private val RADARR_INFO_CARD_KEY = booleanPreferencesKey("radarrInfoCard")
+    private val SONARR_VIEW_TYPE_KEY = intPreferencesKey("sonarrViewType")
+    private val RADARR_VIEW_TYPE_KEY = intPreferencesKey("radarrViewType")
 
-    private fun keyForInstanceType(type: InstanceType): Preferences.Key<Boolean> = when (type) {
-        InstanceType.Sonarr -> SONARR_KEY
-        InstanceType.Radarr -> RADARR_KEY
+    private fun infoCardKey(type: InstanceType): Preferences.Key<Boolean> = when (type) {
+        InstanceType.Sonarr -> SONARR_INFO_CARD_KEY
+        InstanceType.Radarr -> RADARR_INFO_CARD_KEY
+    }
+
+    private fun viewTypeKey(type: InstanceType): Preferences.Key<Int> = when (type) {
+        InstanceType.Sonarr -> SONARR_VIEW_TYPE_KEY
+        InstanceType.Radarr -> RADARR_VIEW_TYPE_KEY
     }
 
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -85,7 +92,7 @@ class PreferencesStore(): KoinComponent {
 
     val showInfoCards: Flow<Map<InstanceType, Boolean>> = dataStore.data
         .map { preferences ->
-            InstanceType.entries.associateWith { type -> (preferences[keyForInstanceType(type)] ?: true) }
+            InstanceType.entries.associateWith { type -> (preferences[infoCardKey(type)] ?: true) }
         }
 
     fun dismissInfoCard(type: InstanceType) {
@@ -95,7 +102,22 @@ class PreferencesStore(): KoinComponent {
     fun setInfoCardVisibility(type: InstanceType, value: Boolean) {
         scope.launch {
             dataStore.edit { preferences ->
-                preferences[keyForInstanceType(type)] = value
+                preferences[infoCardKey(type)] = value
+            }
+        }
+    }
+
+    val viewType: Flow<Map<InstanceType, ViewType>> = dataStore.data
+        .map { preferences ->
+            InstanceType.entries.associateWith { type ->
+                ViewType.entries[preferences[viewTypeKey(type)] ?: 0]
+            }
+        }
+
+    fun saveViewType(instanceType: InstanceType, viewType: ViewType) {
+        scope.launch {
+            dataStore.edit { preferences ->
+                preferences[viewTypeKey(type = instanceType)] = viewType.ordinal
             }
         }
     }

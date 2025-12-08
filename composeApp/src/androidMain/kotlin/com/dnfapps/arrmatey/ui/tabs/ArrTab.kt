@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.ui.tabs
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,11 +39,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.PreferencesStore
 import com.dnfapps.arrmatey.R
+import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.viewmodel.LibraryUiError
 import com.dnfapps.arrmatey.api.arr.viewmodel.LibraryUiState
 import com.dnfapps.arrmatey.compose.components.FilterMenuButton
+import com.dnfapps.arrmatey.compose.components.MediaList
 import com.dnfapps.arrmatey.compose.components.PosterGrid
 import com.dnfapps.arrmatey.compose.components.SortMenuButton
+import com.dnfapps.arrmatey.compose.components.ViewTypeMenuButton
 import com.dnfapps.arrmatey.compose.utils.FilterBy
 import com.dnfapps.arrmatey.compose.utils.SortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
@@ -51,6 +55,7 @@ import com.dnfapps.arrmatey.compose.utils.applySorting
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.model.InstanceType
+import com.dnfapps.arrmatey.ui.theme.ViewType
 import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModelFactory
 import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
@@ -58,6 +63,7 @@ import com.dnfapps.arrmatey.ui.viewmodel.NetworkConnectivityViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArrTab(type: InstanceType) {
@@ -72,6 +78,8 @@ fun ArrTab(type: InstanceType) {
     val selectedSortOrder by preferenceStore.sortOrder.collectAsState(SortOrder.Asc)
     val selectedSortOption by preferenceStore.sortBy.collectAsState(SortBy.Title)
     val selectedFilter by preferenceStore.filterBy.collectAsState(FilterBy.All)
+    val viewTypeMap by preferenceStore.viewType.collectAsState(emptyMap())
+    val selectedViewType = viewTypeMap[type] ?: ViewType.Grid
 
     val snackbarHostState = remember { SnackbarHostState() }
     var hasServerConnetivityError by remember { mutableStateOf(false) }
@@ -127,6 +135,10 @@ fun ArrTab(type: InstanceType) {
                 },
                 actions = {
                     instance?.let {
+                        ViewTypeMenuButton(
+                            viewType = selectedViewType,
+                            onViewTypeChanged = { preferenceStore.saveViewType(type, it) }
+                        )
                         FilterMenuButton(
                             instanceType = type,
                             selectedFilter = selectedFilter,
@@ -181,12 +193,12 @@ fun ArrTab(type: InstanceType) {
                                 }
                             }
                         ) {
-                            PosterGrid(
+                            MediaView(
                                 items = state.items
                                     .applyFiltering(type, selectedFilter)
                                     .applySorting(type, selectedSortOption, selectedSortOrder),
                                 onItemClick = {},
-                                modifier = Modifier.fillMaxSize()
+                                viewType = selectedViewType
                             )
                         }
                     }
@@ -214,12 +226,12 @@ fun ArrTab(type: InstanceType) {
                             }
                         ) {
                             if (state.cachedItems.isNotEmpty()) {
-                                PosterGrid(
+                                MediaView(
                                     items = state.cachedItems
                                         .applyFiltering(type, selectedFilter)
                                         .applySorting(type, selectedSortOption, selectedSortOrder),
                                     onItemClick = {},
-                                    modifier = Modifier.fillMaxSize()
+                                    viewType = selectedViewType
                                 )
                             } else {
                                 // todo - error screen
@@ -232,5 +244,27 @@ fun ArrTab(type: InstanceType) {
                 Text(text = "No instances found")
             }
         }
+    }
+}
+
+@Composable
+fun MediaView(
+    items: List<AnyArrMedia>,
+    onItemClick: (AnyArrMedia) -> Unit,
+    viewType: ViewType
+) {
+    when (viewType) {
+        ViewType.List -> MediaList(
+            items = items,
+            onItemClick = onItemClick,
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .fillMaxSize()
+        )
+        ViewType.Grid -> PosterGrid(
+            items = items,
+            onItemClick = onItemClick,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }

@@ -11,12 +11,12 @@ plugins {
     kotlin("plugin.serialization") version libs.versions.kotlin
 }
 
-tasks.register<Exec>("generateLocalization") {
-    group = "build setup"
-    description = "Generation localization files"
-
-    commandLine("/Users/owen.lejeune/.nvm/versions/node/v22.3.0/bin/node", "$rootDir/strings/generate-strings.js")
-}
+//tasks.register<Exec>("generateLocalization") {
+//    group = "build setup"
+//    description = "Generation localization files"
+//
+//    commandLine("/Users/owen.lejeune/.nvm/versions/node/v22.3.0/bin/node", "$rootDir/strings/generate-strings.js")
+//}
 
 skie {
     features {
@@ -41,12 +41,12 @@ kotlin {
         }
     }
 
-    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().configureEach {
-        binaries.all {
-            linkTaskProvider.get()
-                .dependsOn(tasks.named("generateLocalization"))
-        }
-    }
+//    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().configureEach {
+//        binaries.all {
+//            linkTaskProvider.get()
+//                .dependsOn(tasks.named("generateLocalization"))
+//        }
+//    }
 
     sourceSets {
         all {
@@ -90,6 +90,7 @@ kotlin {
             implementation(libs.coil.network)
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)
+            implementation(libs.cloudy)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -123,9 +124,9 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
-afterEvaluate {
-    tasks.matching { (it.name.startsWith("compile") && it.name.contains("Kotlin")) || it.name.contains("build") }
-        .configureEach {
-            dependsOn(tasks.named("generateLocalization"))
-        }
-}
+//afterEvaluate {
+//    tasks.matching { (it.name.startsWith("compile") && it.name.contains("Kotlin")) || it.name.contains("build") }
+//        .configureEach {
+//            dependsOn(tasks.named("generateLocalization"))
+//        }
+//}

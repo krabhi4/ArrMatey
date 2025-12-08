@@ -36,11 +36,12 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMedia
 import com.dnfapps.arrmatey.api.arr.model.CoverType
 
 @Composable
-fun <T: ArrMedia<*,*,*,*,*>> PosterGrid(
+fun <T: AnyArrMedia> PosterGrid(
     items: List<T>,
     onItemClick: (T) -> Unit,
     modifier: Modifier = Modifier
@@ -52,63 +53,71 @@ fun <T: ArrMedia<*,*,*,*,*>> PosterGrid(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         items(items) { item ->
-            var imageLoadError by remember { mutableStateOf(false) }
-            var imageLoaded by remember { mutableStateOf(false) }
+            PosterItem(item, onItemClick)
+        }
+    }
+}
 
-            val url = item.images.firstOrNull { it.coverType == CoverType.Poster }?.remoteUrl
-            val model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(url)
-                .diskCacheKey(url)
-                .networkCachePolicy(CachePolicy.ENABLED)
-                .memoryCachePolicy(CachePolicy.ENABLED)
-                .crossfade(true)
-                .listener(
-                    onError = { _, err ->
-                        println(err.throwable.message)
-                        imageLoadError = true
-                    },
-                    onSuccess = { _, _ -> imageLoaded = true }
-                )
-                .build()
-            Card(
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(5.dp))
-                    .aspectRatio(0.675f, true)
-                    .clickable {
-                        onItemClick(item)
-                    }
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    AsyncImage(
-                        model = model,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(5.dp)),
-                        contentScale = ContentScale.FillBounds
-                    )
-                    if (imageLoadError) {
-                        Icon(
-                            imageVector = Icons.Default.BrokenImage,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(64.dp).align(Alignment.Center)
-                        )
-                    }
-                    LinearProgressIndicator(
-                        progress = { item.statusProgress },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
-                            .height(6.dp),
-                        color = item.statusColor
-                    )
-                }
+@Composable
+fun <T: AnyArrMedia> PosterItem(
+    item: T,
+    onItemClick: (T) -> Unit
+) {
+    var imageLoadError by remember { mutableStateOf(false) }
+    var imageLoaded by remember { mutableStateOf(false) }
+
+    val url = item.images.firstOrNull { it.coverType == CoverType.Poster }?.remoteUrl
+    val model = ImageRequest.Builder(LocalPlatformContext.current)
+        .data(url)
+        .diskCacheKey(url)
+        .networkCachePolicy(CachePolicy.ENABLED)
+        .memoryCachePolicy(CachePolicy.ENABLED)
+        .crossfade(true)
+        .listener(
+            onError = { _, err ->
+                println(err.throwable.message)
+                imageLoadError = true
+            },
+            onSuccess = { _, _ -> imageLoaded = true }
+        )
+        .build()
+    Card(
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .clip(RoundedCornerShape(5.dp))
+            .aspectRatio(0.675f, true)
+            .clickable {
+                onItemClick(item)
             }
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            AsyncImage(
+                model = model,
+                contentDescription = null,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(5.dp)),
+                contentScale = ContentScale.FillBounds
+            )
+            if (imageLoadError) {
+                Icon(
+                    imageVector = Icons.Default.BrokenImage,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(64.dp).align(Alignment.Center)
+                )
+            }
+            LinearProgressIndicator(
+                progress = { item.statusProgress },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .height(6.dp),
+                color = item.statusColor
+            )
         }
     }
 }

@@ -5,6 +5,8 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
+typealias AnyArrMedia = ArrMedia<*,*,*,*,*>
+
 @Serializable
 sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S> {
     abstract var instanceId: Long?
@@ -39,4 +41,7 @@ sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S> {
 
     abstract val statusProgress: Float
     abstract val statusColor: Color
+
+    val fileSize: Long
+        get() = statistics.sizeOnDisk
 }

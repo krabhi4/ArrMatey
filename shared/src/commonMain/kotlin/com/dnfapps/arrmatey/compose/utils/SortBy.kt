@@ -23,7 +23,7 @@ import arrmatey.shared.generated.resources.sort_ascending
 import arrmatey.shared.generated.resources.sort_descending
 import arrmatey.shared.generated.resources.title
 import arrmatey.shared.generated.resources.year
-import com.dnfapps.arrmatey.api.arr.model.ArrMedia
+import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
 import com.dnfapps.arrmatey.compose.icons.Hard_drive
@@ -77,7 +77,7 @@ enum class SortOrder(
     Desc("arrow.down", "sort_descending", Icons.Default.ArrowDownward, Res.string.sort_descending)
 }
 
-private fun List<ArrMedia<*,*,*,*,*>>.applyBaseSorting(sortBy: SortBy, order: SortOrder) = when(sortBy) {
+private fun List<AnyArrMedia>.applyBaseSorting(sortBy: SortBy, order: SortOrder) = when(sortBy) {
     SortBy.Title -> if (order == SortOrder.Asc) sortedBy { it.title.lowercase() } else sortedByDescending { it.title.lowercase() }
     SortBy.Year -> if (order == SortOrder.Asc) sortedBy { it.year } else sortedByDescending { it.year }
     SortBy.Added -> if (order == SortOrder.Asc) sortedBy { it.added } else sortedByDescending { it.added }
@@ -98,7 +98,7 @@ fun List<ArrMovie>.applyMovieSorting(sortBy: SortBy, order: SortOrder = SortOrde
     else -> applyBaseSorting(sortBy, order) as List<ArrMovie>
 }
 
-fun List<ArrMedia<*,*,*,*,*>>.applySorting(type: InstanceType, sortBy: SortBy, order: SortOrder = SortOrder.Asc) = when(type) {
+fun List<AnyArrMedia>.applySorting(type: InstanceType, sortBy: SortBy, order: SortOrder = SortOrder.Asc) = when(type) {
     InstanceType.Sonarr -> (this as List<ArrSeries>).applySeriesSorting(sortBy, order)
     InstanceType.Radarr -> (this as List<ArrMovie>).applyMovieSorting(sortBy, order)
 }

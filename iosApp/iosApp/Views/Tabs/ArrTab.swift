@@ -23,6 +23,10 @@ struct ArrTab: View {
     
     @State private var stableItemsKey: String = UUID().uuidString
     
+    private var viewType: ViewType {
+        preferences.viewTypeMap[type] ?? .grid
+    }
+    
     private var firstInstance: Instance? {
         instanceViewModel.firstInstance
     }
@@ -117,7 +121,7 @@ struct ArrTab: View {
             if sortedAndFilteredItems.isEmpty {
                 Text("No items")
             } else {
-                PosterGridView(items: sortedAndFilteredItems) { media in
+                mediaView(items: sortedAndFilteredItems) { media in
                     print("tapped: \(media.title)")
                 }
                 .id(stableItemsKey)
@@ -130,7 +134,7 @@ struct ArrTab: View {
             ZStack {
                 // Show cached items if available, otherwise show error message
                 if !error.cachedItems.isEmpty {
-                    PosterGridView(items: sortedAndFilteredCacheItems) { media in
+                    mediaView(items: sortedAndFilteredCacheItems) { media in
                         print("tapped: \(media.title)")
                     }
                     .ignoresSafeArea(edges: .bottom)
@@ -186,6 +190,22 @@ struct ArrTab: View {
     
     @ToolbarContentBuilder
     var toolbarOptions: some ToolbarContent {
+        let newType = switch viewType {
+        case .grid: ViewType.list
+        case .list: ViewType.grid
+        }
+        let image = switch newType {
+        case .grid: "rectangle.grid.2x2"
+        case .list: "rectangle.grid.1x2"
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Image(systemName: image)
+                .imageScale(.medium)
+                .onTapGesture {
+                    preferences.saveViewType(type: type, viewType: newType)
+                }
+        }
+        
         ToolbarItem(placement: .primaryAction) {
             SortByPickerMenu(type: type, sortedBy: $preferences.sortBy, sortOrder: $preferences.sortOrder)
                 .onChange(of: preferences.sortBy) { _, newValue in
@@ -203,6 +223,16 @@ struct ArrTab: View {
                     preferences.saveFilterBy(newValue)
                 }
                 .menuIndicator(.hidden)
+        }
+    }
+     @ViewBuilder
+    private func mediaView(
+        items: [GenericArrMedia],
+        onItemClicked: @escaping (GenericArrMedia) -> Void
+    ) -> some View {
+        switch viewType {
+        case .grid: PosterGridView(items: items, onItemClick: onItemClicked)
+        case .list: PosterListView(items: items, onItemClick: onItemClicked)
         }
     }
     
