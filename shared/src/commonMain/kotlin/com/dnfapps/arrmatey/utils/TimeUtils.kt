@@ -1,11 +1,13 @@
 package com.dnfapps.arrmatey.utils
 
-import com.dnfapps.arrmatey.api.arr.model.ArrMovie
-import com.dnfapps.arrmatey.api.arr.model.ArrSeries
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 expect fun getCurrentSystemTimeMillis(): Long
 
 expect fun is24Hour(): Boolean
 
-expect fun ArrSeries.formatNextAiringTime(): String?
-expect fun ArrMovie.formatReleaseDate(): String?
+expect fun formatLocalDateTime(localDateTime: LocalDateTime, pattern: String, timeZone: TimeZone): String
+
+expect fun Instant.format(pattern: String  = "HH:mm MMMM d, yyyy"): String

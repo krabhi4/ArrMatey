@@ -2,6 +2,7 @@ package com.dnfapps.arrmatey.compose.screens.viewmodel
 
 import com.dnfapps.arrmatey.PreferencesStore
 import com.dnfapps.arrmatey.api.arr.BaseArrClient
+import com.dnfapps.arrmatey.api.arr.GenericClient
 import com.dnfapps.arrmatey.database.InstanceRepository
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
@@ -13,7 +14,7 @@ import org.koin.core.component.inject
 
 class AddInstanceRepository: KoinComponent {
 
-    private val client: BaseArrClient by inject()
+    private val client: GenericClient by inject()
     private val instanceRepository: InstanceRepository by inject()
     private val preferencesStore: PreferencesStore by inject()
 

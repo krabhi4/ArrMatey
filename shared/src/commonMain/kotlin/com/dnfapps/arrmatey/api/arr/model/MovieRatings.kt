@@ -10,3 +10,11 @@ data class MovieRatings(
     val rottenTomatoes: MovieRating? = null,
     val trakt: MovieRating? = null
 )
+
+enum class RatingType {
+    Imdb,
+    Tmdb,
+    Metacritic,
+    RottenTomatoes,
+    Trakt
+}

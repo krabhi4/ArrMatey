@@ -51,8 +51,7 @@ import com.dnfapps.arrmatey.api.arr.model.SeriesStatus
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.extensions.pxToDp
 import com.dnfapps.arrmatey.ui.theme.TranslucentBlack
-import com.dnfapps.arrmatey.utils.formatNextAiringTime
-import com.dnfapps.arrmatey.utils.formatReleaseDate
+import com.dnfapps.arrmatey.utils.format
 import com.skydoves.cloudy.cloudy
 import org.jetbrains.compose.resources.pluralStringResource
 
@@ -90,26 +89,13 @@ fun <T: AnyArrMedia> MediaItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            val banner = item.images.firstOrNull { it.coverType == CoverType.Banner }?.remoteUrl
-                ?: item.images.firstOrNull { it.coverType == CoverType.Poster }?.remoteUrl
-            banner?.let { bannerUrl ->
-                val bannerModel = ImageRequest.Builder(LocalPlatformContext.current)
-                    .data(bannerUrl)
-                    .diskCacheKey(bannerUrl)
-                    .networkCachePolicy(CachePolicy.ENABLED)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .crossfade(true)
-                    .build()
-                AsyncImage(
-                    model = bannerModel,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .cloudy(radius = 40)
-                        .matchParentSize()
-                )
-            }
-            Box(modifier = Modifier.fillMaxWidth().height(cardHeight).background(TranslucentBlack))
+            BannerView(
+                item = item,
+                modifier = Modifier.matchParentSize(),
+                overlay = {
+                    Box(modifier = Modifier.fillMaxWidth().height(cardHeight).background(TranslucentBlack))
+                }
+            )
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(18.dp),
@@ -173,7 +159,7 @@ private fun ColumnScope.SeriesDetails(item: ArrSeries) {
     Text(firstLine, color = Color.White)
 
     val statusStr = when (item.status) {
-        SeriesStatus.Continuing -> item.formatNextAiringTime() ?: "${item.status.name} - Unknown"
+        SeriesStatus.Continuing -> item.nextAiring?.format() ?: "${item.status.name} - Unknown"
         else -> item.status.name
     }
     Text(statusStr, color = Color.White)
@@ -198,7 +184,7 @@ private fun ColumnScope.SeriesDetails(item: ArrSeries) {
 
 @Composable
 private fun ColumnScope.MovieDetails(item: ArrMovie) {
-    item.formatReleaseDate()?.let {
+    item.releaseDate?.format()?.let {
         Text(it, color = Color.White)
     }
 
@@ -217,4 +203,31 @@ private fun ColumnScope.MovieDetails(item: ArrMovie) {
             .height(6.dp),
         color = item.statusColor
     )
+}
+
+@Composable
+fun BannerView(
+    item: AnyArrMedia,
+    modifier: Modifier = Modifier,
+    overlay: @Composable () -> Unit = {}
+) {
+    val banner = item.images.firstOrNull { it.coverType == CoverType.Banner }?.remoteUrl
+        ?: item.images.firstOrNull { it.coverType == CoverType.Poster }?.remoteUrl
+    banner?.let { bannerUrl ->
+        val bannerModel = ImageRequest.Builder(LocalPlatformContext.current)
+            .data(bannerUrl)
+            .diskCacheKey(bannerUrl)
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .crossfade(true)
+            .build()
+        AsyncImage(
+            model = bannerModel,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+                .cloudy(radius = 40)
+        )
+        overlay()
+    }
 }

@@ -3,6 +3,7 @@ package com.dnfapps.arrmatey.di
 import com.dnfapps.arrmatey.DataStoreFactory
 import com.dnfapps.arrmatey.PreferencesStore
 import com.dnfapps.arrmatey.api.arr.BaseArrClient
+import com.dnfapps.arrmatey.api.arr.GenericClient
 import com.dnfapps.arrmatey.api.arr.RadarrClient
 import com.dnfapps.arrmatey.api.arr.SonarrClient
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
@@ -24,7 +25,7 @@ import org.koin.dsl.module
 val networkModule = module {
     factory<HttpClient> { (instance: Instance?) -> createInstanceClient(instance) }
 
-    single { BaseArrClient() }
+    single { GenericClient() }
     factory<SonarrClient> { (instance: Instance) -> SonarrClient(instance) }
     factory<RadarrClient> { (instance: Instance) -> RadarrClient(instance) }
 

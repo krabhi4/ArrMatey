@@ -3,6 +3,7 @@ package com.dnfapps.arrmatey.compose.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,7 +54,22 @@ fun <T: AnyArrMedia> PosterGrid(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         items(items) { item ->
-            PosterItem(item, onItemClick)
+            PosterItem(
+                item = item,
+                onItemClick = onItemClick,
+                modifier = Modifier.padding(8.dp),
+                additionalContent = {
+                    LinearProgressIndicator(
+                        progress = { item.statusProgress },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                            .height(6.dp),
+                        color = item.statusColor
+                    )
+                }
+            )
         }
     }
 }
@@ -61,7 +77,10 @@ fun <T: AnyArrMedia> PosterGrid(
 @Composable
 fun <T: AnyArrMedia> PosterItem(
     item: T,
-    onItemClick: (T) -> Unit
+    modifier: Modifier = Modifier,
+    onItemClick: ((T) -> Unit)? = null,
+    enabled: Boolean = true,
+    additionalContent: @Composable BoxScope.() -> Unit = {}
 ) {
     var imageLoadError by remember { mutableStateOf(false) }
     var imageLoaded by remember { mutableStateOf(false) }
@@ -83,13 +102,15 @@ fun <T: AnyArrMedia> PosterItem(
         .build()
     Card(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
-        modifier = Modifier
-            .padding(8.dp)
+        modifier = modifier
             .clip(RoundedCornerShape(5.dp))
             .aspectRatio(0.675f, true)
-            .clickable {
-                onItemClick(item)
-            }
+            .clickable(
+                enabled = enabled && onItemClick != null,
+                onClick = {
+                    onItemClick?.invoke(item)
+                }
+            )
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -109,15 +130,8 @@ fun <T: AnyArrMedia> PosterItem(
                     modifier = Modifier.size(64.dp).align(Alignment.Center)
                 )
             }
-            LinearProgressIndicator(
-                progress = { item.statusProgress },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-                    .height(6.dp),
-                color = item.statusColor
-            )
+            additionalContent()
+
         }
     }
 }

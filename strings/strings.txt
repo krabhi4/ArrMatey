@@ -106,6 +106,10 @@
         iosKey = %d seasons
         en = Season
         en_plural = Seasons
+    [airing_next]
+        en = Next episode
+    [in_cinemas]
+        en = In cinemas
 
 [[Errors]]
     [instance_connect_error]

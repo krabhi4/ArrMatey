@@ -38,7 +38,7 @@ fun createInstanceClient(instance: Instance?) =
 
         install(Logging) {
             logger = Logger.SIMPLE
-            level = LogLevel.HEADERS
+            level = LogLevel.ALL
         }
 
         instance?.let { instance ->

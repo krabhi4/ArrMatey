@@ -78,7 +78,7 @@ enum class SortOrder(
 }
 
 private fun List<AnyArrMedia>.applyBaseSorting(sortBy: SortBy, order: SortOrder) = when(sortBy) {
-    SortBy.Title -> if (order == SortOrder.Asc) sortedBy { it.title.lowercase() } else sortedByDescending { it.title.lowercase() }
+    SortBy.Title -> if (order == SortOrder.Asc) sortedBy { it.sortTitle?.lowercase() } else sortedByDescending { it.sortTitle?.lowercase() }
     SortBy.Year -> if (order == SortOrder.Asc) sortedBy { it.year } else sortedByDescending { it.year }
     SortBy.Added -> if (order == SortOrder.Asc) sortedBy { it.added } else sortedByDescending { it.added }
     SortBy.Rating -> if (order == SortOrder.Asc) sortedBy { it.ratingScore() } else sortedByDescending { it.ratingScore() }

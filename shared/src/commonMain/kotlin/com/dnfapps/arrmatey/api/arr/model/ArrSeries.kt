@@ -12,6 +12,7 @@ import com.dnfapps.arrmatey.ui.theme.SonarrMissingEpsSeriesMonitored
 import com.dnfapps.arrmatey.ui.theme.SonarrMissingEpsSeriesUnmonitored
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import org.koin.core.component.KoinComponent
 import kotlin.time.Instant
 
 @Serializable
@@ -34,7 +35,7 @@ data class ArrSeries(
     override val originalLanguage: Language,
     override val year: Int,
     override val qualityProfileId: Int,
-    override val monitored: Boolean,
+    override var monitored: Boolean,
     override val runtime: Int,
     override val tmdbId: Int,
     override val status: SeriesStatus,
@@ -59,12 +60,12 @@ data class ArrSeries(
 
     val ended: Boolean,
     val seasonFolder: Boolean,
-    val monitorNewItems: String,
+    val monitorNewItems: SeriesMonitorNewItems,
     val useSceneNumbering: Boolean,
     val tvdbId: Int,
     val tvRageId: Int,
     val tvMazeId: Int,
-    val seriesType: String,
+    val seriesType: SeriesType,
     val seasons: List<Season> = emptyList(),
     val profileName: String? = null,
     @Contextual val nextAiring: Instant? = null,
@@ -90,6 +91,9 @@ data class ArrSeries(
     val seasonCount: Int
         get() = seasons.size
 
+    override val statusString: String
+        get() = status.name
+
     override val statusProgress: Float
         get() = statistics.percentOfEpisodes.toFloat()
 
@@ -101,5 +105,33 @@ data class ArrSeries(
             statistics.percentOfEpisodes != 100.toDouble() && !monitored -> SonarrMissingEpsSeriesUnmonitored
             else -> Color.Unspecified
         }
+
+    override val releasedBy: String?
+        get() = network
+
+    override fun setMonitored(monitored: Boolean): ArrSeries {
+        return copy(monitored = monitored)
+    }
+
+    // todo - include quality profiles/tags from instance
+    override val infoItems: List<Info>
+        get() = listOf(
+            Info(
+                label = "Series Type",
+                value = seriesType.name
+            ),
+            Info(
+                label = "Root Folder",
+                value = rootFolderPath ?: "Unknown"
+            ),
+            Info(
+                label = "New Seasons",
+                value = if (monitorNewItems == SeriesMonitorNewItems.All) "Monitored" else "Unmonitored"
+            ),
+            Info(
+                label = "Season Folders",
+                value = if (seasonFolder) "Yes" else "No"
+            )
+        )
 
 }

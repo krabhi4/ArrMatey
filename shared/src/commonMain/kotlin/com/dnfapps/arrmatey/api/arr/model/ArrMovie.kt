@@ -11,6 +11,7 @@ import com.dnfapps.arrmatey.ui.theme.RadarrDownloadedUnmonitored
 import com.dnfapps.arrmatey.ui.theme.RadarrMissingMonitored
 import com.dnfapps.arrmatey.ui.theme.RadarrMissingUnmonitored
 import com.dnfapps.arrmatey.ui.theme.RadarrUnreleased
+import com.dnfapps.arrmatey.utils.format
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -62,10 +63,10 @@ data class ArrMovie(
     val secondaryYear: Int? = null,
     val secondaryYearSourceId: Int,
     val sizeOnDisk: Long,
-    val inCinemas: String? = null,
-    val physicalRelease: String? = null,
+    @Contextual val inCinemas: Instant? = null,
+    @Contextual val physicalRelease: Instant? = null,
     @Contextual val digitalRelease: Instant? = null,
-    val releaseDate: Instant? = null,
+    @Contextual val releaseDate: Instant? = null,
     val physicalReleaseNote: String? = null,
     val website: String,
     val remotePoster: String? = null,
@@ -73,7 +74,7 @@ data class ArrMovie(
     val studio: String,
     val hasFile: Boolean,
     val movieFileId: Int,
-    val minimumAvailability: String,
+    val minimumAvailability: MovieStatus,
     val isAvailable: Boolean,
     val folderName: String,
     val keywords: List<String> = emptyList(),
@@ -94,6 +95,9 @@ data class ArrMovie(
         return avail.sum() / avail.size
     }
 
+    override val statusString: String
+        get() = status.name
+
     override val statusProgress: Float
         get() = 1f
 
@@ -107,19 +111,50 @@ data class ArrMovie(
             else -> Color.Unspecified
         }
 
-    val runtimeString: String
-        get() {
-            val hours = runtime / 60
-            val minutes = runtime % 60
+    override val releasedBy: String?
+        get() = studio
 
-            return buildString {
-                if (hours > 0) append("$hours${if (hours == 1) "h" else "h"}")
-                if (minutes > 0) {
-                    if (hours > 0) append(" ")
-                    append("$minutes${if (minutes == 1) "m" else "m"}")
-                }
-                if (hours == 0 && minutes == 0) append("0m")
+    val ratingsAsMap: Map<RatingType, MovieRating?>
+        get() = mapOf(
+            RatingType.Tmdb to ratings.tmdb,
+            RatingType.Imdb to ratings.imdb,
+            RatingType.Metacritic to ratings.metacritic,
+            RatingType.RottenTomatoes to ratings.rottenTomatoes,
+            RatingType.Trakt to ratings.trakt
+        )
+
+    override fun setMonitored(monitored: Boolean): ArrMovie {
+        return copy(monitored = monitored)
+    }
+
+    override val infoItems: List<Info>
+        get() = listOfNotNull(
+            Info(
+                label = "Minimum Availability",
+                value = minimumAvailability.name
+            ),
+            Info(
+                label = "Root Folder",
+                value = rootFolderPath ?: "Unknown"
+            ),
+            inCinemas?.format()?.let {
+                Info(
+                    label = "In Cinemas",
+                    value = it
+                )
+            },
+            digitalRelease?.format()?.let {
+                Info(
+                    label = "Digital Release",
+                    value = it
+                )
+            },
+            physicalRelease?.format()?.let {
+                Info(
+                    label = "Physical Release",
+                    value = it
+                )
             }
-        }
+        )
 
 }

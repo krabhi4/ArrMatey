@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9b60b16ed7ecd8caae51fbea9d052efc",
+    "identityHash": "87b5d53d2bdccca384dffbbd153d8c85",
     "entities": [
       {
         "tableName": "instances",
@@ -367,7 +367,7 @@
       },
       {
         "tableName": "arr_movies",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `originalLanguage` TEXT NOT NULL, `year` INTEGER NOT NULL, `qualityProfileId` INTEGER NOT NULL, `monitored` INTEGER NOT NULL, `runtime` INTEGER NOT NULL, `tmdbId` INTEGER NOT NULL, `status` TEXT NOT NULL, `sortTitle` TEXT, `overview` TEXT, `path` TEXT, `cleanTitle` TEXT, `imdbId` TEXT, `titleSlug` TEXT, `rootFolderPath` TEXT, `folder` TEXT, `certification` TEXT, `images` TEXT NOT NULL, `alternateTitles` TEXT NOT NULL, `genres` TEXT NOT NULL, `tags` TEXT NOT NULL, `addOptions` TEXT, `ratings` TEXT NOT NULL, `statistics` TEXT NOT NULL, `added` INTEGER NOT NULL, `instanceId` INTEGER, `originalTitle` TEXT NOT NULL, `secondaryYear` INTEGER, `secondaryYearSourceId` INTEGER NOT NULL, `sizeOnDisk` INTEGER NOT NULL, `inCinemas` TEXT, `physicalRelease` TEXT, `digitalRelease` INTEGER, `releaseDate` INTEGER, `physicalReleaseNote` TEXT, `website` TEXT NOT NULL, `remotePoster` TEXT, `youTubeTrailerId` TEXT NOT NULL, `studio` TEXT NOT NULL, `hasFile` INTEGER NOT NULL, `movieFileId` INTEGER NOT NULL, `minimumAvailability` TEXT NOT NULL, `isAvailable` INTEGER NOT NULL, `folderName` TEXT NOT NULL, `keywords` TEXT NOT NULL, `movieFile` TEXT, `collection` TEXT, `popularity` REAL NOT NULL, `lastSearchTime` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`instanceId`) REFERENCES `instances`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `originalLanguage` TEXT NOT NULL, `year` INTEGER NOT NULL, `qualityProfileId` INTEGER NOT NULL, `monitored` INTEGER NOT NULL, `runtime` INTEGER NOT NULL, `tmdbId` INTEGER NOT NULL, `status` TEXT NOT NULL, `sortTitle` TEXT, `overview` TEXT, `path` TEXT, `cleanTitle` TEXT, `imdbId` TEXT, `titleSlug` TEXT, `rootFolderPath` TEXT, `folder` TEXT, `certification` TEXT, `images` TEXT NOT NULL, `alternateTitles` TEXT NOT NULL, `genres` TEXT NOT NULL, `tags` TEXT NOT NULL, `addOptions` TEXT, `ratings` TEXT NOT NULL, `statistics` TEXT NOT NULL, `added` INTEGER NOT NULL, `instanceId` INTEGER, `originalTitle` TEXT NOT NULL, `secondaryYear` INTEGER, `secondaryYearSourceId` INTEGER NOT NULL, `sizeOnDisk` INTEGER NOT NULL, `inCinemas` INTEGER, `physicalRelease` INTEGER, `digitalRelease` INTEGER, `releaseDate` INTEGER, `physicalReleaseNote` TEXT, `website` TEXT NOT NULL, `remotePoster` TEXT, `youTubeTrailerId` TEXT NOT NULL, `studio` TEXT NOT NULL, `hasFile` INTEGER NOT NULL, `movieFileId` INTEGER NOT NULL, `minimumAvailability` TEXT NOT NULL, `isAvailable` INTEGER NOT NULL, `folderName` TEXT NOT NULL, `keywords` TEXT NOT NULL, `movieFile` TEXT, `collection` TEXT, `popularity` REAL NOT NULL, `lastSearchTime` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`instanceId`) REFERENCES `instances`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -546,12 +546,12 @@
           {
             "fieldPath": "inCinemas",
             "columnName": "inCinemas",
-            "affinity": "TEXT"
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "physicalRelease",
             "columnName": "physicalRelease",
-            "affinity": "TEXT"
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "digitalRelease",
@@ -683,7 +683,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9b60b16ed7ecd8caae51fbea9d052efc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '87b5d53d2bdccca384dffbbd153d8c85')"
     ]
   }
 }

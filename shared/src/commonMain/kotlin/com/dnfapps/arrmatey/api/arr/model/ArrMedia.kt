@@ -1,6 +1,7 @@
 package com.dnfapps.arrmatey.api.arr.model
 
 import androidx.compose.ui.graphics.Color
+import com.dnfapps.arrmatey.extensions.formatAsRuntime
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -41,7 +42,18 @@ sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S> {
 
     abstract val statusProgress: Float
     abstract val statusColor: Color
+    abstract val releasedBy: String?
+    abstract val statusString: String
 
     val fileSize: Long
         get() = statistics.sizeOnDisk
+
+    val runtimeString: String
+        get() = runtime.formatAsRuntime()
+
+    abstract fun setMonitored(monitored: Boolean): ArrMedia<AT, AO, R, STAT, S>
+
+    class Info(val label: String, val value: String)
+
+    abstract val infoItems: List<Info>
 }

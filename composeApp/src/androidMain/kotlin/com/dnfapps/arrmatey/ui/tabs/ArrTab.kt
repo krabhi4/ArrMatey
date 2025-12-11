@@ -40,7 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.PreferencesStore
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
-import com.dnfapps.arrmatey.api.arr.viewmodel.LibraryUiError
+import com.dnfapps.arrmatey.api.arr.viewmodel.UiErrorType
 import com.dnfapps.arrmatey.api.arr.viewmodel.LibraryUiState
 import com.dnfapps.arrmatey.compose.components.FilterMenuButton
 import com.dnfapps.arrmatey.compose.components.MediaList
@@ -55,6 +55,8 @@ import com.dnfapps.arrmatey.compose.utils.applySorting
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.model.InstanceType
+import com.dnfapps.arrmatey.navigation.RootNavigation
+import com.dnfapps.arrmatey.navigation.RootScreen
 import com.dnfapps.arrmatey.ui.theme.ViewType
 import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModelFactory
@@ -69,6 +71,8 @@ import org.koin.compose.koinInject
 fun ArrTab(type: InstanceType) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    val appNavigation = viewModel<RootNavigation>()
 
     val networkViewModel = viewModel<NetworkConnectivityViewModel>()
     val instanceViewModel = viewModel<InstanceViewModel>()
@@ -197,7 +201,9 @@ fun ArrTab(type: InstanceType) {
                                 items = state.items
                                     .applyFiltering(type, selectedFilter)
                                     .applySorting(type, selectedSortOption, selectedSortOrder),
-                                onItemClick = {},
+                                onItemClick = {
+                                    appNavigation.navigateTo(RootScreen.MediaDetails(type = type, id = it.id))
+                                },
                                 viewType = selectedViewType
                             )
                         }
@@ -208,7 +214,7 @@ fun ArrTab(type: InstanceType) {
                             snackbarHostState.showSnackbarImmediately(state.error.message)
                         }
 
-                        hasServerConnetivityError = state.type == LibraryUiError.Network
+                        hasServerConnetivityError = state.type == UiErrorType.Network
 
                         var isRefreshing by remember { mutableStateOf(false) }
 
@@ -230,7 +236,9 @@ fun ArrTab(type: InstanceType) {
                                     items = state.cachedItems
                                         .applyFiltering(type, selectedFilter)
                                         .applySorting(type, selectedSortOption, selectedSortOrder),
-                                    onItemClick = {},
+                                    onItemClick = {
+                                        appNavigation.navigateTo(RootScreen.MediaDetails(type = type, id = it.id))
+                                    },
                                     viewType = selectedViewType
                                 )
                             } else {

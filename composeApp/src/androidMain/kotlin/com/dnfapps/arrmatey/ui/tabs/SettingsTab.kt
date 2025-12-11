@@ -90,8 +90,9 @@ fun SettingsTab() {
                             }
                         }
                     }
+                    val topR = if (allInstances.isEmpty()) radius else 0.dp
                     Card(
-                        shape = RoundedCornerShape(bottomEnd = radius, bottomStart = radius),
+                        shape = RoundedCornerShape(bottomEnd = radius, bottomStart = radius, topEnd = topR, topStart = topR),
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             settingsNav.navigateTo(SettingsScreen.AddInstance)

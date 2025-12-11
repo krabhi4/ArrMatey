@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class CustomFormat(
     val id: Int,
     val name: String,
-    val includeCustomFormatWhenRenaming: Boolean,
-    val specifications: List<Specification>
+    val includeCustomFormatWhenRenaming: Boolean = false,
+    val specifications: List<Specification> = emptyList()
 )

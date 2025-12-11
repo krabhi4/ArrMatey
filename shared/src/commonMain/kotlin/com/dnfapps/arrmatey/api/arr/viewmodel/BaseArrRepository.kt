@@ -2,7 +2,6 @@ package com.dnfapps.arrmatey.api.arr.viewmodel
 
 import com.dnfapps.arrmatey.api.arr.IArrClient
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
-import com.dnfapps.arrmatey.api.arr.model.ArrMedia
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.database.dao.BaseArrDao
 import com.dnfapps.arrmatey.model.Instance
@@ -34,6 +33,9 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
 
     protected val _uiState = MutableStateFlow<LibraryUiState<T>>(LibraryUiState.Initial)
     override val uiState: StateFlow<LibraryUiState<T>> = _uiState.asStateFlow()
+
+    protected val _detailUiState = MutableStateFlow<DetailsUiState<T>>(DetailsUiState.Initial)
+    override val detailUiState = _detailUiState
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -83,7 +85,7 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
                 _uiState.value = LibraryUiState.Error(
                     error = ErrorEvent(result.message ?: "Network error occurred"),
                     cachedItems = currentItems,
-                    type = LibraryUiError.Network
+                    type = UiErrorType.Network
                 )
             }
 
@@ -91,7 +93,7 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
                 _uiState.value = LibraryUiState.Error(
                     error = ErrorEvent(result.message ?: "Server error occurred"),
                     cachedItems = currentItems,
-                    type = LibraryUiError.Http
+                    type = UiErrorType.Http
                 )
             }
 
@@ -99,9 +101,54 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
                 _uiState.value = LibraryUiState.Error(
                     error = ErrorEvent(result.cause.message ?: "An unexpected error occurred"),
                     cachedItems = currentItems,
-                    type = LibraryUiError.Unexpected
+                    type = UiErrorType.Unexpected
                 )
             }
+        }
+    }
+
+    override suspend fun getDetails(id: Int) {
+        _detailUiState.value = DetailsUiState.Loading
+
+        val result = client.getDetail(id)
+        when (result) {
+            is NetworkResult.Success -> {
+                _detailUiState.value = DetailsUiState.Success(item = result.data)
+            }
+            is NetworkResult.HttpError -> {
+                _detailUiState.value = DetailsUiState.Error(
+                    error = ErrorEvent(result.message ?: "Server error occurred"),
+                    type = UiErrorType.Http
+                )
+            }
+            is NetworkResult.NetworkError -> {
+                _detailUiState.value = DetailsUiState.Error(
+                    error = ErrorEvent(result.message ?: "Network error occurred"),
+                    type = UiErrorType.Network
+                )
+            }
+            is NetworkResult.UnexpectedError -> {
+                _detailUiState.value = DetailsUiState.Error(
+                    error = ErrorEvent(result.cause.message ?: "An unexpected error occurred"),
+                    type = UiErrorType.Unexpected
+                )
+            }
+        }
+    }
+
+    override suspend fun setMonitorStatus(id: Int, monitorStatus: Boolean) {
+        val resp = client.setMonitorStatus(id, monitorStatus)
+
+        if (
+            resp is NetworkResult.Success
+            && resp.data.firstOrNull() != null
+            && _detailUiState.value is DetailsUiState.Success
+        ) {
+            val first = resp.data.first()
+            val newItem = (_detailUiState.value as DetailsUiState.Success<T>).item.setMonitored(
+                monitored = first.monitored
+            ) as T
+            _detailUiState.value = DetailsUiState.Success(item = newItem)
         }
     }
 
@@ -116,9 +163,21 @@ sealed interface LibraryUiState<out T> {
     ): LibraryUiState<T>
     data class Error<T>(
         val error: ErrorEvent,
-        val type: LibraryUiError,
+        val type: UiErrorType,
         val cachedItems: List<T> = emptyList()
     ): LibraryUiState<T>
+}
+
+sealed interface DetailsUiState<out T> {
+    data object Initial: DetailsUiState<Nothing>
+    data object Loading: DetailsUiState<Nothing>
+    data class Success<T>(
+        val item: T
+    ): DetailsUiState<T>
+    data class Error<T>(
+        val error: ErrorEvent,
+        val type: UiErrorType
+    ): DetailsUiState<T>
 }
 
 data class ErrorEvent(
@@ -126,7 +185,7 @@ data class ErrorEvent(
     val timestamp: Long = getCurrentSystemTimeMillis()
 )
 
-enum class LibraryUiError {
+enum class UiErrorType {
     Network,
     Http,
     Unexpected

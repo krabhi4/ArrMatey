@@ -1,0 +1,68 @@
+package com.dnfapps.arrmatey.api.arr.model
+
+import com.dnfapps.arrmatey.utils.formatLocalDateTime
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.time.Clock
+import kotlin.time.Instant
+
+@Serializable
+data class Episode(
+    val id: Long,
+    val seriesId: Long,
+    val tvdbId: Long?,
+    val episodeFileId: Long?,
+    val seasonNumber: Int,
+    val episodeNumber: Int,
+    val title: String? = null,
+    val airDate: LocalDate? = null,
+    @Contextual val airDateUtc: Instant? = null,
+    @Contextual val lastSearchTime: Instant? = null,
+    val runtime: Int?,
+    val finaleType: FinalType? = null,
+    val overview: String? = null,
+    val episodeFile: EpisodeFile? = null,
+    val hasFile: Boolean,
+    val monitored: Boolean,
+    val absoluteEpisodeNumber: Int? = null,
+    val sceneAbsoluteEpisodeNumber: Int? = null,
+    val sceneEpisodeNumber: Int? = null,
+    val sceneSeasonNumber: Int? = null,
+    val unverifiedSceneNumbering: Boolean,
+    val endTime: String? = null,
+    val grabDate: String? = null,
+    val images: List<ArrImage> = emptyList()
+) {
+    fun formatAirDateUtc(
+        friendlyTodayFormat: Boolean = true,
+        timeZone: TimeZone = TimeZone.currentSystemDefault()
+    ): String? {
+        if (airDateUtc == null) return null
+        val localDateTime = airDateUtc.toLocalDateTime(timeZone)
+        val localDate = localDateTime.date
+        val today = Clock.System.todayIn(timeZone)
+
+        return if (localDate == today && friendlyTodayFormat) {
+            val timeString = formatLocalDateTime(localDateTime, "HH:mm", timeZone)
+            "Today at $timeString"
+        } else {
+            formatLocalDateTime(localDateTime, "MMM d, yyyy", timeZone)
+        }
+    }
+}
+
+enum class FinalType(val label: String) {
+    @SerialName("series")
+    Series("Series finale"),
+
+    @SerialName("season")
+    Season("Season finale"),
+
+    @SerialName("midseason")
+    Midseason("Midseason finale")
+}

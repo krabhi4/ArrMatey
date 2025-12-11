@@ -59,6 +59,8 @@
         <item quantity="one">Season</item>
         <item quantity="other">Seasons</item>
     </plurals>
+    <string name="airing_next">Next episode</string>
+    <string name="in_cinemas">In cinemas</string>
 
     <!-- Errors -->
     <string name="instance_connect_error">Failed to connect to instance at %1$s</string>

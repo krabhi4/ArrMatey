@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class Season(
     val seasonNumber: Int,
     val monitored: Boolean,
-    val statistics: SeasonStatistics,
+    val statistics: SeasonStatistics? = null,
     val images: List<ArrImage> = emptyList()
 )

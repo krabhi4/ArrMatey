@@ -3,7 +3,7 @@ package com.dnfapps.arrmatey.api.arr.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MovieCollection(
-    val title: String? = null,
-    val tmdbId: Int? = null
+data class MonitoredResponse(
+    val id: Int,
+    val monitored: Boolean
 )

@@ -10,7 +10,7 @@ enum class MovieStatus {
     @SerialName("inCinemas")
     InCinemas,
     @SerialName("released")
-    Release,
+    Released,
     @SerialName("deleted")
     Deleted
 }
