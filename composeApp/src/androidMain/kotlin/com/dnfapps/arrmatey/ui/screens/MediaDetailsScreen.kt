@@ -120,7 +120,6 @@ fun MediaDetailsScreen(
                     IconButton(
                         onClick = {
                             arrViewModel?.setMonitorStatus(id, !isMonitored)
-//                            isMonitored = !isMonitored
                         }
                     ) {
                         Icon(
@@ -286,7 +285,9 @@ private fun ItemDescriptionCard(item: AnyArrMedia) {
 @Composable
 private fun UpcomingDateView(item: AnyArrMedia) {
     when (item) {
-        is ArrSeries -> if (item.status == SeriesStatus.Continuing) item.nextAiring?.format()?.let { "${stringResource(R.string.airing_next)} $it" } ?: "Continuing - Unknown" else null
+        is ArrSeries -> if (item.status == SeriesStatus.Continuing) item.nextAiring?.format()?.let {
+                "${stringResource(R.string.airing_next)} $it"
+            } ?: stringResource(R.string.continuing_unknown) else null
         is ArrMovie -> item.inCinemas?.format()?.takeUnless {
             item.digitalRelease != null || item.physicalRelease != null
         }?.let { "${stringResource(R.string.in_cinemas)} $it" }
@@ -320,12 +321,12 @@ private fun MovieFileView(movie: ArrMovie) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Files",
+                text = stringResource(R.string.files),
                 fontWeight = FontWeight.Medium,
                 fontSize = 26.sp
             )
             Text(
-                text = "History",
+                text = stringResource(R.string.history),
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable {
@@ -355,14 +356,14 @@ private fun MovieFileView(movie: ArrMovie) {
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "Added on ${file.dateAdded.format("MMM d, yyyy")}",
+                        text = stringResource(R.string.added_on, file.dateAdded.format("MMM d, yyyy")),
                         fontSize = 14.sp
                     )
                 }
             }
         } ?:
             Text(
-                text = "No files",
+                text = stringResource(R.string.no_files),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 12.dp),
@@ -381,7 +382,7 @@ private fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Seasons",
+            text = stringResource(R.string.seasons),
             fontWeight = FontWeight.Medium,
             fontSize = 26.sp
         )
@@ -405,7 +406,11 @@ private fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
                         modifier = Modifier.clickable { expanded = !expanded }
                     ) {
                         Text(
-                            text = if (season.seasonNumber == 0) "Specials" else "Season ${season.seasonNumber}",
+                            text = if (season.seasonNumber == 0) {
+                                stringResource(R.string.specials)
+                            } else {
+                                "${stringResource(R.string.season_singular)} ${season.seasonNumber}"
+                            },
                             fontWeight = FontWeight.Medium,
                             fontSize = 22.sp
                         )
@@ -423,7 +428,11 @@ private fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
                         )
                         Icon(
                             imageVector = if (season.monitored) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                            contentDescription = if (season.monitored) "Monitored" else "Unmonitored",
+                            contentDescription = if (season.monitored) {
+                                stringResource(R.string.monitored)
+                            } else {
+                                stringResource(R.string.unmonitored)
+                            },
                             modifier = Modifier.clickable {
                                 vm.toggleSeasonMonitor(series, season.seasonNumber)
                             }
@@ -471,10 +480,11 @@ private fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
 @OptIn(ExperimentalTime::class)
 @Composable
 private fun SeasonHeader(season: Season, episodes: List<Episode>) {
+    val tbaLabel = stringResource(R.string.tba)
     val year = remember(episodes) {
         episodes.mapNotNull { it.airDateUtc }.minOrNull()
             ?.toLocalDateTime(TimeZone.UTC)?.date?.year?.toString()
-            ?: "TBA"
+            ?: tbaLabel
     }
 
     val runtime = remember(episodes) {
@@ -555,7 +565,7 @@ private fun EpisodeRow(episode: Episode, vm: SonarrViewModel) {
             val statusString =
                 episode.episodeFile?.qualityName
                     ?: episode.airDate?.takeIf { it.isTodayOrAfter() }?.let {
-                        "Unaired"
+                        stringResource(R.string.unaired)
                     }
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -567,7 +577,7 @@ private fun EpisodeRow(episode: Episode, vm: SonarrViewModel) {
                     )
                 } ?:
                     Text(
-                        text = "Missing",
+                        text = stringResource(R.string.missing),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -620,7 +630,7 @@ private fun InfoArea(item: AnyArrMedia) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Information",
+            text = stringResource(R.string.information),
             fontWeight = FontWeight.Medium,
             fontSize = 26.sp
         )
@@ -631,7 +641,8 @@ private fun InfoArea(item: AnyArrMedia) {
             Column (
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp)
             ) {
-                item.infoItems.forEachIndexed { index, info ->
+                val infoItems by item.infoItems.collectAsStateWithLifecycle(emptyList())
+                infoItems.forEachIndexed { index, info ->
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -640,7 +651,7 @@ private fun InfoArea(item: AnyArrMedia) {
                         Text(text = info.label)
                         Text(text = info.value, color = MaterialTheme.colorScheme.primary)
                     }
-                    if (index < item.infoItems.size - 1) {
+                    if (index < infoItems.size - 1) {
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     }
                 }

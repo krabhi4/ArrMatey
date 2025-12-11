@@ -3,8 +3,16 @@ package com.dnfapps.arrmatey.api.arr.model
 import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import arrmatey.shared.generated.resources.Res
+import arrmatey.shared.generated.resources.digital_release
+import arrmatey.shared.generated.resources.in_cinemas
+import arrmatey.shared.generated.resources.minimum_availability
+import arrmatey.shared.generated.resources.physical_release
+import arrmatey.shared.generated.resources.root_folder
+import arrmatey.shared.generated.resources.unknown
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.ui.theme.RadarrDownloadedMonitored
 import com.dnfapps.arrmatey.ui.theme.RadarrDownloadedUnmonitored
@@ -12,8 +20,15 @@ import com.dnfapps.arrmatey.ui.theme.RadarrMissingMonitored
 import com.dnfapps.arrmatey.ui.theme.RadarrMissingUnmonitored
 import com.dnfapps.arrmatey.ui.theme.RadarrUnreleased
 import com.dnfapps.arrmatey.utils.format
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.getString
 import kotlin.time.Instant
 
 @Serializable
@@ -127,34 +142,41 @@ data class ArrMovie(
         return copy(monitored = monitored)
     }
 
-    override val infoItems: List<Info>
-        get() = listOfNotNull(
-            Info(
-                label = "Minimum Availability",
-                value = minimumAvailability.name
-            ),
-            Info(
-                label = "Root Folder",
-                value = rootFolderPath ?: "Unknown"
-            ),
-            inCinemas?.format()?.let {
+    override val infoItems: Flow<List<Info>>
+        get() = _infoItems
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            val newInfo = listOfNotNull(
                 Info(
-                    label = "In Cinemas",
-                    value = it
-                )
-            },
-            digitalRelease?.format()?.let {
+                    label = getString(Res.string.minimum_availability),
+                    value = minimumAvailability.name
+                ),
                 Info(
-                    label = "Digital Release",
-                    value = it
-                )
-            },
-            physicalRelease?.format()?.let {
-                Info(
-                    label = "Physical Release",
-                    value = it
-                )
-            }
-        )
+                    label = getString(Res.string.root_folder),
+                    value = rootFolderPath ?: getString(Res.string.unknown)
+                ),
+                inCinemas?.format()?.let {
+                    Info(
+                        label = getString(Res.string.in_cinemas),
+                        value = it
+                    )
+                },
+                digitalRelease?.format()?.let {
+                    Info(
+                        label = getString(Res.string.digital_release),
+                        value = it
+                    )
+                },
+                physicalRelease?.format()?.let {
+                    Info(
+                        label = getString(Res.string.physical_release),
+                        value = it
+                    )
+                }
+            )
+            _infoItems.emit(newInfo)
+        }
+    }
 
 }

@@ -3,15 +3,33 @@ package com.dnfapps.arrmatey.api.arr.model
 import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import arrmatey.shared.generated.resources.Res
+import arrmatey.shared.generated.resources.monitored
+import arrmatey.shared.generated.resources.new_seasons
+import arrmatey.shared.generated.resources.no
+import arrmatey.shared.generated.resources.root_folder
+import arrmatey.shared.generated.resources.season_folders
+import arrmatey.shared.generated.resources.series_type
+import arrmatey.shared.generated.resources.unknown
+import arrmatey.shared.generated.resources.unmonitored
+import arrmatey.shared.generated.resources.yes
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.ui.theme.SonarrContinuingAllDownloaded
 import com.dnfapps.arrmatey.ui.theme.SonarrEndedAllDownloaded
 import com.dnfapps.arrmatey.ui.theme.SonarrMissingEpsSeriesMonitored
 import com.dnfapps.arrmatey.ui.theme.SonarrMissingEpsSeriesUnmonitored
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.getString
 import org.koin.core.component.KoinComponent
 import kotlin.time.Instant
 
@@ -114,24 +132,35 @@ data class ArrSeries(
     }
 
     // todo - include quality profiles/tags from instance
-    override val infoItems: List<Info>
-        get() = listOf(
-            Info(
-                label = "Series Type",
-                value = seriesType.name
-            ),
-            Info(
-                label = "Root Folder",
-                value = rootFolderPath ?: "Unknown"
-            ),
-            Info(
-                label = "New Seasons",
-                value = if (monitorNewItems == SeriesMonitorNewItems.All) "Monitored" else "Unmonitored"
-            ),
-            Info(
-                label = "Season Folders",
-                value = if (seasonFolder) "Yes" else "No"
+    override val infoItems: Flow<List<Info>>
+        get() = _infoItems
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            val newInfo = listOf(
+                Info(
+                    label = getString(Res.string.series_type),
+                    value = seriesType.name
+                ),
+                Info(
+                    label = getString(Res.string.root_folder),
+                    value = rootFolderPath ?: getString(Res.string.unknown)
+                ),
+                Info(
+                    label = getString(Res.string.new_seasons),
+                    value = if (monitorNewItems == SeriesMonitorNewItems.All) {
+                        getString(Res.string.monitored)
+                    } else {
+                        getString(Res.string.unmonitored)
+                    }
+                ),
+                Info(
+                    label = getString(Res.string.season_folders),
+                    value = if (seasonFolder) getString(Res.string.yes) else getString(Res.string.no)
+                )
             )
-        )
+            _infoItems.emit(newInfo)
+        }
+    }
 
 }

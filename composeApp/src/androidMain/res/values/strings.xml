@@ -15,6 +15,8 @@
     <string name="close">Close</string>
     <string name="back">Back</string>
     <string name="save">Save</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <!-- Labels -->
     <string name="label">Label</string>
@@ -38,6 +40,7 @@
     <string name="file_size">File Size</string>
     <string name="grabbed">Grabbed</string>
     <string name="digital_release">Digital Release</string>
+    <string name="physical_release">Physical Release</string>
     <string name="next_airing">Next Airing</string>
     <string name="previous_airing">Previous Airing</string>
     <string name="sort_ascending">Ascending</string>
@@ -59,8 +62,25 @@
         <item quantity="one">Season</item>
         <item quantity="other">Seasons</item>
     </plurals>
+    <string name="seasons">Seasons</string>
+    <string name="season_singular">Season</string>
+    <string name="specials">Specials</string>
     <string name="airing_next">Next episode</string>
     <string name="in_cinemas">In cinemas</string>
+    <string name="continuing_unknown">Continuing - Unknown</string>
+    <string name="files">Files</string>
+    <string name="no_files">No files</string>
+    <string name="history">History</string>
+    <string name="added_on">Added on %1$s</string>
+    <string name="tba">TBA</string>
+    <string name="unaired">Unaired</string>
+    <string name="information">Information</string>
+    <string name="series_type">Series Type</string>
+    <string name="root_folder">Root Folder</string>
+    <string name="unknown">Unknown</string>
+    <string name="new_seasons">New Seasons</string>
+    <string name="season_folders">Season Folders</string>
+    <string name="minimum_availability">Minimum Availability</string>
 
     <!-- Errors -->
     <string name="instance_connect_error">Failed to connect to instance at %1$s</string>

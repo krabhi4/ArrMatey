@@ -1,7 +1,10 @@
 package com.dnfapps.arrmatey.api.arr.model
 
 import androidx.compose.ui.graphics.Color
+import androidx.room.Ignore
 import com.dnfapps.arrmatey.extensions.formatAsRuntime
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -53,7 +56,10 @@ sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S> {
 
     abstract fun setMonitored(monitored: Boolean): ArrMedia<AT, AO, R, STAT, S>
 
+    @Serializable
     class Info(val label: String, val value: String)
 
-    abstract val infoItems: List<Info>
+    @Ignore
+    protected val _infoItems = MutableStateFlow<List<Info>>(emptyList())
+    abstract val infoItems: Flow<List<Info>>
 }

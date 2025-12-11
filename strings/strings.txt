@@ -23,6 +23,10 @@
         en = Back
     [save]
         en = Save
+    [yes]
+        en = Yes
+    [no]
+        en = No
 
 [[Labels]]
     [label]
@@ -68,6 +72,8 @@
         en = Grabbed
     [digital_release]
         en = Digital Release
+    [physical_release]
+        en = Physical Release
     [next_airing]
         en = Next Airing
     [previous_airing]
@@ -106,10 +112,46 @@
         iosKey = %d seasons
         en = Season
         en_plural = Seasons
+    [seasons]
+        en = Seasons
+    [season_singular]
+        en = Season
+    [specials]
+        en = Specials
     [airing_next]
         en = Next episode
     [in_cinemas]
         en = In cinemas
+    [continuing_unknown]
+        en = Continuing - Unknown
+    [files]
+        en = Files
+    [no_files]
+        en = No files
+    [history]
+        en = History
+    [added_on]
+        iosKey = added_on %@
+        en = Added on %@
+    [tba]
+        en = TBA
+    [unaired]
+        en = Unaired
+    [information]
+        en = Information
+    [series_type]
+        en = Series Type
+    [root_folder]
+        en = Root Folder
+    [unknown]
+        en = Unknown
+    [new_seasons]
+        en = New Seasons
+    [season_folders]
+        en = Season Folders
+    [minimum_availability]
+        en = Minimum Availability
+
 
 [[Errors]]
     [instance_connect_error]
