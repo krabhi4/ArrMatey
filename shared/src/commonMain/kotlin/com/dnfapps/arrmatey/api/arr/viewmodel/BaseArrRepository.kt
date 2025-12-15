@@ -2,6 +2,9 @@ package com.dnfapps.arrmatey.api.arr.viewmodel
 
 import com.dnfapps.arrmatey.api.arr.IArrClient
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
+import com.dnfapps.arrmatey.api.arr.model.ArrMedia
+import com.dnfapps.arrmatey.api.arr.model.ArrMovie
+import com.dnfapps.arrmatey.api.arr.model.ArrSeries
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.database.dao.BaseArrDao
 import com.dnfapps.arrmatey.model.Instance
@@ -139,16 +142,19 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
     override suspend fun setMonitorStatus(id: Int, monitorStatus: Boolean) {
         val resp = client.setMonitorStatus(id, monitorStatus)
 
+        val item = (_detailUiState.value as? DetailsUiState.Success<T>)?.item
         if (
             resp is NetworkResult.Success
             && resp.data.firstOrNull() != null
-            && _detailUiState.value is DetailsUiState.Success
+            && item != null
         ) {
             val first = resp.data.first()
-            val newItem = (_detailUiState.value as DetailsUiState.Success<T>).item.setMonitored(
-                monitored = first.monitored
-            ) as T
-            _detailUiState.value = DetailsUiState.Success(item = newItem)
+            if (item is ArrSeries || item is ArrMovie) {
+                val newItem = item.setMonitored(
+                    monitored = first.monitored
+                ) as T
+                _detailUiState.value = DetailsUiState.Success(item = newItem)
+            }
         }
     }
 

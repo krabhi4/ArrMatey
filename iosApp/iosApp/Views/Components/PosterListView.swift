@@ -9,12 +9,12 @@ import SwiftUI
 import Shared
 
 struct PosterListView: UIViewControllerRepresentable {
-    let items: [GenericArrMedia]
-    let onItemClick: (GenericArrMedia) -> Void
+    let items: [AnyArrMedia]
+    let onItemClick: (AnyArrMedia) -> Void
     
     init(
-        items: [GenericArrMedia],
-        onItemClick: @escaping (GenericArrMedia) -> Void
+        items: [AnyArrMedia],
+        onItemClick: @escaping (AnyArrMedia) -> Void
     ) {
         self.items = items
         self.onItemClick = onItemClick

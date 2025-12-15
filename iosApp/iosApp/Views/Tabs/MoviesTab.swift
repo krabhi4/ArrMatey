@@ -9,8 +9,18 @@ import Foundation
 import SwiftUI
 import Shared
 
-struct MoviesTab: View {   
+struct MoviesTab: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    
     var body: some View {
-        ArrTab(type: .radarr)
+        NavigationStack(path: $navigationManager.moviePath) {
+            ArrTab(type: .radarr)
+                .navigationDestination(for: MediaRoute.self) { value in
+                    switch value {
+                    case .details(let id):
+                        MediaDetailsScreen(id: id, type: .radarr)
+                    }
+                }
+        }
     }
 }

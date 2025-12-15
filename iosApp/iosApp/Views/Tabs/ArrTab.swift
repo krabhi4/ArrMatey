@@ -13,6 +13,8 @@ import ToastViewSwift
 struct ArrTab: View {
     let type: InstanceType
     
+    @EnvironmentObject var navigation: NavigationManager
+    
     @ObservedObject var networkViewModel: NetworkConnectivityViewModel = NetworkConnectivityViewModel()
     @ObservedObject var instanceViewModel: InstanceViewModel = InstanceViewModel()
     @ObservedObject var preferences: PreferencesViewModel = PreferencesViewModel()
@@ -83,24 +85,26 @@ struct ArrTab: View {
             }
     }
     
-    private var sortedAndFilteredItems: [GenericArrMedia] {
+    private var sortedAndFilteredItems: [AnyArrMedia] {
         guard case let success = uiState as? LibraryUiStateSuccess<AnyObject>,
-              let items = success?.items as? [GenericArrMedia] else { return [] }
+              let items = success?.items as? [AnyArrMedia] else { return [] }
         
-        guard let sorted = SortByKt.applySorting(items, type: type, sortBy: preferences.sortBy, order: preferences.sortOrder) as? [GenericArrMedia] else { return [] }
-        
-        guard let filtered = FilterByKt.applyFiltering(sorted, type: type, filterBy: preferences.filterBy) as? [GenericArrMedia] else { return [] }
+        let sorted = SortByKt.applySorting(items, type: type, sortBy: preferences.sortBy, order: preferences.sortOrder) as [AnyArrMedia]
+        let filtered = FilterByKt.applyFiltering(sorted, type: type, filterBy: preferences.filterBy) as [AnyArrMedia]
         
         return filtered
     }
     
-    private var sortedAndFilteredCacheItems: [GenericArrMedia] {
+    private var itemIdentifiers: [Int32] {
+        sortedAndFilteredItems.map(\.id)
+    }
+    
+    private var sortedAndFilteredCacheItems: [AnyArrMedia] {
         guard case let error = uiState as? LibraryUiStateError<AnyObject>,
-              let items = error?.cachedItems as? [GenericArrMedia] else { return [] }
+              let items = error?.cachedItems as? [AnyArrMedia] else { return [] }
         
-        guard let sorted = SortByKt.applySorting(items, type: type, sortBy: preferences.sortBy, order: preferences.sortOrder) as? [GenericArrMedia] else { return [] }
-        
-        guard let filtered = FilterByKt.applyFiltering(sorted, type: type, filterBy: preferences.filterBy) as? [GenericArrMedia] else { return [] }
+        let sorted = SortByKt.applySorting(items, type: type, sortBy: preferences.sortBy, order: preferences.sortOrder) as [AnyArrMedia]
+        let filtered = FilterByKt.applyFiltering(sorted, type: type, filterBy: preferences.filterBy) as [AnyArrMedia]
         
         return filtered
     }
@@ -117,15 +121,15 @@ struct ArrTab: View {
                 ProgressView()
                     .progressViewStyle(.circular)
             }
-        case let success as LibraryUiStateSuccess<AnyObject>:
+        case _ as LibraryUiStateSuccess<AnyObject>:
             if sortedAndFilteredItems.isEmpty {
                 Text("No items")
             } else {
                 mediaView(items: sortedAndFilteredItems) { media in
-                    print("tapped: \(media.title)")
+                    navigation.go(to: .details(Int(media.id)), of: type)
                 }
                 .id(stableItemsKey)
-                .onChange(of: sortedAndFilteredItems) { _, _ in
+                .onChange(of: itemIdentifiers) { _, _ in
                     stableItemsKey = UUID().uuidString
                 }
                 .ignoresSafeArea(edges: .bottom)
@@ -135,7 +139,7 @@ struct ArrTab: View {
                 // Show cached items if available, otherwise show error message
                 if !error.cachedItems.isEmpty {
                     mediaView(items: sortedAndFilteredCacheItems) { media in
-                        print("tapped: \(media.title)")
+                        navigation.go(to: .details(Int(media.id)), of: type)
                     }
                     .ignoresSafeArea(edges: .bottom)
                 } else {
@@ -227,8 +231,8 @@ struct ArrTab: View {
     }
      @ViewBuilder
     private func mediaView(
-        items: [GenericArrMedia],
-        onItemClicked: @escaping (GenericArrMedia) -> Void
+        items: [AnyArrMedia],
+        onItemClicked: @escaping (AnyArrMedia) -> Void
     ) -> some View {
         switch viewType {
         case .grid: PosterGridView(items: items, onItemClick: onItemClicked)

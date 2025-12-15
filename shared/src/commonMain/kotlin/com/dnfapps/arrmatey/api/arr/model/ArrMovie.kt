@@ -3,12 +3,10 @@ package com.dnfapps.arrmatey.api.arr.model
 import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import arrmatey.shared.generated.resources.Res
 import arrmatey.shared.generated.resources.digital_release
-import arrmatey.shared.generated.resources.genres
 import arrmatey.shared.generated.resources.in_cinemas
 import arrmatey.shared.generated.resources.minimum_availability
 import arrmatey.shared.generated.resources.path
@@ -26,7 +24,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable

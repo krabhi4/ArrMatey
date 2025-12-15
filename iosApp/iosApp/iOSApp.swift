@@ -6,10 +6,13 @@ struct iOSApp: App {
     init() {
         KoinHelperKt.doInitKoin()
     }
+    
+    @StateObject private var navigationManager = NavigationManager()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(navigationManager)
         }
     }
 }

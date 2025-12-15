@@ -303,6 +303,7 @@ private fun UpcomingDateView(item: AnyArrMedia) {
         is ArrMovie -> item.inCinemas?.format()?.takeUnless {
             item.digitalRelease != null || item.physicalRelease != null
         }?.let { "${stringResource(R.string.in_cinemas)} $it" }
+        else -> null
     }?.let { airingString ->
         Text(
             text = airingString,

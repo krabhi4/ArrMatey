@@ -7,7 +7,17 @@ import SwiftUI
 import Shared
 
 struct SeriesTab: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    
     var body: some View {
-        ArrTab(type: .sonarr)
+        NavigationStack(path: $navigationManager.seriesPath) {
+            ArrTab(type: .sonarr)
+                .navigationDestination(for: MediaRoute.self) { value in
+                    switch value {
+                    case .details(let id):
+                        MediaDetailsScreen(id: id, type: .sonarr)
+                    }
+                }
+        }
     }
 }

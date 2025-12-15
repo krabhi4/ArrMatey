@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -80,6 +81,7 @@ fun <T: AnyArrMedia> PosterItem(
     modifier: Modifier = Modifier,
     onItemClick: ((T) -> Unit)? = null,
     enabled: Boolean = true,
+    elevation: Dp = 8.dp,
     additionalContent: @Composable BoxScope.() -> Unit = {}
 ) {
     var imageLoadError by remember { mutableStateOf(false) }
@@ -101,7 +103,7 @@ fun <T: AnyArrMedia> PosterItem(
         )
         .build()
     Card(
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation),
         modifier = modifier
             .clip(RoundedCornerShape(5.dp))
             .aspectRatio(0.675f, true)
