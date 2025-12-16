@@ -11,7 +11,6 @@ import kotlinx.serialization.Transient
 import kotlin.time.Instant
 
 interface AnyArrMedia {
-    var instanceId: Long?
     val id: Int
     val title: String
     val originalLanguage: Language
@@ -49,7 +48,6 @@ class Info(val label: String, val value: String)
 
 @Serializable
 sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S>: AnyArrMedia {
-    abstract override var instanceId: Long?
     abstract override val id: Int
     abstract override val title: String
     abstract override val originalLanguage: Language
@@ -93,7 +91,6 @@ sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S>: AnyArrMedia {
 
     abstract fun setMonitored(monitored: Boolean): ArrMedia<AT, AO, R, STAT, S>
 
-    @Ignore
     @Transient
     protected val _infoItems = MutableStateFlow<List<Info>>(emptyList())
     abstract override val infoItems: Flow<List<Info>>

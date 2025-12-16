@@ -114,10 +114,7 @@ fun ArrTab(type: InstanceType) {
                                 tint = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.clickable {
                                     scope.launch {
-                                        var message = context.getString(R.string.instance_connect_error, instance?.url ?: "")
-                                        if (instance?.cacheOnDisk == true) {
-                                            message += ". ${context.getString(R.string.showing_cached_library)}"
-                                        }
+                                        val message = context.getString(R.string.instance_connect_error, instance?.url ?: "")
                                         snackbarHostState.showSnackbarImmediately(message = message)
                                     }
                                 }
@@ -232,20 +229,8 @@ fun ArrTab(type: InstanceType) {
                                 }
                             }
                         ) {
-                            if (state.cachedItems.isNotEmpty()) {
-                                MediaView(
-                                    items = state.cachedItems
-                                        .applyFiltering(type, selectedFilter)
-                                        .applySorting(type, selectedSortOption, selectedSortOrder),
-                                    onItemClick = {
-                                        appNavigation.navigateTo(RootScreen.MediaDetails(type = type, id = it.id))
-                                    },
-                                    viewType = selectedViewType
-                                )
-                            } else {
-                                // todo - error screen
-                                Text(text = "error occurred")
-                            }
+                            // todo - error screen
+                            Text(text = "error occurred")
                         }
                     }
                 }

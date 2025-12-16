@@ -128,14 +128,6 @@ struct NewInstanceView: View {
             }
             
             Section {
-                Toggle(isOn: $viewModel.cacheOnDisk) {
-                    Text(LocalizedStringResource("cache_on_disk"))
-                    Text(LocalizedStringResource("cache_on_disk_description"))
-                        .font(.system(size: 14))
-                }
-                .onChange(of: viewModel.cacheOnDisk) { _, newValue in
-                    viewModel.setCacheOnDisk(newValue)
-                }
                 Toggle(LocalizedStringResource("slow_instance"), isOn: $viewModel.isSlowInstance)
                     .onChange(of: viewModel.isSlowInstance) { _, newValue in
                         viewModel.setIsSlowInstance(newValue)

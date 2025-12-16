@@ -4,22 +4,16 @@ import com.dnfapps.arrmatey.api.arr.SonarrClient
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
 import com.dnfapps.arrmatey.api.arr.model.Episode
 import com.dnfapps.arrmatey.api.client.NetworkResult
-import com.dnfapps.arrmatey.database.dao.SeriesDao
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 
 class SonarrRepository(instance: Instance): BaseArrRepository<ArrSeries>(instance) {
 
     override val client: SonarrClient by inject { parametersOf(instance) }
-    override val dao: SeriesDao by inject()
 
     private val _episodeState = MutableStateFlow<EpisodeUiState>(EpisodeUiState.Initial)
     val episodeState: StateFlow<EpisodeUiState> = _episodeState

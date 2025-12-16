@@ -21,7 +21,6 @@ class AddInstanceViewModel: ObservableObject {
         @Published var result: Bool? = nil
         @Published var isSlowInstance: Bool = false
         @Published var customTimeout: Int64? = nil
-        @Published var cacheOnDisk: Bool = false
         @Published var instanceLabel: String = ""
         
         init() {
@@ -85,12 +84,6 @@ class AddInstanceViewModel: ObservableObject {
             }
             
             Task {
-                for await value in repository.cacheOnDisk {
-                    cacheOnDisk = value.boolValue
-                }
-            }
-            
-            Task {
                 for await value in repository.instanceLabel {
                     instanceLabel = value
                 }
@@ -111,10 +104,6 @@ class AddInstanceViewModel: ObservableObject {
         
         func setCustomTimeout(_ value: Int64?) {
             repository.setCustomTimeout(value: value?.kotlinLong)
-        }
-        
-        func setCacheOnDisk(_ value: Bool) {
-            repository.setCacheOnDisk(value: value)
         }
         
         func setInstanceLabel(_ value: String) {

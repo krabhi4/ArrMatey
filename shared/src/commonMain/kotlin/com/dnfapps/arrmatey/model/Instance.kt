@@ -16,8 +16,7 @@ data class Instance(
     var apiKey: String,
     var enabled: Boolean = true,
     var slowInstance: Boolean = false,
-    var customTimeout: Long? = null,
-    var cacheOnDisk: Boolean = false
+    var customTimeout: Long? = null
 )
 
 enum class InstanceType(

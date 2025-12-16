@@ -2,12 +2,10 @@ package com.dnfapps.arrmatey.di
 
 import com.dnfapps.arrmatey.DataStoreFactory
 import com.dnfapps.arrmatey.PreferencesStore
-import com.dnfapps.arrmatey.api.arr.BaseArrClient
 import com.dnfapps.arrmatey.api.arr.GenericClient
 import com.dnfapps.arrmatey.api.arr.RadarrClient
 import com.dnfapps.arrmatey.api.arr.SonarrClient
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
-import com.dnfapps.arrmatey.api.arr.model.ArrMedia
 import com.dnfapps.arrmatey.api.arr.viewmodel.BaseArrRepository
 import com.dnfapps.arrmatey.api.arr.viewmodel.createInstanceRepository
 import com.dnfapps.arrmatey.api.client.createInstanceClient
@@ -37,8 +35,6 @@ val databaseModule = module {
     single { getRoomDatabase(get()) }
 
     single { get<ArrMateyDatabase>().getInstanceDao() }
-    single { get<ArrMateyDatabase>().getSeriesDao() }
-    single { get<ArrMateyDatabase>().getMoviesDao() }
 
     single { InstanceRepository() }
     single { AddInstanceRepository() }

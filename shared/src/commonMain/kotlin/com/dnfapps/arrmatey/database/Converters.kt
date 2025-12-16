@@ -9,13 +9,11 @@ import com.dnfapps.arrmatey.api.arr.model.MovieCollection
 import com.dnfapps.arrmatey.api.arr.model.MovieFile
 import com.dnfapps.arrmatey.api.arr.model.MovieRatings
 import com.dnfapps.arrmatey.api.arr.model.MovieStatistics
-import com.dnfapps.arrmatey.api.arr.model.MovieStatus
 import com.dnfapps.arrmatey.api.arr.model.Season
 import com.dnfapps.arrmatey.api.arr.model.SeriesAddOptions
 import com.dnfapps.arrmatey.api.arr.model.SeriesAlternateTitle
 import com.dnfapps.arrmatey.api.arr.model.SeriesRatings
 import com.dnfapps.arrmatey.api.arr.model.SeriesStatistics
-import com.dnfapps.arrmatey.database.dao.MovieDao
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 

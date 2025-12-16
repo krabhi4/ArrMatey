@@ -99,16 +99,6 @@ struct ArrTab: View {
         sortedAndFilteredItems.map(\.id)
     }
     
-    private var sortedAndFilteredCacheItems: [AnyArrMedia] {
-        guard case let error = uiState as? LibraryUiStateError<AnyObject>,
-              let items = error?.cachedItems as? [AnyArrMedia] else { return [] }
-        
-        let sorted = SortByKt.applySorting(items, type: type, sortBy: preferences.sortBy, order: preferences.sortOrder) as [AnyArrMedia]
-        let filtered = FilterByKt.applyFiltering(sorted, type: type, filterBy: preferences.filterBy) as [AnyArrMedia]
-        
-        return filtered
-    }
-    
     @ViewBuilder
     private func contentForState() -> some View {
         switch uiState {
@@ -136,20 +126,12 @@ struct ArrTab: View {
             }
         case let error as LibraryUiStateError<AnyObject>:
             ZStack {
-                // Show cached items if available, otherwise show error message
-                if !error.cachedItems.isEmpty {
-                    mediaView(items: sortedAndFilteredCacheItems) { media in
-                        navigation.go(to: .details(Int(media.id)), of: type)
-                    }
-                    .ignoresSafeArea(edges: .bottom)
-                } else {
-                    VStack {
-                        Text("An error occurred")
-                            .font(.headline)
-                        Text(error.error.message)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
+                VStack {
+                    Text("An error occurred")
+                        .font(.headline)
+                    Text(error.error.message)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
             }
             .onAppear {

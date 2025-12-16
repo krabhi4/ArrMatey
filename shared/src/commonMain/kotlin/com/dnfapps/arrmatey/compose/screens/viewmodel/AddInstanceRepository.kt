@@ -44,9 +44,6 @@ class AddInstanceRepository: KoinComponent {
     private val _customTimeout = MutableStateFlow<Long?>(null)
     val customTimeout: StateFlow<Long?> = _customTimeout
 
-    private val _cacheOnDisk = MutableStateFlow(false)
-    val cacheOnDisk = _cacheOnDisk
-
     private val _instanceLabel = MutableStateFlow("")
     val instanceLabel = _instanceLabel
 
@@ -70,10 +67,6 @@ class AddInstanceRepository: KoinComponent {
 
     fun setCustomTimeout(value: Long?) {
         _customTimeout.value = value
-    }
-
-    fun setCacheOnDisk(value: Boolean) {
-        _cacheOnDisk.value = value
     }
 
     fun setInstanceLabel(value: String) {
@@ -111,7 +104,6 @@ class AddInstanceRepository: KoinComponent {
         instanceLabel.value = ""
         _isSlowInstance.value = false
         _customTimeout.value = null
-        _cacheOnDisk.value = false
     }
 
     fun dismissInfoCard(instanceType: InstanceType) {
@@ -125,8 +117,7 @@ class AddInstanceRepository: KoinComponent {
             url = apiEndpoint.value,
             apiKey = apiKey.value,
             slowInstance = isSlowInstance.value,
-            customTimeout = if (isSlowInstance.value) customTimeout.value else null,
-            cacheOnDisk = cacheOnDisk.value
+            customTimeout = if (isSlowInstance.value) customTimeout.value else null
         )
         instanceRepository.newInstance(newInstance)
     }

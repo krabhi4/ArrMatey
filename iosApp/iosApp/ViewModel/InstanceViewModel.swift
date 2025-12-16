@@ -26,7 +26,6 @@ class InstanceViewModel: ObservableObject {
     @MainActor
     func refresh() async {
         for await instances in instanceRepository.allInstances {
-            print("got instances \(instances.count)")
             self.instances = instances
         }
     }

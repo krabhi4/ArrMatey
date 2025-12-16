@@ -46,7 +46,6 @@ fun ArrConfigurationScreen(
 
     val isSlowInstance by viewModel.isSlowInstance.collectAsStateWithLifecycle()
     val customTimeout by viewModel.customTimeout.collectAsStateWithLifecycle()
-    val cacheOnDisk by viewModel.cacheOnDisk.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -139,24 +138,5 @@ fun ArrConfigurationScreen(
             placeholder = "300",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-                .toggleable(
-                    value = cacheOnDisk,
-                    onValueChange = { viewModel.setCacheOnDisk(it) }
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.cache_on_disk)
-            )
-            Switch(
-                checked = cacheOnDisk,
-                onCheckedChange = null
-            )
-        }
     }
 }

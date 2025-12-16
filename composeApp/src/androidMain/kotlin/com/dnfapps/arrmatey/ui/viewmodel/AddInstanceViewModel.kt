@@ -28,7 +28,6 @@ class AddInstanceViewModel: ViewModel(), KoinComponent {
     val apiKey = repository.apiKey
     val isSlowInstance = repository.isSlowInstance
     val customTimeout = repository.customTimeout
-    val cacheOnDisk = repository.cacheOnDisk
     val instanceLabel = repository.instanceLabel
 
     fun setApiEndpoint(value: String) = repository.setApiEndpoint(value)
@@ -38,8 +37,6 @@ class AddInstanceViewModel: ViewModel(), KoinComponent {
     fun setIsSlowInstance(value: Boolean) = repository.setIsSlowInstance(value)
 
     fun setCustomTimeout(value: Long?) = repository.setCustomTimeout(value)
-
-    fun setCacheOnDisk(value: Boolean) = repository.setCacheOnDisk(value)
 
     fun setInstanceLabel(value: String) = repository.setInstanceLabel(value)
 

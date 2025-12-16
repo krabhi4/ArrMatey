@@ -36,18 +36,6 @@ import org.koin.core.component.KoinComponent
 import kotlin.time.Instant
 
 @Serializable
-@Entity(
-    tableName = "arr_series",
-    foreignKeys = [
-        ForeignKey(
-            entity = Instance::class,
-            parentColumns = ["id"],
-            childColumns = ["instanceId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [Index("instanceId")]
-)
 data class ArrSeries(
     @PrimaryKey(autoGenerate = false)
     override val id: Int,
@@ -76,7 +64,6 @@ data class ArrSeries(
     override val ratings: SeriesRatings,
     override val statistics: SeriesStatistics,
     @Contextual override val added: Instant,
-    override var instanceId: Long? = null,
 
     val ended: Boolean,
     val seasonFolder: Boolean,
