@@ -170,7 +170,7 @@ struct ArrTab: View {
         
         guard let firstInstance = self.firstInstance else { return }
         
-        self.arrViewModel = ArrViewModel(instance: firstInstance)
+        self.arrViewModel = createArrViewModel(for: firstInstance)
         
         observationTask?.cancel()
         observationTask = Task {

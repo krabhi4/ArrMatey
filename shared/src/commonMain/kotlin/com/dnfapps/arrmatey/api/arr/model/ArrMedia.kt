@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlin.time.Instant
 
 interface AnyArrMedia {
@@ -33,17 +34,13 @@ interface AnyArrMedia {
     val tags: List<Int>
     val statistics: ArrStatistics
     @Contextual val added: Instant
-
     fun ratingScore(): Double
-
     val statusProgress: Float
     val statusColor: Color
     val releasedBy: String?
     val statusString: String
-
     val fileSize: Long
     val runtimeString: String
-
     val infoItems: Flow<List<Info>>
 }
 
@@ -97,6 +94,7 @@ sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S>: AnyArrMedia {
     abstract fun setMonitored(monitored: Boolean): ArrMedia<AT, AO, R, STAT, S>
 
     @Ignore
+    @Transient
     protected val _infoItems = MutableStateFlow<List<Info>>(emptyList())
     abstract override val infoItems: Flow<List<Info>>
 }

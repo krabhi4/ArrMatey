@@ -40,6 +40,17 @@ struct MediaDetailsScreen: View {
             .onDisappear {
                 observationTask?.cancel()
             }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Image(systemName: isMonitored ? "bookmark.fill" : "bookmark")
+                        .imageScale(.medium)
+                        .onTapGesture {
+                            Task {
+                                await arrViewModel?.setMonitorStatus(id: Int32(id), isMonitored: !isMonitored)
+                            }
+                        }
+                }
+            }
     }
     
     @ViewBuilder
@@ -62,7 +73,10 @@ struct MediaDetailsScreen: View {
 
                 Text([item.releasedBy ?? "", item.statusString].joined(separator: " • "))
                     .font(.system(size: 14))
-                    .lineSpacing(16 - 14) // optional rough equivalent of lineHeight
+                
+                Text(item.genres.joined(separator: " • "))
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
 
             }
             .frame(alignment: .top)
@@ -83,30 +97,28 @@ struct MediaDetailsScreen: View {
             }
         case let state as DetailsUiStateSuccess<AnyArrMedia>:
             if let item = state.item {
-                VStack(alignment: .leading, spacing: 12){
-                    header(item: item)
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        if let airingString = makeAiringString(for: item) {
-                            Text(airingString)
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.accentColor)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12){
+                        header(item: item)
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            if let airingString = makeAiringString(for: item) {
+                                Text(airingString)
+                                    .font(.system(size: 20, weight: .medium))
+                                    .foregroundColor(.accentColor)
+                            }
+                            
+                            ItemDescriptionCard(overview: item.overview)
+                            
+                            filesArea(for: item)
+                            
+                            MediaInfoArea(item: item)
                         }
-                        
-                        ItemDescriptionCard(overview: item.overview)
-                        
-                        filesArea(for: item)
-                        
-                        MediaInfoArea(item: item)
+                        .padding(.horizontal, 12)
                     }
                     .padding(.horizontal, 12)
+                    .frame(alignment: .top)
                 }
-                .padding(.horizontal, 12)
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity,
-                    alignment: .top // or .topLeading
-                )
             }
         case let error as DetailsUiStateError<AnyArrMedia>:
             VStack{}
@@ -139,10 +151,12 @@ struct MediaDetailsScreen: View {
     
     @ViewBuilder
     private func filesArea(for item: AnyArrMedia) -> some View {
-        switch item {
-        case is ArrSeries: SeriesFilesView(series: item as! ArrSeries)
-        case is ArrMovie: MovieFilesView(movie: item as! ArrMovie)
-        default: EmptyView()
+        if let series = item as? ArrSeries, let vm = arrViewModel as? SonarrViewModel {
+            SeriesFilesView(series: series, viewModel: vm)
+        } else if let movie = item as? ArrMovie, let vm = arrViewModel as? RadarrViewModel {
+            MovieFilesView(movie: movie)
+        } else {
+            EmptyView()
         }
     }
     
@@ -152,7 +166,7 @@ struct MediaDetailsScreen: View {
         
         guard let firstInstance = self.firstInstance else { return }
         
-        self.arrViewModel = ArrViewModel(instance: firstInstance)
+        self.arrViewModel = createArrViewModel(for: firstInstance)
         
         observationTask?.cancel()
         observationTask = Task {

@@ -2,7 +2,6 @@ package com.dnfapps.arrmatey.ui.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
-import com.dnfapps.arrmatey.api.arr.model.Episode
 import com.dnfapps.arrmatey.api.arr.viewmodel.SonarrRepository
 import com.dnfapps.arrmatey.model.Instance
 import kotlinx.coroutines.launch

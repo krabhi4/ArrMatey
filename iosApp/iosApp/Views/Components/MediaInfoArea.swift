@@ -38,7 +38,7 @@ struct MediaInfoArea: View {
             .collect(flow: item.infoItems, into: $infoItems)
         } header: {
             Text(String(localized: LocalizedStringResource("information")))
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: 26, weight: .bold))
         }
     }
 }

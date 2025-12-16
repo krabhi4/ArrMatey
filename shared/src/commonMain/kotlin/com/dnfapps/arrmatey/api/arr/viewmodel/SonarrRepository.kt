@@ -85,11 +85,6 @@ class SonarrRepository(instance: Instance): BaseArrRepository<ArrSeries>(instanc
                         if (episode.id == episodeId) newEpisode else episode
                     }
                     _episodeState.value = EpisodeUiState.Success(items = episodeList)
-//                    val episodeList = state.items.toMutableList()
-//                    val index = episodeList.indexOfFirst { it.id == episodeId }
-//                    episodeList.removeAt(index)
-//                    episodeList.add(newEpisode)
-//                    _episodeState.value = EpisodeUiState.Success(items = episodeList)
                 }
             }
         }

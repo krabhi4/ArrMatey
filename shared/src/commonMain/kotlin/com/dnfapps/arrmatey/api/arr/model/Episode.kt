@@ -54,6 +54,8 @@ data class Episode(
             formatLocalDateTime(localDateTime, "MMM d, yyyy", timeZone)
         }
     }
+
+    fun formatAirDateUtc() = formatAirDateUtc(true, TimeZone.currentSystemDefault())
 }
 
 enum class FinalType(val label: String) {

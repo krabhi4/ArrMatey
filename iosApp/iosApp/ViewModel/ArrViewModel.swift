@@ -8,21 +8,24 @@
 import SwiftUI
 import Shared
 
-class ArrViewModel {
-    let instance: Instance
-    private let repository: IArrRepository
+protocol ArrViewModel {
+    func getUiState() -> SkieSwiftStateFlow<LibraryUiState>
+    func getDetailsUiState() -> SkieSwiftStateFlow<DetailsUiState>
+    func refreshLibrary() async
+    func getDetails(id: Int32) async
+    func setMonitorStatus(id: Int32, isMonitored: Bool) async
     
+    var instance: Instance { get }
+    var repository: IArrRepository { get }
+}
+
+extension ArrViewModel {
     func getUiState() -> SkieSwiftStateFlow<LibraryUiState> {
         return repository.uiState
     }
     
     func getDetailsUiState() -> SkieSwiftStateFlow<DetailsUiState> {
         return repository.detailUiState
-    }
-    
-    init(instance: Instance) {
-        self.instance = instance
-        self.repository = BaseArrRepositoryKt.createInstanceRepository(instance: instance)
     }
     
     func refreshLibrary() async {
@@ -41,12 +44,18 @@ class ArrViewModel {
         }
     }
     
-    func setMonitorStatus(id: Int32, monitorStatus: Bool) async {
+    func setMonitorStatus(id: Int32, isMonitored: Bool) async {
         do {
-            try await repository.setMonitorStatus(id: id, monitorStatus: monitorStatus)
+            try await repository.setMonitorStatus(id: id, monitorStatus: isMonitored)
         } catch {
             return
         }
     }
+}
 
+func createArrViewModel(for instance: Instance) -> any ArrViewModel {
+    switch instance.type {
+    case .sonarr: return SonarrViewModel(instance: instance)
+    case .radarr: return RadarrViewModel(instance: instance)
+    }
 }

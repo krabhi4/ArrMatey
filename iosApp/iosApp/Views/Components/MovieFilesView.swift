@@ -24,7 +24,6 @@ struct MovieFilesView: View {
                     let dateAdded = file.dateAdded.format(pattern: "MMM d, yyyy")
                     Text(String(localized: LocalizedStringResource("added_on \(dateAdded)")))
                         .font(.system(size: 14))
-//                    Text(String(localized: LocalizedStringResource("added_on ")))
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 18)
@@ -41,6 +40,16 @@ struct MovieFilesView: View {
                     .padding(.vertical, 12)
                     .multilineTextAlignment(.center)
             }
+        } header: {
+            HStack(alignment: .center) {
+                Text(String(localized: LocalizedStringResource("files")))
+                    .font(.system(size: 20, weight: .bold))
+                Spacer()
+                Text(String(localized: LocalizedStringResource("history")))
+                    .font(.system(size: 16))
+                    .foregroundColor(.accentColor)
+            }
+            .frame(maxWidth: .infinity)
         }
     }
     
