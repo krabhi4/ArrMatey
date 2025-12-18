@@ -19,6 +19,8 @@ struct SettingsTab: View {
                         NewInstanceView()
                     case .dev:
                         DevSettingsScreen()
+                    case .editInstance(let id):
+                        EditInstanceScreen(id: id)
                     }
                 }
         }

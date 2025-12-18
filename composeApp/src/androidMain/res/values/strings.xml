@@ -11,12 +11,17 @@
     <string name="add_instance">Add instance</string>
     <string name="instances">Instances</string>
 
+    <!-- Messages -->
+    <string name="confirm_delete_instance">Are you sure you want to delete %1$s?</string>
+
     <!-- Actions -->
     <string name="close">Close</string>
     <string name="back">Back</string>
     <string name="save">Save</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="ok">Ok</string>
+    <string name="confirm">Confirm</string>
 
     <!-- Labels -->
     <string name="label">Label</string>

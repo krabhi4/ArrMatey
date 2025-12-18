@@ -33,4 +33,14 @@ class InstanceViewModel: ObservableObject {
         }
     }
     
+    func delete(_ instance: Instance) {
+        Task {
+            do {
+                try await instanceRepository.deleteInstance(instance: instance)
+            } catch {
+                return
+            }
+        }
+    }
+    
 }

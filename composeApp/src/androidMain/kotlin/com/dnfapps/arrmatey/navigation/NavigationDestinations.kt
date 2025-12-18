@@ -17,5 +17,6 @@ sealed interface HomeTab : NavKey {
 sealed interface SettingsScreen : NavKey {
     object Landing : SettingsScreen
     object AddInstance : SettingsScreen
+    class EditInstance(val id: Long): SettingsScreen
     object Dev: SettingsScreen
 }

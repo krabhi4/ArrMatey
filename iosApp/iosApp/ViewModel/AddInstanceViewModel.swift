@@ -23,6 +23,7 @@ class AddInstanceViewModel: ObservableObject {
     @Published var customTimeout: Int64? = nil
     @Published var instanceLabel: String = ""
     @Published var createResult: InsertResult? = nil
+    @Published var editResult: InsertResult? = nil
     @Published var wasCreatedSuccessfully: Bool = false
     @Published var hasCreationError: Bool = false
     
@@ -97,6 +98,14 @@ class AddInstanceViewModel: ObservableObject {
                 hasCreationError = createResult is InsertResultError || createResult is InsertResultConflict
             }
         }
+        Task {
+            for await value in repository.editResult {
+                print("edit result: \(value)")
+                editResult = value
+                wasCreatedSuccessfully = editResult is InsertResultSuccess
+                hasCreationError = editResult is InsertResultError || editResult is InsertResultConflict
+            }
+        }
     }
     
     func setApiEndpoint(_ value: String) {
@@ -137,6 +146,40 @@ class AddInstanceViewModel: ObservableObject {
         Task {
             try await repository.createInstance(instanceType: instanceType)
         }
+    }
+    
+    func updateInstance(instance: Instance) {
+        Task {
+            try await repository.updateInstance(instance: instance)
+        }
+    }
+    
+    func initialize(instance: Instance) {
+        print("initializing with instance \(instance)")
+        setApiEndpoint(instance.url)
+        setApiKey(instance.apiKey)
+        setIsSlowInstance(instance.slowInstance)
+        setCustomTimeout(instance.customTimeout?.int64Value)
+        setInstanceLabel(instance.label)
+    }
+    
+    var customTimeoutTextBinding: Binding<String> {
+        Binding(
+            get: {
+                guard let value = self.customTimeout else { return "" }
+                return String(value)
+            },
+            set: { newValue in
+                let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.isEmpty {
+                    self.setCustomTimeout(nil)
+                } else if let intValue = Int64(trimmed) {
+                    self.setCustomTimeout(intValue)
+                } else {
+                    // do nothing
+                }
+            }
+        )
     }
 }
 

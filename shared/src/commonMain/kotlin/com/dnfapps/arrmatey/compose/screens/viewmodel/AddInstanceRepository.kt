@@ -20,10 +20,11 @@ class AddInstanceRepository: KoinComponent {
     private val instanceRepository: InstanceRepository by inject()
     private val preferencesStore: PreferencesStore by inject()
 
-//    private val _fieldConflicts = MutableStateFlow<List<ConflictField>>(emptyList())
-//    val fieldConflicts: StateFlow<List<ConflictField>> = _fieldConflicts
     private val _createResult = MutableStateFlow<InsertResult?>(null)
     val createResult: StateFlow<InsertResult?> = _createResult
+
+    private val _editResult = MutableStateFlow<InsertResult?>(null)
+    val editResult: StateFlow<InsertResult?> = _editResult
 
     private val _saveButtonEnabled = MutableStateFlow(false)
     val saveButtonEnabled: StateFlow<Boolean> = _saveButtonEnabled
@@ -105,9 +106,11 @@ class AddInstanceRepository: KoinComponent {
         _testing.value = false
         _apiEndpoint.value = ""
         _apiKey.value = ""
-        instanceLabel.value = ""
+        _instanceLabel.value = ""
         _isSlowInstance.value = false
         _customTimeout.value = null
+        _createResult.value = null
+        _editResult.value = null
     }
 
     fun dismissInfoCard(instanceType: InstanceType) {
@@ -125,5 +128,18 @@ class AddInstanceRepository: KoinComponent {
         )
         val result = instanceRepository.createInstance(newInstance)
         _createResult.emit(result)
+    }
+
+    suspend fun updateInstance(instance: Instance) {
+        val newInstance = instance.copy(
+            label = instanceLabel.value,
+            url = apiEndpoint.value,
+            apiKey = apiKey.value,
+            slowInstance = isSlowInstance.value,
+            customTimeout = if (isSlowInstance.value) customTimeout.value else null
+        )
+
+        val result = instanceRepository.updateInstance(newInstance)
+        _editResult.emit(result)
     }
 }

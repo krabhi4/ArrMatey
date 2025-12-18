@@ -36,9 +36,9 @@ import com.dnfapps.arrmatey.utils.thenGet
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArrConfigurationScreen(
-    instanceType: InstanceType
+    instanceType: InstanceType,
+    viewModel: AddInstanceViewModel = viewModel<AddInstanceViewModel>()
 ) {
-    val viewModel = viewModel<AddInstanceViewModel>()
 
     val apiEndpoint by viewModel.apiEndpoint.collectAsStateWithLifecycle()
     val apiKey by viewModel.apiKey.collectAsStateWithLifecycle()

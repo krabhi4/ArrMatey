@@ -21,10 +21,7 @@ interface InstanceDao {
     suspend fun delete(instance: Instance)
 
     @Update
-    suspend fun update(instance: Instance)
-
-    @Query("SELECT * FROM instances")
-    suspend fun getAllInstances(): List<Instance>
+    suspend fun update(instance: Instance): Int
 
     @Query("SELECT * FROM instances")
     fun observeAllInstances(): Flow<List<Instance>>

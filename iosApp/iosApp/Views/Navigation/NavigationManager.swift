@@ -34,4 +34,5 @@ enum MediaRoute: Hashable {
 enum SettingsRoute : Hashable {
     case newInstance
     case dev
+    case editInstance(Int64)
 }

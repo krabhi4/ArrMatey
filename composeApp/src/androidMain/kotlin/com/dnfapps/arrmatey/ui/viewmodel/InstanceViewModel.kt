@@ -37,6 +37,12 @@ class InstanceViewModel: ViewModel(), KoinComponent {
         }
     }
 
+    fun delete(instance: Instance) {
+        viewModelScope.launch {
+            repository.deleteInstance(instance)
+        }
+    }
+
 }
 
 @Composable

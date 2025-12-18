@@ -1,17 +1,18 @@
 package com.dnfapps.arrmatey.ui.tabs
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,8 +35,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.entensions.getDrawableId
 import com.dnfapps.arrmatey.isDebug
-import com.dnfapps.arrmatey.navigation.SettingsScreen
 import com.dnfapps.arrmatey.navigation.SettingsNavigation
+import com.dnfapps.arrmatey.navigation.SettingsScreen
 import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,11 +69,13 @@ fun SettingsTab() {
                             shape = RoundedCornerShape(topStart = topR, topEnd = topR),
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                Toast.makeText(context, "TODO - ${instance.label}", Toast.LENGTH_SHORT).show()
+                                settingsNav.navigateTo(SettingsScreen.EditInstance(instance.id))
                             }
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                                modifier = Modifier
+                                    .padding(vertical = 12.dp)
+                                    .padding(start = 24.dp, end = 18.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(24.dp)
                             ) {
@@ -87,6 +90,12 @@ fun SettingsTab() {
                                     Text(text = instance.label, fontSize = 18.sp, fontWeight = FontWeight.Medium)
                                     Text(text = instance.url, fontSize = 16.sp)
                                 }
+                                Spacer(modifier = Modifier.weight(1f))
+                                Icon(
+                                    imageVector = Icons.Default.ChevronRight,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp)
+                                )
                             }
                         }
                     }

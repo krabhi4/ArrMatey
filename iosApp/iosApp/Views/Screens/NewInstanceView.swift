@@ -149,7 +149,7 @@ struct NewInstanceView: View {
                 HStack(spacing: 24) {
                     Text(LocalizedStringResource("custom_timeout_seconds"))
                         .foregroundStyle(viewModel.isSlowInstance ? Color.primary.opacity(1.0) : Color.primary.opacity(0.3))
-                    TextField(text: customTimeoutTextBinding, prompt: Text("300")) { EmptyView() }
+                    TextField(text: viewModel.customTimeoutTextBinding, prompt: Text("300")) { EmptyView() }
                         .multilineTextAlignment(.trailing)
                         .keyboardType(.numberPad)
                         .onChange(of: viewModel.customTimeout) { _, newValue in
@@ -196,28 +196,5 @@ struct NewInstanceView: View {
                 }
             }
         }
-    }
-    
-    private var customTimeoutTextBinding: Binding<String> {
-        Binding(
-            get: {
-                if let value = viewModel.customTimeout {
-                    return String(value)
-                } else {
-                    return ""
-                }
-            },
-            set: { newValue in
-                let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmed.isEmpty {
-                    viewModel.setCustomTimeout(nil)
-                } else if let intValue = Int64(trimmed) {
-                    viewModel.setCustomTimeout(intValue)
-                } else {
-                    // Optional: decide what to do with invalid input.
-                    // For now, ignore or keep previous value.
-                }
-            }
-        )
     }
 }

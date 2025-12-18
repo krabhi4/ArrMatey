@@ -26,6 +26,11 @@ struct SettingsScreen: View {
                             Text(instance.url)
                                 .font(.system(size: 16))
                         }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                    }
+                    .onTapGesture {
+                        navigationManager.go(to: .editInstance(instance.id))
                     }
                 }
                 Button(LocalizedStringResource("add_instance")) {

@@ -37,7 +37,7 @@ val databaseModule = module {
     single { get<ArrMateyDatabase>().getInstanceDao() }
 
     single { InstanceRepository() }
-    single { AddInstanceRepository() }
+    factory { AddInstanceRepository() }
 
     factory<BaseArrRepository<out AnyArrMedia>> {
         (instance: Instance) -> createInstanceRepository(instance)

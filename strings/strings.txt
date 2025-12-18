@@ -16,6 +16,11 @@
     [instances]
         en = Instances
 
+[[Messages]]
+    [confirm_delete_instance]
+        iosKey = confirm_delete_instance %@
+        en = Are you sure you want to delete %@?
+
 [[Actions]]
     [close]
         en = Close
@@ -27,6 +32,10 @@
         en = Yes
     [no]
         en = No
+    [ok]
+        en = Ok
+    [confirm]
+        en = Confirm
 
 [[Labels]]
     [label]
@@ -155,6 +164,8 @@
         en = Genres
     [path]
         en = Path
+    [error]
+        en = Error
 
 
 [[Errors]]

@@ -4,7 +4,6 @@ import com.dnfapps.arrmatey.database.dao.ConflictField
 import com.dnfapps.arrmatey.database.dao.InsertResult
 import com.dnfapps.arrmatey.database.dao.InstanceDao
 import com.dnfapps.arrmatey.model.Instance
-import com.dnfapps.arrmatey.model.InstanceType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -52,8 +51,34 @@ class InstanceRepository: KoinComponent {
             }
 
         } catch (e: Exception) {
-            InsertResult.Error(e.message ?: "")
+            InsertResult.Error(e.message ?: "An error occurred")
         }
+    }
+
+    suspend fun updateInstance(instance: Instance): InsertResult {
+        return try {
+            val urlConflict = instanceDao.findOtherByUrl(instance.url, instance.id) != null
+            val labelConflict = instanceDao.findOtherByLabel(instance.label, instance.id) != null
+
+            val conflictField = buildList {
+                if (urlConflict) add(ConflictField.InstanceUrl)
+                if (labelConflict) add(ConflictField.InstanceLabel)
+            }
+
+            if (conflictField.isNotEmpty()) {
+                InsertResult.Conflict(fields = conflictField)
+            } else {
+                val rows = instanceDao.update(instance)
+                if (rows > 0) InsertResult.Success(instance.id)
+                else InsertResult.Error("Failed to update")
+            }
+        } catch (e: Exception) {
+            InsertResult.Error(e.message ?: "An error occurred")
+        }
+    }
+
+    suspend fun deleteInstance(instance: Instance) {
+        instanceDao.delete(instance)
     }
 
     suspend fun setInstanceActive(instance: Instance) {

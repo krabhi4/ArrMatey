@@ -53,6 +53,10 @@ fun AddInstanceScreen() {
 
     val createResult by addInstanceViewModel.createResult.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        addInstanceViewModel.reset()
+    }
+
     LaunchedEffect(selectedInstanceType) {
         addInstanceViewModel.reset()
         addInstanceViewModel.setInstanceLabel(selectedInstanceType.name)
@@ -83,14 +87,6 @@ fun AddInstanceScreen() {
                         onClick = {
                             scope.launch {
                                 addInstanceViewModel.createInstance(selectedInstanceType)
-//                                {
-//                                    if (fieldConflicts.isEmpty()) {
-//                                        settingsNav.popBackStack()
-//                                    }
-//                                }
-
-//                                addInstanceViewModel.saveInstance(selectedInstanceType)
-//                                settingsNav.popBackStack()
                             }
                         },
                         enabled = saveButtonEnabled,
@@ -125,11 +121,6 @@ fun AddInstanceScreen() {
             )
 
             ArrConfigurationScreen(selectedInstanceType)
-
-//            when (selectedInstanceType) {
-//                InstanceType.Sonarr -> ArrConfigurationScreen(InstanceType.Sonarr)// { saveButtonEnabled = it == true }
-//                InstanceType.Radarr -> ArrConfigurationScreen(InstanceType.Radarr)// { saveButtonEnabled = it == true }
-//            }
         }
     }
 }
