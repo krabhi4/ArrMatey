@@ -109,13 +109,17 @@ struct ArrTab: View {
     @ViewBuilder
     private func contentForState() -> some View {
         if instance == nil {
-            Text("no instances")
+            VStack {
+                noInstanceView()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             switch uiState {
             case is LibraryUiStateInitial:
-                ZStack {
-                    Text("initial state")
+                VStack {
+                    noInstanceView()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             case is LibraryUiStateLoading:
                 ZStack {
                     ProgressView()
@@ -123,7 +127,10 @@ struct ArrTab: View {
                 }
             case _ as LibraryUiStateSuccess<AnyObject>:
                 if sortedAndFilteredItems.isEmpty {
-                    Text("No items")
+                    VStack {
+                        emptyLibraryView()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     mediaView(items: sortedAndFilteredItems) { media in
                         navigation.go(to: .details(Int(media.id)), of: type)
@@ -134,25 +141,16 @@ struct ArrTab: View {
                     }
                     .ignoresSafeArea(edges: .bottom)
                 }
-            case let error as LibraryUiStateError<AnyObject>:
+            case _ as LibraryUiStateError<AnyObject>:
                 ZStack {
-                    VStack {
-                        Text("An error occurred")
-                            .font(.headline)
-                        Text(error.error.message)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
+                    errorView()
                 }
-                .onAppear {
-                    print("GOT ERROR \(error.error.message)")
-                    let toast = Toast.text(error.error.message)
-                    toast.show()
-                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             default:
                 VStack {
-                    Text("default")
+                    noInstanceView()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
     }
@@ -186,11 +184,6 @@ struct ArrTab: View {
     
     @ToolbarContentBuilder
     var toolbarOptions: some ToolbarContent {
-        ToolbarItem(placement: .navigation) {
-            InstancePickerMenu(type: type)
-                .menuIndicator(.hidden)
-        }
-        
         let newType = switch viewType {
         case .grid: ViewType.list
         case .list: ViewType.grid
@@ -205,6 +198,15 @@ struct ArrTab: View {
                 .onTapGesture {
                     preferences.saveViewType(type: type, viewType: newType)
                 }
+        }
+        
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.flexible, placement: .navigation)
+        }
+        
+        ToolbarItem(placement: .navigation) {
+            InstancePickerMenu(type: type)
+                .menuIndicator(.hidden)
         }
         
         ToolbarItem(placement: .primaryAction) {
@@ -235,6 +237,61 @@ struct ArrTab: View {
         case .grid: PosterGridView(items: items, onItemClick: onItemClicked)
         case .list: PosterListView(items: items, onItemClick: onItemClicked)
         }
+    }
+    
+    @ViewBuilder
+    private func errorView() -> some View {
+        VStack(alignment: .center, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 64))
+                .imageScale(.large)
+            
+            Text("couldnt_connect")
+                .font(.system(size: 20, weight: .medium))
+                .multilineTextAlignment(.center)
+            Text("couldnt_connect_message")
+                .multilineTextAlignment(.center)
+            Button(action: {
+                Task {
+                    await arrViewModel?.refreshLibrary()
+                }
+            }) {
+                Text("retry")
+            }
+        }
+        .padding(.horizontal, 24)
+    }
+    
+    @ViewBuilder
+    private func noInstanceView() -> some View {
+        VStack(alignment: .center, spacing: 8) {
+            Image(systemName: "externaldrive.fill.trianglebadge.exclamationmark")
+                .font(.system(size: 64))
+                .imageScale(.large)
+            
+            Text("no_type_instances \(type)")
+                .font(.system(size: 20, weight: .medium))
+                .multilineTextAlignment(.center)
+            Text(String(localized: LocalizedStringResource("no_type_instances_message \(type)")))
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, 24)
+    }
+    
+    @ViewBuilder
+    private func emptyLibraryView() -> some View {
+        VStack(alignment: .center, spacing: 8) {
+            Image(systemName: "popcorn.fill")
+                .font(.system(size: 64))
+                .imageScale(.large)
+            
+            Text("empty_library")
+                .font(.system(size: 20, weight: .medium))
+                .multilineTextAlignment(.center)
+            Text("empty_library_message")
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, 24)
     }
     
 }

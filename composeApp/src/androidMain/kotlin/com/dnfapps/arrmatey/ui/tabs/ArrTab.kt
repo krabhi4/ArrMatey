@@ -1,16 +1,21 @@
 package com.dnfapps.arrmatey.ui.tabs
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.SignalWifiOff
+import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -33,8 +38,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.PreferencesStore
@@ -193,17 +202,29 @@ fun ArrTab(type: InstanceType) {
                                 scope.launch {
                                     arrViewModel.refreshLibrary()
                                 }
-                            }
+                            },
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            MediaView(
-                                items = state.items
-                                    .applyFiltering(type, selectedFilter)
-                                    .applySorting(type, selectedSortOption, selectedSortOrder),
-                                onItemClick = {
-                                    appNavigation.navigateTo(RootScreen.MediaDetails(type = type, id = it.id))
-                                },
-                                viewType = selectedViewType
-                            )
+                            val items = state.items
+                                .applyFiltering(type, selectedFilter)
+                                .applySorting(type, selectedSortOption, selectedSortOrder)
+
+                            if (items.isEmpty()) {
+                                EmptyLibraryView(modifier = Modifier.align(Alignment.Center))
+                            } else {
+                                MediaView(
+                                    items = items,
+                                    onItemClick = {
+                                        appNavigation.navigateTo(
+                                            RootScreen.MediaDetails(
+                                                type = type,
+                                                id = it.id
+                                            )
+                                        )
+                                    },
+                                    viewType = selectedViewType
+                                )
+                            }
                         }
                     }
 
@@ -220,23 +241,109 @@ fun ArrTab(type: InstanceType) {
                             isRefreshing = false
                         }
 
+                        LaunchedEffect(isRefreshing) {
+                            if (isRefreshing) {
+                                scope.launch { arrViewModel.refreshLibrary() }
+                            }
+                        }
+
                         PullToRefreshBox(
                             isRefreshing = isRefreshing,
                             onRefresh = {
                                 isRefreshing = true
-                                scope.launch {
-                                    arrViewModel.refreshLibrary()
-                                }
-                            }
+                            },
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            // todo - error screen
-                            Text(text = "error occurred")
+                            InstanceErrorView(
+                                onRefresh = { isRefreshing = true },
+                                modifier = Modifier.align(Alignment.Center)
+                            )
                         }
                     }
                 }
             } ?: run {
-                Text(text = "No instances found")
+                NoInstanceView(
+                    type = type,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun NoInstanceView(
+    type: InstanceType,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.Default.CloudQueue,
+            contentDescription = null,
+            modifier = Modifier.size(128.dp)
+        )
+        Text(
+            text = stringResource(R.string.no_type_instances, type.name),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Medium
+        )
+        Text(text = stringResource(R.string.no_type_instances_message, type.name))
+    }
+}
+
+@Composable
+private fun EmptyLibraryView(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.Default.VideoLibrary,
+            contentDescription = null,
+            modifier = Modifier.size(128.dp)
+        )
+        Text(
+            text = stringResource(R.string.empty_library),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            text = stringResource(R.string.empty_library_message)
+        )
+    }
+}
+
+@Composable
+private fun InstanceErrorView(
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.Default.CloudOff,
+            contentDescription = null,
+            modifier = Modifier.size(128.dp),
+            tint = MaterialTheme.colorScheme.error
+        )
+        Text(
+            text = stringResource(R.string.couldnt_connect),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Medium
+        )
+        Text(text = stringResource(R.string.couldnt_connect_message))
+        Button(onClick = onRefresh) {
+            Text(text = stringResource(R.string.retry))
         }
     }
 }

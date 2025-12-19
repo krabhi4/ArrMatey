@@ -216,7 +216,7 @@ function generateAndroidStringsXML(json) {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
-      .replace(/'/g, "&apos;");
+      .replace(/'/g, "\\'");
 
   supportedLangs.forEach((lang) => {
     const dir = lang === DEFAULT_LANG ? `values` : `values-${lang}`;

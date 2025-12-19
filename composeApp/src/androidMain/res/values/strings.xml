@@ -10,9 +10,15 @@
     <!-- Titles -->
     <string name="add_instance">Add instance</string>
     <string name="instances">Instances</string>
+    <string name="couldnt_connect">Couldn\'t Connect</string>
+    <string name="no_type_instances">No %1$s instances</string>
+    <string name="empty_library">Nothing here</string>
 
     <!-- Messages -->
     <string name="confirm_delete_instance">Are you sure you want to delete %1$s?</string>
+    <string name="couldnt_connect_message">There was an error connecting to the server</string>
+    <string name="no_type_instances_message">You don\'t have any %1$s instances added yet</string>
+    <string name="empty_library_message">Try adding something to your library</string>
 
     <!-- Actions -->
     <string name="close">Close</string>
@@ -22,6 +28,7 @@
     <string name="no">No</string>
     <string name="ok">Ok</string>
     <string name="confirm">Confirm</string>
+    <string name="retry">Retry</string>
 
     <!-- Labels -->
     <string name="label">Label</string>
@@ -88,6 +95,7 @@
     <string name="minimum_availability">Minimum Availability</string>
     <string name="genres">Genres</string>
     <string name="path">Path</string>
+    <string name="error">Error</string>
 
     <!-- Errors -->
     <string name="instance_connect_error">Failed to connect to instance at %1$s</string>

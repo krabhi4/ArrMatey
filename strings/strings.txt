@@ -15,11 +15,25 @@
         en = Add instance
     [instances]
         en = Instances
+    [couldnt_connect]
+        en = Couldn't Connect
+    [no_type_instances]
+        iosKey = no_type_instances %@
+        en = No %@ instances
+    [empty_library]
+        en = Nothing here
 
 [[Messages]]
     [confirm_delete_instance]
         iosKey = confirm_delete_instance %@
         en = Are you sure you want to delete %@?
+    [couldnt_connect_message]
+        en = There was an error connecting to the server
+    [no_type_instances_message]
+        iosKey = no_type_instances_message %@
+        en = You don't have any %@ instances added yet
+    [empty_library_message]
+        en = Try adding something to your library
 
 [[Actions]]
     [close]
@@ -36,6 +50,8 @@
         en = Ok
     [confirm]
         en = Confirm
+    [retry]
+        en = Retry
 
 [[Labels]]
     [label]
