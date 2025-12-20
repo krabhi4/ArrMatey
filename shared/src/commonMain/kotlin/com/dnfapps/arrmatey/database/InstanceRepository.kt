@@ -4,10 +4,13 @@ import com.dnfapps.arrmatey.database.dao.ConflictField
 import com.dnfapps.arrmatey.database.dao.InsertResult
 import com.dnfapps.arrmatey.database.dao.InstanceDao
 import com.dnfapps.arrmatey.model.Instance
+import com.dnfapps.arrmatey.model.InstanceType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -28,8 +31,8 @@ class InstanceRepository: KoinComponent {
                 .none { i ->
                     i.type == instance.type && i.selected
                 }
-        instance.selected = shouldBeSelected
-        return instanceDao.insert(instance)
+        val newInstance = instance.copy(selected = shouldBeSelected)
+        return instanceDao.insert(newInstance)
     }
 
     suspend fun createInstance(instance: Instance): InsertResult {
@@ -45,7 +48,7 @@ class InstanceRepository: KoinComponent {
             if (conflictFields.isNotEmpty()) {
                 InsertResult.Conflict(fields = conflictFields)
             } else {
-                val id = newInstance(instance)//instanceDao.insert(instance)
+                val id = newInstance(instance)
                 if (id > 0L) InsertResult.Success(id)
                 else InsertResult.Error("Failed to save")
             }
@@ -78,7 +81,7 @@ class InstanceRepository: KoinComponent {
     }
 
     suspend fun deleteInstance(instance: Instance) {
-        instanceDao.delete(instance)
+        instanceDao.deleteAndUpdateSelected(instance)
     }
 
     suspend fun setInstanceActive(instance: Instance) {

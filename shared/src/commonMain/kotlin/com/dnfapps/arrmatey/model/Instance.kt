@@ -14,13 +14,13 @@ import androidx.room.PrimaryKey
 data class Instance(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val type: InstanceType,
-    var label: String,
-    var url: String,
-    var apiKey: String,
-    var enabled: Boolean = true,
-    var slowInstance: Boolean = false,
-    var customTimeout: Long? = null,
-    var selected: Boolean = false
+    val label: String,
+    val url: String,
+    val apiKey: String,
+    val enabled: Boolean = true,
+    val slowInstance: Boolean = false,
+    val customTimeout: Long? = null,
+    val selected: Boolean = false
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -47,4 +47,30 @@ interface InstanceDao {
 
     @Query("SELECT id FROM instances WHERE label = :label AND id != :currentId LIMIT 1")
     suspend fun findOtherByLabel(label: String, currentId: Long): Long?
+
+    @Query("""
+        UPDATE instances
+        SET selected = true
+        WHERE id = (
+            SELECT id
+            FROM instances AS i
+            WHERE i.type = :type
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM instances AS j
+                    WHERE j.type = :type
+                        AND j.selected = true
+                )
+            ORDER BY i.id
+            LIMIT 1
+        )
+    """)
+    suspend fun ensureFirstSelectedIfNone(type: InstanceType)
+
+    @Transaction
+    suspend fun deleteAndUpdateSelected(instance: Instance) {
+        val type = instance.type
+        delete(instance)
+        ensureFirstSelectedIfNone(type)
+    }
 }
