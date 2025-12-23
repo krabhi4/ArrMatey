@@ -92,6 +92,10 @@ fun ArrTab(type: InstanceType) {
     val networkViewModel = viewModel<NetworkConnectivityViewModel>()
     val instance = rememberInstanceFor(type)
 
+    LaunchedEffect(instance) {
+        println("instance changes $instance")
+    }
+
     val preferenceStore: PreferencesStore = koinInject()
     val selectedSortOrder by preferenceStore.sortOrder.collectAsState(SortOrder.Asc)
     val selectedSortOption by preferenceStore.sortBy.collectAsState(SortBy.Title)

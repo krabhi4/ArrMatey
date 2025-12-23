@@ -15,17 +15,29 @@ class InstanceViewModel: ObservableObject {
     @Published
     private(set) var instances: [Instance] = []
     
+    private var observationTask: Task<Void, Never>?
+    
     init() {
-        Task {
-            for await value in instanceRepository.allInstances {
-                self.instances = value
+        observationTask = Task {
+            do {
+                for try await value in instanceRepository.allInstances {
+                    print("new instances value \(value)")
+                    self.instances = value
+                }
+            } catch {
+                print("Error observing instance: \(error)")
             }
         }
+    }
+    
+    deinit {
+        observationTask?.cancel()
     }
     
     func setSelected(_ instance: Instance) {
         Task {
             do {
+                print("setting \(instance.label) as active")
                 try await instanceRepository.setInstanceActive(instance: instance)
             } catch {
                 return

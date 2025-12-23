@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.database
 
+import androidx.collection.intSetOf
 import com.dnfapps.arrmatey.database.dao.ConflictField
 import com.dnfapps.arrmatey.database.dao.InsertResult
 import com.dnfapps.arrmatey.database.dao.InstanceDao
@@ -8,10 +9,17 @@ import com.dnfapps.arrmatey.model.InstanceType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -19,18 +27,40 @@ class InstanceRepository: KoinComponent {
 
     private val instanceDao: InstanceDao by inject()
 
-    val allInstances = instanceDao.observeAllInstances()
+    private val _allInstances = MutableSharedFlow<List<Instance>>(
+        replay = 1,
+        extraBufferCapacity = 1
+    )
+    val allInstances: Flow<List<Instance>> = _allInstances
+
+//    val _allInstancesStateFlow = MutableStateFlow<List<Instance>>(emptyList())
+//    val allInstancesStateFlow: StateFlow<List<Instance>> = _allInstancesStateFlow
+    val allInstancesFlow = instanceDao.observeAllInstances()
         .stateIn(
             scope = CoroutineScope(Dispatchers.IO),
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
 
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            val initial = instanceDao.getAllInstances()
+            emitInstances(initial)
+
+            instanceDao.observeAllInstances().collect { instances ->
+                emitInstances(instances)
+            }
+        }
+    }
+
+    private suspend fun emitInstances(instances: List<Instance>) {
+        _allInstances.emit(instances)
+//        _allInstancesStateFlow.emit(instances)
+    }
+
     private suspend fun newInstance(instance: Instance): Long {
-        val shouldBeSelected = allInstances.value
-                .none { i ->
-                    i.type == instance.type && i.selected
-                }
+        val currentInstances = instanceDao.getInstancesOfType(instance.type)
+        val shouldBeSelected = currentInstances.none { i -> i.selected }
         val newInstance = instance.copy(selected = shouldBeSelected)
         return instanceDao.insert(newInstance)
     }
@@ -85,7 +115,16 @@ class InstanceRepository: KoinComponent {
     }
 
     suspend fun setInstanceActive(instance: Instance) {
-        instanceDao.setInstanceAsSelected(instance.id, instance.type)
+        println("KT setting ${instance.label} as active")
+
+        withContext(Dispatchers.IO) {
+            instanceDao.setInstanceAsSelected(instance.id, instance.type)
+
+            // Force refresh
+            val instances = instanceDao.getAllInstances()
+            emitInstances(instances)
+//            _allInstances.emit(instances)
+        }
     }
 
 }

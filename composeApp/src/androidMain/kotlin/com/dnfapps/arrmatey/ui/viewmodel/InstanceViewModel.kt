@@ -31,6 +31,13 @@ class InstanceViewModel: ViewModel(), KoinComponent {
             initialValue = emptyList()
         )
 
+    val allInstancesFlow = repository.allInstancesFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     fun setSelected(instance: Instance) {
         viewModelScope.launch {
             repository.setInstanceActive(instance)
@@ -48,7 +55,7 @@ class InstanceViewModel: ViewModel(), KoinComponent {
 @Composable
 fun rememberInstanceFor(type: InstanceType): Instance? {
     val viewModel = viewModel<InstanceViewModel>()
-    val instances by viewModel.allInstances.collectAsState()
+    val instances by viewModel.allInstancesFlow.collectAsState()
     return instances.firstOrNull { i ->
         i.type == type && i.selected
     }
@@ -57,6 +64,6 @@ fun rememberInstanceFor(type: InstanceType): Instance? {
 @Composable
 fun rememberHasMultipleInstances(type: InstanceType): Boolean {
     val viewModel = viewModel<InstanceViewModel>()
-    val instances by viewModel.allInstances.collectAsState()
+    val instances by viewModel.allInstancesFlow.collectAsState()
     return instances.count { it.type == type } > 1
 }

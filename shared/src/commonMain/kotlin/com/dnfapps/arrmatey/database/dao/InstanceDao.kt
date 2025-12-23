@@ -26,15 +26,33 @@ interface InstanceDao {
     @Query("SELECT * FROM instances")
     fun observeAllInstances(): Flow<List<Instance>>
 
-    @Query("""
-        UPDATE instances 
-        SET selected = CASE 
-            WHEN id = :id THEN true
-            ELSE false
-        END
-        WHERE type = :type
-    """)
-    suspend fun setInstanceAsSelected(id: Long, type: InstanceType)
+    @Query("SELECT * FROM instances")
+    suspend fun getAllInstances(): List<Instance>
+
+    @Query("SELECT * FROM instances WHERE type = :type")
+    suspend fun getInstancesOfType(type: InstanceType): List<Instance>
+
+    @Query("UPDATE instances SET selected = false WHERE type = :type")
+    suspend fun unselectAllOf(type: InstanceType)
+
+    @Query("UPDATE instances SET selected = true WHERE id = :id")
+    suspend fun selectInstance(id: Long)
+
+    @Transaction
+    suspend fun setInstanceAsSelected(id: Long, type: InstanceType) {
+        unselectAllOf(type)
+        selectInstance(id)
+    }
+
+//    @Query("""
+//        UPDATE instances
+//        SET selected = CASE
+//            WHEN id = :id THEN true
+//            ELSE false
+//        END
+//        WHERE type = :type
+//    """)
+//    suspend fun setInstanceAsSelected(id: Long, type: InstanceType): Int
 
     @Query("SELECT id FROM instances WHERE url = :url")
     suspend fun findByUrl(url: String): Long?
