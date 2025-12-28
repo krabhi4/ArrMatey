@@ -28,8 +28,7 @@ import kotlin.time.Instant
 
 @Serializable
 data class ArrMovie(
-    @PrimaryKey(autoGenerate = false)
-    override val id: Int,
+    override val id: Int? = null,
     override val title: String,
     override val originalLanguage: Language,
     override val year: Int,
@@ -44,7 +43,7 @@ data class ArrMovie(
     override val cleanTitle: String? = null,
     override val imdbId: String? = null,
     override val titleSlug: String? = null,
-    override val rootFolderPath: String? = null,
+    override val rootFolderPath: String = "",
     override val folder: String? = null,
     override val certification: String? = null,
     override val images: List<ArrImage> = emptyList(),
@@ -53,13 +52,13 @@ data class ArrMovie(
     override val tags: List<Int> = emptyList(),
     override val addOptions: MovieAddOptions? = null,
     override val ratings: MovieRatings,
-    override val statistics: MovieStatistics,
+    override val statistics: MovieStatistics? = null,
     @Contextual override val added: Instant,
 
     val originalTitle: String,
     val secondaryYear: Int? = null,
     val secondaryYearSourceId: Int,
-    val sizeOnDisk: Long,
+    val sizeOnDisk: Long = 0,
     @Contextual val inCinemas: Instant? = null,
     @Contextual val physicalRelease: Instant? = null,
     @Contextual val digitalRelease: Instant? = null,
@@ -69,7 +68,7 @@ data class ArrMovie(
     val remotePoster: String? = null,
     val youTubeTrailerId: String,
     val studio: String,
-    val hasFile: Boolean,
+    val hasFile: Boolean = false,
     val movieFileId: Int,
     val minimumAvailability: MovieStatus,
     val isAvailable: Boolean,
@@ -137,7 +136,7 @@ data class ArrMovie(
                     ),
                     Info(
                         label = getString(Res.string.root_folder),
-                        value = rootFolderPath ?: getString(Res.string.unknown)
+                        value = rootFolderPath.takeUnless { it.isBlank() } ?: getString(Res.string.unknown)
                     ),
                     Info(
                         label = getString(Res.string.path),

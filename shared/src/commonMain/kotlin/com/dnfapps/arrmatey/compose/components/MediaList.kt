@@ -47,7 +47,6 @@ import coil3.request.crossfade
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
-import com.dnfapps.arrmatey.api.arr.model.CoverType
 import com.dnfapps.arrmatey.api.arr.model.SeriesStatus
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.extensions.pxToDp

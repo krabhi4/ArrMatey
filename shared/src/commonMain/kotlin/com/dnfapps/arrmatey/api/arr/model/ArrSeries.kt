@@ -37,8 +37,7 @@ import kotlin.time.Instant
 
 @Serializable
 data class ArrSeries(
-    @PrimaryKey(autoGenerate = false)
-    override val id: Int,
+    override val id: Int? = null,
     override val title: String,
     override val originalLanguage: Language,
     override val year: Int,
@@ -62,7 +61,7 @@ data class ArrSeries(
     override val tags: List<Int> = emptyList(),
     override val addOptions: SeriesAddOptions? = null,
     override val ratings: SeriesRatings,
-    override val statistics: SeriesStatistics,
+    override val statistics: SeriesStatistics? = null,
     @Contextual override val added: Instant,
 
     val ended: Boolean,
@@ -90,10 +89,10 @@ data class ArrSeries(
     }
 
     val episodeFileCount: Int
-        get() = statistics.episodeFileCount
+        get() = statistics?.episodeFileCount ?: 0
 
     val episodeCount: Int
-        get() = statistics.episodeCount
+        get() = statistics?.episodeCount ?: 0
 
     val seasonCount: Int
         get() = seasons.size
@@ -102,14 +101,14 @@ data class ArrSeries(
         get() = status.name
 
     override val statusProgress: Float
-        get() = statistics.percentOfEpisodes.toFloat()
+        get() = statistics?.percentOfEpisodes?.toFloat() ?: 0f
 
     override val statusColor: Color
         get() = when {
-            status == SeriesStatus.Ended && statistics.percentOfEpisodes == 100.toDouble() -> SonarrEndedAllDownloaded
-            status == SeriesStatus.Continuing && statistics.percentOfEpisodes == 100.toDouble() -> SonarrContinuingAllDownloaded
-            statistics.percentOfEpisodes != 100.toDouble() && monitored -> SonarrMissingEpsSeriesMonitored
-            statistics.percentOfEpisodes != 100.toDouble() && !monitored -> SonarrMissingEpsSeriesUnmonitored
+            status == SeriesStatus.Ended && statistics?.percentOfEpisodes == 100.toDouble() -> SonarrEndedAllDownloaded
+            status == SeriesStatus.Continuing && statistics?.percentOfEpisodes == 100.toDouble() -> SonarrContinuingAllDownloaded
+            statistics?.percentOfEpisodes != 100.toDouble() && monitored -> SonarrMissingEpsSeriesMonitored
+            statistics?.percentOfEpisodes != 100.toDouble() && !monitored -> SonarrMissingEpsSeriesUnmonitored
             else -> Color.Unspecified
         }
 

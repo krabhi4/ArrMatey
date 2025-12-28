@@ -4,6 +4,9 @@ import com.dnfapps.arrmatey.api.arr.IArrClient
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
+import com.dnfapps.arrmatey.api.arr.model.QualityProfile
+import com.dnfapps.arrmatey.api.arr.model.RootFolder
+import com.dnfapps.arrmatey.api.arr.model.Tag
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
@@ -36,9 +39,42 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
     protected val _detailUiState = MutableStateFlow<DetailsUiState<T>>(DetailsUiState.Initial)
     override val detailUiState = _detailUiState
 
+    protected val _lookupUiState = MutableStateFlow<LibraryUiState<T>>(LibraryUiState.Initial)
+    override val lookupUiState: StateFlow<LibraryUiState<T>> = _lookupUiState.asStateFlow()
+
+    protected val _qualityProfiles = MutableStateFlow<List<QualityProfile>>(emptyList())
+    override val qualityProfiles: StateFlow<List<QualityProfile>> = _qualityProfiles
+
+    protected val _rootFolders = MutableStateFlow<List<RootFolder>>(emptyList())
+    override val rootFolders: StateFlow<List<RootFolder>> = _rootFolders
+
+    protected val _tags = MutableStateFlow<List<Tag>>(emptyList())
+    override val tags: StateFlow<List<Tag>> = _tags
+
+    protected val _addItemUiState = MutableStateFlow<DetailsUiState<T>>(DetailsUiState.Initial)
+    override val addItemUiState: StateFlow<DetailsUiState<T>> = _addItemUiState
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
+            refreshInstance()
             refreshLibrary()
+        }
+    }
+
+    private suspend fun refreshInstance() {
+        val qualityProfilesResp = client.getQualityProfiles()
+        if (qualityProfilesResp is NetworkResult.Success) {
+            _qualityProfiles.emit(qualityProfilesResp.data)
+        }
+
+        val rootFoldersResp = client.getRootFolders()
+        if (rootFoldersResp is NetworkResult.Success) {
+            _rootFolders.emit(rootFoldersResp.data)
+        }
+
+        val tagsResp = client.getTags()
+        if (tagsResp is NetworkResult.Success) {
+            _tags.emit(tagsResp.data)
         }
     }
 
@@ -130,6 +166,60 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
                 ) as T
                 _detailUiState.value = DetailsUiState.Success(item = newItem)
             }
+        }
+    }
+
+    override suspend fun lookup(query: String) {
+        _lookupUiState.value = LibraryUiState.Loading
+
+        if (query.trim().isBlank()) {
+            _lookupUiState.value = LibraryUiState.Initial
+            return
+        }
+
+        val result = client.lookup(query)
+        when (result) {
+            is NetworkResult.Success -> {
+                val newLibrary = result.data
+                _lookupUiState.value = LibraryUiState.Success(newLibrary, isRefreshing = false)
+            }
+
+            is NetworkResult.NetworkError -> {
+                _lookupUiState.value = LibraryUiState.Error(
+                    error = ErrorEvent(result.message ?: "Network error occurred"),
+                    type = UiErrorType.Network
+                )
+            }
+
+            is NetworkResult.HttpError -> {
+                _lookupUiState.value = LibraryUiState.Error(
+                    error = ErrorEvent(result.message ?: "Server error occurred"),
+                    type = UiErrorType.Http
+                )
+            }
+
+            is NetworkResult.UnexpectedError -> {
+                _lookupUiState.value = LibraryUiState.Error(
+                    error = ErrorEvent(result.cause.message ?: "An unexpected error occurred"),
+                    type = UiErrorType.Unexpected
+                )
+            }
+        }
+    }
+
+    override suspend fun addItem(item: T) {
+        _addItemUiState.value = DetailsUiState.Loading
+        val result = client.addItemToLibrary(item)
+
+        when (result) {
+            is NetworkResult.Success -> {
+                _addItemUiState.value = DetailsUiState.Success(result.data)
+//                refreshLibrary()
+            }
+            else -> _addItemUiState.value = DetailsUiState.Error(
+                error = ErrorEvent("An unexpected error occurred"),
+                type = UiErrorType.Unexpected
+            )
         }
     }
 

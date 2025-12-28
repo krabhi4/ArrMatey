@@ -38,13 +38,16 @@ import com.dnfapps.arrmatey.navigation.SettingsNavigation
 import com.dnfapps.arrmatey.ui.viewmodel.AddInstanceViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditInstanceScreen(id: Long) {
+fun EditInstanceScreen(
+    id: Long,
+    settingsNav: SettingsNavigation = koinInject<SettingsNavigation>()
+) {
     val scope = rememberCoroutineScope()
 
-    val settingsNav = viewModel<SettingsNavigation>()
     val editInstanceViewModel = viewModel<AddInstanceViewModel>()
     val instanceViewModel = viewModel<InstanceViewModel>()
 

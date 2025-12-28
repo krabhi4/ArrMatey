@@ -11,24 +11,11 @@ import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.ui.graphics.vector.ImageVector
-import arrmatey.shared.generated.resources.Res
-import arrmatey.shared.generated.resources.added
-import arrmatey.shared.generated.resources.digital_release
-import arrmatey.shared.generated.resources.file_size
-import arrmatey.shared.generated.resources.grabbed
-import arrmatey.shared.generated.resources.next_airing
-import arrmatey.shared.generated.resources.previous_airing
-import arrmatey.shared.generated.resources.rating
-import arrmatey.shared.generated.resources.sort_ascending
-import arrmatey.shared.generated.resources.sort_descending
-import arrmatey.shared.generated.resources.title
-import arrmatey.shared.generated.resources.year
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
 import com.dnfapps.arrmatey.compose.icons.Hard_drive
 import com.dnfapps.arrmatey.model.InstanceType
-import org.jetbrains.compose.resources.StringResource
 
 enum class SortBy(
     val iosIcon: String,
@@ -47,7 +34,10 @@ enum class SortBy(
 
     // TV
     NextAiring("clock", Icons.Default.Schedule, "next_airing"),
-    PreviousAiring("clock.arrow.trianglehead.counterclockwise.rotate.90", Icons.Default.History, "previous_airing");
+    PreviousAiring("clock.arrow.trianglehead.counterclockwise.rotate.90", Icons.Default.History, "previous_airing"),
+
+    // Lookup
+    Relevance("star", Icons.Default.Star, "relevance");
 
     companion object {
 
@@ -63,6 +53,7 @@ enum class SortBy(
                 InstanceType.Radarr -> radarrOps
             }
 
+        fun lookupEntries() = listOf(Relevance, Year, Rating)
     }
 }
 
@@ -80,7 +71,7 @@ private fun List<AnyArrMedia>.applyBaseSorting(sortBy: SortBy, order: SortOrder)
     SortBy.Year -> if (order == SortOrder.Asc) sortedBy { it.year } else sortedByDescending { it.year }
     SortBy.Added -> if (order == SortOrder.Asc) sortedBy { it.added } else sortedByDescending { it.added }
     SortBy.Rating -> if (order == SortOrder.Asc) sortedBy { it.ratingScore() } else sortedByDescending { it.ratingScore() }
-    SortBy.FileSize -> if (order == SortOrder.Asc) sortedBy { it.statistics.sizeOnDisk } else sortedByDescending { it.statistics.sizeOnDisk }
+    SortBy.FileSize -> if (order == SortOrder.Asc) sortedBy { it.statistics?.sizeOnDisk } else sortedByDescending { it.statistics?.sizeOnDisk }
     else -> this
 }
 

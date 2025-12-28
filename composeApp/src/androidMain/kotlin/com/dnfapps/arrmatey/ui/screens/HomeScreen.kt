@@ -10,43 +10,38 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.compose.TabItem
 import com.dnfapps.arrmatey.entensions.getString
-import com.dnfapps.arrmatey.navigation.HomeScreenNavHost
-import com.dnfapps.arrmatey.navigation.HomeTab
-import com.dnfapps.arrmatey.navigation.HomeTabNavigation
+import com.dnfapps.arrmatey.model.InstanceType
+import com.dnfapps.arrmatey.ui.tabs.SettingsTabNavHost
+import com.dnfapps.arrmatey.ui.tabs.ArrTab
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun HomeScreen() {
-    val homeTabNav = viewModel<HomeTabNavigation>()
-
-    val selectedTab by remember { derivedStateOf {
-        when (homeTabNav.backStack.lastOrNull()) {
-            HomeTab.SeriesTab -> TabItem.SHOWS
-            HomeTab.SettingsTab -> TabItem.SETTINGS
-            HomeTab.MoviesTab -> TabItem.MOVIES
-            null -> TabItem.entries.first()
-        }
-    }}
+    var selectedTab by remember { mutableStateOf(TabItem.SHOWS) }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         Box(modifier = Modifier.weight(1f)) {
-            HomeScreenNavHost()
+            when (selectedTab) {
+                TabItem.SHOWS -> ArrTab(InstanceType.Sonarr)
+                TabItem.MOVIES -> ArrTab(InstanceType.Radarr)
+                TabItem.SETTINGS -> SettingsTabNavHost()
+            }
         }
         NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
             TabItem.entries.forEach { entry ->
                 NavigationBarItem(
                     selected = entry == selectedTab,
                     onClick = {
-                        homeTabNav.navigateToHomeTab(entry)
+                        selectedTab = entry
                     },
                     icon = {
                         Icon(

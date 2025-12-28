@@ -12,7 +12,7 @@ class ArrMateyApplication : Application() {
 
         startKoin {
             androidContext(this@ArrMateyApplication)
-            modules(appModules())
+            modules(appModules() + listOf(androidModule))
         }
     }
 }

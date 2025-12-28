@@ -4,12 +4,11 @@ import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.MonitoredResponse
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.api.client.safeGet
+import com.dnfapps.arrmatey.api.client.safePost
 import com.dnfapps.arrmatey.api.client.safePut
 import com.dnfapps.arrmatey.model.Instance
-import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
-import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -46,6 +45,19 @@ class RadarrClient(instance: Instance): BaseArrClient<ArrMovie>(instance) {
                 }
             }
             setBody(body)
+        }
+        return resp
+    }
+
+    override suspend fun lookup(query: String): NetworkResult<List<ArrMovie>> {
+        val resp = httpClient.safeGet<List<ArrMovie>>("api/v3/movie/lookup?term=$query")
+        return resp
+    }
+
+    override suspend fun addItemToLibrary(item: ArrMovie): NetworkResult<ArrMovie> {
+        val resp = httpClient.safePost<ArrMovie>("api/v3/movie") {
+            contentType(ContentType.Application.Json)
+            setBody(item)
         }
         return resp
     }

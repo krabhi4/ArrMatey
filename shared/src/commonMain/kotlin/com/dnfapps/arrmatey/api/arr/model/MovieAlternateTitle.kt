@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MovieAlternateTitle(
-    val id: Int,
+    val id: Int? = null,
     val sourceType: String,
     val movieMetadataId: Int,
     val title: String,

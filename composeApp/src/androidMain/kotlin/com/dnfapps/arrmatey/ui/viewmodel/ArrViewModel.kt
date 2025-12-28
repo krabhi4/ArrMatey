@@ -1,8 +1,10 @@
 package com.dnfapps.arrmatey.ui.viewmodel
 
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.viewmodel.BaseArrRepository
 import com.dnfapps.arrmatey.model.Instance
@@ -13,7 +15,7 @@ import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 
 abstract class ArrViewModel(protected val instance: Instance): ViewModel(), KoinComponent {
-    protected val repository: BaseArrRepository<out AnyArrMedia> by inject {
+    protected val repository: BaseArrRepository<AnyArrMedia> by inject {
         parametersOf(
             instance
         )
@@ -21,6 +23,12 @@ abstract class ArrViewModel(protected val instance: Instance): ViewModel(), Koin
 
     val uiState = repository.uiState
     val detailsUiState = repository.detailUiState
+    val lookupUiState = repository.lookupUiState
+    val addItemUiState = repository.addItemUiState
+
+    val qualityProfiles = repository.qualityProfiles
+    val rootFolders = repository.rootFolders
+    val tags = repository.tags
 
     fun refreshLibrary() {
         viewModelScope.launch {
@@ -39,6 +47,18 @@ abstract class ArrViewModel(protected val instance: Instance): ViewModel(), Koin
             repository.setMonitorStatus(id, monitorStatus)
         }
     }
+
+    fun performLookup(query: String) {
+        viewModelScope.launch {
+            repository.lookup(query)
+        }
+    }
+
+    fun <T: AnyArrMedia> addItem(item: T) {
+        viewModelScope.launch {
+            repository.addItem(item)
+        }
+    }
 }
 
 class ArrViewModelFactory(
@@ -53,5 +73,15 @@ class ArrViewModelFactory(
             }
         }
         throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+@Composable
+fun rememberArrViewModel(instance: Instance?): ArrViewModel? {
+    return instance?.let { instance ->
+        viewModel<ArrViewModel>(
+            key = instance.id.toString(),
+            factory = ArrViewModelFactory(instance)
+        )
     }
 }

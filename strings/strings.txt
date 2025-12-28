@@ -53,7 +53,7 @@
     [retry]
         en = Retry
     [search]
-        en = search
+        en = Search
 
 [[Labels]]
     [label]
@@ -184,7 +184,12 @@
         en = Path
     [error]
         en = Error
-
+    [relevance]
+        en = Relevance
+    [quality_profile]
+        en = Quality profile
+    [monitor]
+        en = Monitor
 
 [[Errors]]
     [instance_connect_error]

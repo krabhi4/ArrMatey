@@ -5,6 +5,7 @@ import com.dnfapps.arrmatey.api.arr.model.Episode
 import com.dnfapps.arrmatey.api.arr.model.MonitoredResponse
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.api.client.safeGet
+import com.dnfapps.arrmatey.api.client.safePost
 import com.dnfapps.arrmatey.api.client.safePut
 import com.dnfapps.arrmatey.model.Instance
 import io.ktor.client.request.setBody
@@ -28,6 +29,19 @@ class SonarrClient(instance: Instance) : BaseArrClient<ArrSeries>(instance) {
 
     override suspend fun update(item: ArrSeries): NetworkResult<ArrSeries> {
         val resp = httpClient.safePut<ArrSeries>("api/v3/series/${item.id}") {
+            contentType(ContentType.Application.Json)
+            setBody(item)
+        }
+        return resp
+    }
+
+    override suspend fun lookup(query: String): NetworkResult<List<ArrSeries>> {
+        val resp = httpClient.safeGet<List<ArrSeries>>("api/v3/series/lookup?term=$query")
+        return resp
+    }
+
+    override suspend fun addItemToLibrary(item: ArrSeries): NetworkResult<ArrSeries> {
+        val resp = httpClient.safePost<ArrSeries>("api/v3/series") {
             contentType(ContentType.Application.Json)
             setBody(item)
         }

@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SeriesAddOptions(
-    val monitor: String,
+    val monitor: SeriesMonitorType,
     val ignoreEpisodesWithFiles: Boolean = false,
     val ignoreEpisodesWithoutFiles: Boolean = false,
     val searchForMissingEpisodes: Boolean = false,

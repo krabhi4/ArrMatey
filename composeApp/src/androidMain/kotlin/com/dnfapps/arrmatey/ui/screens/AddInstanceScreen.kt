@@ -37,19 +37,21 @@ import com.dnfapps.arrmatey.ui.components.DropdownPicker
 import com.dnfapps.arrmatey.ui.components.InstanceInfoCard
 import com.dnfapps.arrmatey.ui.viewmodel.AddInstanceViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddInstanceScreen() {
+fun AddInstanceScreen(
+    navigation: SettingsNavigation = koinInject<SettingsNavigation>()
+) {
     val scope = rememberCoroutineScope()
 
-    val settingsNav = viewModel<SettingsNavigation>()
     val addInstanceViewModel = viewModel<AddInstanceViewModel>()
 
     var selectedInstanceType by remember { mutableStateOf(InstanceType.Sonarr) }
     val saveButtonEnabled by addInstanceViewModel.saveButtonEnabled.collectAsStateWithLifecycle()
     val infoCardMap by addInstanceViewModel.infoCardMap.collectAsStateWithLifecycle()
-    val showInfoCard = infoCardMap[selectedInstanceType] ?: true
+    val showInfoCard = infoCardMap[selectedInstanceType] ?: false
 
     val createResult by addInstanceViewModel.createResult.collectAsStateWithLifecycle()
 
@@ -64,7 +66,7 @@ fun AddInstanceScreen() {
 
     LaunchedEffect(createResult) {
         if (createResult is InsertResult.Success) {
-            settingsNav.popBackStack()
+            navigation.popBackStack()
         }
     }
 
@@ -74,7 +76,7 @@ fun AddInstanceScreen() {
                 title = { Text(text = stringResource(R.string.add_instance)) },
                 navigationIcon = {
                     IconButton(
-                        onClick = { settingsNav.popBackStack() }
+                        onClick = { navigation.popBackStack() }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,

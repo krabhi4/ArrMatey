@@ -39,8 +39,6 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
-import com.dnfapps.arrmatey.api.arr.model.ArrMedia
-import com.dnfapps.arrmatey.api.arr.model.CoverType
 
 @Composable
 fun <T: AnyArrMedia> PosterGrid(
@@ -60,15 +58,17 @@ fun <T: AnyArrMedia> PosterGrid(
                 onItemClick = onItemClick,
                 modifier = Modifier.padding(8.dp),
                 additionalContent = {
-                    LinearProgressIndicator(
-                        progress = { item.statusProgress },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
-                            .height(6.dp),
-                        color = item.statusColor
-                    )
+                    if (item.id != null) {
+                        LinearProgressIndicator(
+                            progress = { item.statusProgress },
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                                .height(6.dp),
+                            color = item.statusColor
+                        )
+                    }
                 }
             )
         }

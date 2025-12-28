@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.PreferencesStore
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.model.InstanceType
@@ -32,10 +31,10 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DevSettingsScreen() {
-    val preferenceStore = koinInject<PreferencesStore>()
-    val settingsNav = viewModel<SettingsNavigation>()
-
+fun DevSettingsScreen(
+    preferenceStore: PreferencesStore = koinInject<PreferencesStore>(),
+    settingsNav: SettingsNavigation = koinInject<SettingsNavigation>()
+) {
     val showInfoCardMap by preferenceStore.showInfoCards.collectAsState(emptyMap())
 
     Scaffold(

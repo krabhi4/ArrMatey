@@ -37,10 +37,17 @@ fun SortMenuButton(
     onSortChanged: (SortBy) -> Unit,
     sortOrder: SortOrder,
     onOrderChanged: (SortOrder) -> Unit,
+    limitToLookup: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val options = remember { SortBy.typeEntries(instanceType) }
+    val options = remember {
+        if (limitToLookup) {
+            SortBy.lookupEntries() }
+        else {
+            SortBy.typeEntries(instanceType)
+        }
+    }
 
     IconButton(
         onClick = { expanded = !expanded }

@@ -11,7 +11,7 @@ import kotlinx.serialization.Transient
 import kotlin.time.Instant
 
 interface AnyArrMedia {
-    val id: Int
+    val id: Int?
     val title: String
     val originalLanguage: Language
     val year: Int
@@ -31,7 +31,7 @@ interface AnyArrMedia {
     val certification: String?
     val genres: List<String>
     val tags: List<Int>
-    val statistics: ArrStatistics
+    val statistics: ArrStatistics?
     @Contextual val added: Instant
     fun ratingScore(): Double
     val statusProgress: Float
@@ -42,8 +42,14 @@ interface AnyArrMedia {
     val runtimeString: String
     val infoItems: Flow<List<Info>>
 
-    fun getPoster(): ArrImage?
-    fun getBanner(): ArrImage?
+    fun getPoster(): ArrImage?  {
+        return images.firstOrNull { it.coverType == CoverType.Poster }
+    }
+    fun getBanner(): ArrImage? {
+        return images.firstOrNull { it.coverType == CoverType.FanArt }
+            ?: images.firstOrNull { it.coverType == CoverType.Banner }
+            ?: images.firstOrNull { it.coverType == CoverType.Poster }
+    }
 }
 
 @Serializable
@@ -51,7 +57,7 @@ class Info(val label: String, val value: String)
 
 @Serializable
 sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S>: AnyArrMedia {
-    abstract override val id: Int
+    abstract override val id: Int?
     abstract override val title: String
     abstract override val originalLanguage: Language
     abstract override val year: Int
@@ -75,7 +81,7 @@ sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S>: AnyArrMedia {
     abstract val alternateTitles: List<AT>
     abstract val addOptions: AO?
     abstract val ratings: R
-    abstract override val statistics: STAT
+    abstract override val statistics: STAT?
     @Contextual
     abstract override val added: Instant
 
@@ -87,7 +93,7 @@ sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S>: AnyArrMedia {
     abstract override val statusString: String
 
     override val fileSize: Long
-        get() = statistics.sizeOnDisk
+        get() = statistics?.sizeOnDisk ?: 0L
 
     override val runtimeString: String
         get() = runtime.formatAsRuntime()
@@ -97,10 +103,4 @@ sealed class ArrMedia<AT, AO, R, STAT: ArrStatistics, S>: AnyArrMedia {
     @Transient
     protected val _infoItems = MutableStateFlow<List<Info>>(emptyList())
     abstract override val infoItems: Flow<List<Info>>
-
-    override fun getPoster(): ArrImage? = images.firstOrNull { it.coverType == CoverType.Poster }
-
-    override fun getBanner(): ArrImage? = images.firstOrNull { it.coverType == CoverType.FanArt }
-        ?: images.firstOrNull { it.coverType == CoverType.Banner }
-        ?: images.firstOrNull { it.coverType == CoverType.Poster }
 }

@@ -62,7 +62,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
@@ -74,41 +73,39 @@ import com.dnfapps.arrmatey.api.arr.viewmodel.DetailsUiState
 import com.dnfapps.arrmatey.api.arr.viewmodel.EpisodeUiState
 import com.dnfapps.arrmatey.compose.components.PosterItem
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
+import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.extensions.formatAsRuntime
 import com.dnfapps.arrmatey.extensions.isToday
 import com.dnfapps.arrmatey.extensions.isTodayOrAfter
 import com.dnfapps.arrmatey.model.InstanceType
-import com.dnfapps.arrmatey.navigation.RootNavigation
+import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.ui.tabs.LocalArrViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModel
-import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModelFactory
-import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.SonarrViewModel
-import com.dnfapps.arrmatey.ui.viewmodel.rememberInstanceFor
 import com.dnfapps.arrmatey.utils.format
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MediaDetailsScreen(
     type: InstanceType,
-    id: Int
+    id: Int,
+    navigation: ArrTabNavigation = koinInject<ArrTabNavigation>(parameters = { parametersOf(type) })
 ) {
-    val instance = rememberInstanceFor(type)
-
-    val appNavigation = viewModel<RootNavigation>()
-
     var isMonitored by remember { mutableStateOf(false) }
 
-    var arrViewModel: ArrViewModel? = null
+    val arrViewModel = LocalArrViewModel.current
 
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
                     IconButton(
-                        onClick = { appNavigation.popBackStack() }
+                        onClick = { navigation.popBackStack() }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -144,15 +141,10 @@ fun MediaDetailsScreen(
     ) { paddingValues ->
         Box(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(paddingValues.copy(bottom = 0.dp))
                 .fillMaxSize()
         ) {
-            instance?.let { instance ->
-                arrViewModel = viewModel(
-                    key = instance.id.toString(),
-                    factory = ArrViewModelFactory(instance)
-                )
-
+            arrViewModel?.let { arrViewModel ->
                 val detailUiState by arrViewModel.detailsUiState.collectAsState()
                 var isRefreshing by remember { mutableStateOf(true) }
 
@@ -262,7 +254,7 @@ fun DetailsHeader(item: AnyArrMedia) {
 }
 
 @Composable
-private fun ItemDescriptionCard(item: AnyArrMedia) {
+fun ItemDescriptionCard(item: AnyArrMedia) {
     item.overview?.let { overview ->
         var expanded by remember { mutableStateOf(false) }
         Card(
@@ -295,7 +287,7 @@ private fun ItemDescriptionCard(item: AnyArrMedia) {
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun UpcomingDateView(item: AnyArrMedia) {
+fun UpcomingDateView(item: AnyArrMedia) {
     when (item) {
         is ArrSeries -> if (item.status == SeriesStatus.Continuing) item.nextAiring?.format()?.let {
                 "${stringResource(R.string.airing_next)} $it"
@@ -315,7 +307,7 @@ private fun UpcomingDateView(item: AnyArrMedia) {
 }
 
 @Composable
-private fun FilesArea(item: AnyArrMedia, vm: ArrViewModel) {
+fun FilesArea(item: AnyArrMedia, vm: ArrViewModel) {
     when (item) {
         is ArrSeries -> SeasonsArea(item, vm as SonarrViewModel)
         is ArrMovie -> MovieFileView(item)
@@ -324,7 +316,7 @@ private fun FilesArea(item: AnyArrMedia, vm: ArrViewModel) {
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun MovieFileView(movie: ArrMovie) {
+fun MovieFileView(movie: ArrMovie) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -388,7 +380,7 @@ private fun MovieFileView(movie: ArrMovie) {
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
+fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
     val episodeState by vm.episodeState.collectAsStateWithLifecycle()
 
     Column(
