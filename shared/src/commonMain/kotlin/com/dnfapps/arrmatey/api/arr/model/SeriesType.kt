@@ -10,5 +10,9 @@ enum class SeriesType {
     Daily,
 
     @SerialName("anime")
-    Anime
+    Anime;
+
+    companion object {
+        fun allEntries() = entries.toList()
+    }
 }

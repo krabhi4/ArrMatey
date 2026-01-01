@@ -168,4 +168,18 @@ data class ArrMovie(
         }
     }
 
+    fun copyForCreation(
+        monitored: Boolean,
+        minimumAvailability: MovieStatus,
+        qualityProfileId: Int,
+        rootFolderPath: String
+    ) = copy(
+        id = 0,
+        alternateTitles = alternateTitles.filter { it.id != null },
+        monitored = monitored,
+        minimumAvailability = minimumAvailability,
+        qualityProfileId = qualityProfileId,
+        rootFolderPath = rootFolderPath
+    )
+
 }

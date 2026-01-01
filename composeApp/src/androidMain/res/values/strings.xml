@@ -79,13 +79,11 @@
     <string name="season_singular">Season</string>
     <string name="specials">Specials</string>
     <string name="airing_next">Next episode</string>
-    <string name="in_cinemas">In cinemas</string>
     <string name="continuing_unknown">Continuing - Unknown</string>
     <string name="files">Files</string>
     <string name="no_files">No files</string>
     <string name="history">History</string>
     <string name="added_on">Added on %1$s</string>
-    <string name="tba">TBA</string>
     <string name="unaired">Unaired</string>
     <string name="information">Information</string>
     <string name="series_type">Series Type</string>
@@ -113,5 +111,30 @@
     <!-- Instances -->
     <string name="sonarr_description">Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.</string>
     <string name="radarr_description">Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available</string>
+
+    <!-- Movie Statuses -->
+    <string name="tba">TBA</string>
+    <string name="announced">Announced</string>
+    <string name="in_cinemas">In cinemas</string>
+    <string name="released">Released</string>
+    <string name="deleted">Deleted</string>
+
+    <!-- Series Monitor Type -->
+    <string name="future">Future</string>
+    <string name="existing">Existing</string>
+    <string name="first_season">First season</string>
+    <string name="last_season">Last season</string>
+    <string name="latest_seasons">Latest season</string>
+    <string name="pilot">Pilot</string>
+    <string name="recent">Recent</string>
+    <string name="monitor_specials">Monitor specials</string>
+    <string name="unmonitor_specials">Unmonitor specials</string>
+    <string name="none">None</string>
+    <string name="skip">Skip</string>
+
+    <!-- Series type -->
+    <string name="standard">Standard</string>
+    <string name="daily">Daily</string>
+    <string name="anime">Anime</string>
 
 </resources>

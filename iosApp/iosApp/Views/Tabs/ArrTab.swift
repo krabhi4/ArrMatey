@@ -235,10 +235,11 @@ struct ArrTab: View {
         }
         
         ToolbarItem(placement: .primaryAction) {
-            Button("add", systemImage: "plus") {
-                navigation.go(to: .search(""), of: type)
-            }
-            .glassCompatibleButtonStyle()
+            Image(systemName: "plus")
+                .imageScale(.medium)
+                .onTapGesture {
+                    navigation.go(to: .search(""), of: type)
+                }
         }
         
         ToolbarItem(placement: .bottomBar) {

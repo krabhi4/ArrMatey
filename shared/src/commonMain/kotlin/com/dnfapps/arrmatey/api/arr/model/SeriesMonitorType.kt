@@ -43,5 +43,9 @@ enum class SeriesMonitorType {
     None,
 
     @SerialName("skip")
-    Skip
+    Skip;
+
+    companion object {
+        fun allValues() = entries.toList()
+    }
 }

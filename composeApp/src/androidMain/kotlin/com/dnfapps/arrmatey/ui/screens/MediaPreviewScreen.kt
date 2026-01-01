@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ import com.dnfapps.arrmatey.api.arr.model.SeriesType
 import com.dnfapps.arrmatey.api.arr.viewmodel.DetailsUiState
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.entensions.copy
+import com.dnfapps.arrmatey.entensions.stringResource
 import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.ArrTabNavigation
@@ -152,6 +154,8 @@ fun AddSeriesForm(
     val arrViewModel = LocalArrViewModel.current
     if (arrViewModel == null) return
 
+    val context = LocalContext.current
+
     val uiState by arrViewModel.addItemUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState) {
@@ -216,8 +220,28 @@ fun AddSeriesForm(
                 modifier = Modifier.fillMaxWidth(),
                 selectedOption = monitor,
                 onOptionSelected = { monitor = it },
+                getOptionLabel = { stringResource(it.stringResource()) },
                 label = { Text(stringResource(R.string.monitor)) }
             )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = seasonFolders,
+                        onValueChange = { seasonFolders = it }
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.season_folders)
+                )
+                Switch(
+                    checked = seasonFolders,
+                    onCheckedChange = null
+                )
+            }
 
             DropdownPicker(
                 options = qualityProfiles,
@@ -233,6 +257,7 @@ fun AddSeriesForm(
                 modifier = Modifier.fillMaxWidth(),
                 selectedOption = seriesType,
                 onOptionSelected = { seriesType = it },
+                getOptionLabel = { stringResource(it.stringResource()) },
                 label = { Text(stringResource(R.string.series_type)) }
             )
 
@@ -351,6 +376,7 @@ fun AddMovieForm(
                 modifier = Modifier.fillMaxWidth(),
                 selectedOption = minimumAvailability,
                 onOptionSelected = { minimumAvailability = it },
+                getOptionLabel = { stringResource(it.stringResource()) },
                 label = { Text(stringResource(R.string.minimum_availability)) }
             )
 

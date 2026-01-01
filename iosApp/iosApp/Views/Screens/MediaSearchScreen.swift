@@ -17,7 +17,7 @@ struct MediaSearchScreen: View {
     @EnvironmentObject private var arrTabViewModel: ArrTabViewModel
     
     @State private var searchQuery: String
-    @State private var searchPresented: Bool = true
+    @State private var searchPresented: Bool = false
     @State private var uiState: Any = LibraryUiStateInitial()
     @State private var observationTask: Task<Void, Never>? = nil
     
@@ -45,6 +45,10 @@ struct MediaSearchScreen: View {
         contentForState()
             .task {
                 await setupViewModel()
+            }
+            .task {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                searchPresented = true
             }
             .onDebounceSearch(searchQuery) { query in
                 guard !query.isEmpty else { return }

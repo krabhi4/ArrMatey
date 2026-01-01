@@ -86,6 +86,9 @@ struct MediaDetailsScreen: View {
                             filesArea(for: item)
                             
                             MediaInfoArea(item: item)
+                            
+                            Spacer()
+                                .frame(height: 12)
                         }
                         .padding(.horizontal, 24)
                     }

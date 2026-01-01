@@ -147,8 +147,6 @@
         en = Specials
     [airing_next]
         en = Next episode
-    [in_cinemas]
-        en = In cinemas
     [continuing_unknown]
         en = Continuing - Unknown
     [files]
@@ -160,8 +158,6 @@
     [added_on]
         iosKey = added_on %@
         en = Added on %@
-    [tba]
-        en = TBA
     [unaired]
         en = Unaired
     [information]
@@ -212,3 +208,47 @@
         en = Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
     [radarr_description]
         en = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available
+
+[[Movie Statuses]]
+    [tba]
+        en = TBA
+    [announced]
+        en = Announced
+    [in_cinemas]
+        en = In cinemas
+    [released]
+        en = Released
+    [deleted]
+        en = Deleted
+
+[[Series Monitor Type]]
+    [future]
+        en = Future
+    [existing]
+        en = Existing
+    [first_season]
+        en = First season
+    [last_season]
+        en = Last season
+    [latest_seasons]
+        en = Latest season
+    [pilot]
+        en = Pilot
+    [recent]
+        en = Recent
+    [monitor_specials]
+        en = Monitor specials
+    [unmonitor_specials]
+        en = Unmonitor specials
+    [none]
+        en = None
+    [skip]
+        en = Skip
+
+[[Series type]]
+    [standard]
+        en = Standard
+    [daily]
+        en = Daily
+    [anime]
+        en = Anime

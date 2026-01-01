@@ -159,4 +159,19 @@ data class ArrSeries(
         }
     }
 
+    fun copyForCreation(
+        monitor: SeriesMonitorType,
+        qualityProfileId: Int,
+        seriesType: SeriesType,
+        seasonFolder: Boolean,
+        rootFolderPath: String?
+    ) = copy(
+        id = 0,
+        addOptions = SeriesAddOptions(monitor = monitor),
+        qualityProfileId = qualityProfileId,
+        seriesType = seriesType,
+        seasonFolder = seasonFolder,
+        rootFolderPath = rootFolderPath
+    )
+
 }

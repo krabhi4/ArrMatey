@@ -21,7 +21,6 @@ class InstanceViewModel: ObservableObject {
         observationTask = Task {
             do {
                 for try await value in instanceRepository.allInstances {
-                    print("new instances value \(value)")
                     self.instances = value
                 }
             } catch {
@@ -41,7 +40,6 @@ class InstanceViewModel: ObservableObject {
     func setSelected(_ instance: Instance) {
         Task {
             do {
-                print("setting \(instance.label) as active")
                 try await instanceRepository.setInstanceActive(instance: instance)
             } catch {
                 return

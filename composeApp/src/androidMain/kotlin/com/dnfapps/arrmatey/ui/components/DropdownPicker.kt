@@ -28,7 +28,7 @@ fun <T> DropdownPicker(
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
-    getOptionLabel: (T) -> String = { it.toString() },
+    getOptionLabel: @Composable (T) -> String = { it.toString() },
     label: @Composable () -> Unit = {}
 ) {
     var isDropDownExpanded by remember { mutableStateOf(false) }

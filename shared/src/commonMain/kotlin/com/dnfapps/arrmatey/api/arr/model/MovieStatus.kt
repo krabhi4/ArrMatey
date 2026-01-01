@@ -12,5 +12,9 @@ enum class MovieStatus {
     @SerialName("released")
     Released,
     @SerialName("deleted")
-    Deleted
+    Deleted;
+
+    companion object {
+        fun allValues() = entries.toList()
+    }
 }

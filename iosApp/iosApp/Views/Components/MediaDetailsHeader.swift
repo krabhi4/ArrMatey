@@ -21,6 +21,7 @@ struct MediaDetailsHeader: View {
                 )
                 .frame(width: 150, height: 220)
                 .clipped()
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 .background(.clear)
                 
                 VStack(alignment: .leading, spacing: 4) {

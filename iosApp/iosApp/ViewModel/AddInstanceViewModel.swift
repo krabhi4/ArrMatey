@@ -100,7 +100,6 @@ class AddInstanceViewModel: ObservableObject {
         }
         Task {
             for await value in repository.editResult {
-                print("edit result: \(value)")
                 editResult = value
                 wasCreatedSuccessfully = editResult is InsertResultSuccess
                 hasCreationError = editResult is InsertResultError || editResult is InsertResultConflict
@@ -155,7 +154,6 @@ class AddInstanceViewModel: ObservableObject {
     }
     
     func initialize(instance: Instance) {
-        print("initializing with instance \(instance)")
         setApiEndpoint(instance.url)
         setApiKey(instance.apiKey)
         setIsSlowInstance(instance.slowInstance)

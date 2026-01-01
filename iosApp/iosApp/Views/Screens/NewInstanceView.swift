@@ -83,7 +83,7 @@ struct NewInstanceView: View {
             Section {
                 Picker(LocalizedStringResource("instance_type"), selection: $instanceType) {
                     ForEach(InstanceType.companion.allValue(),  id: \.self) { type in
-                        Text(String(localized: LocalizedStringResource(stringLiteral: type.name	)))
+                        Text(String(localized: LocalizedStringResource(stringLiteral: type.name)))
                             .tag(type)
                     }
                 }

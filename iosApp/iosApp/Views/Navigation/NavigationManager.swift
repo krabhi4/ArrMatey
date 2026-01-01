@@ -22,6 +22,17 @@ class NavigationManager: ObservableObject {
         }
     }
     
+    func replaceCurrent(with route: MediaRoute, for type: InstanceType) {
+        switch type {
+        case .sonarr:
+            seriesPath.removeLast()
+            seriesPath.append(route)
+        case .radarr:
+            moviePath.removeLast()
+            moviePath.append(route)
+        }
+    }
+    
     func go(to route: SettingsRoute) {
         settingsPath.append(route)
     }

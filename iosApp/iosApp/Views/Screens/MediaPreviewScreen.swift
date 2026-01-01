@@ -15,6 +15,15 @@ struct MediaPreviewScreen: View {
     @EnvironmentObject private var arrTabViewModel: ArrTabViewModel
 
     @State private var sheetPresented: Bool = false
+    
+    @State private var qualityProfiles: [QualityProfile] = []
+    @State private var rootFolders: [RootFolder] = []
+    @State private var tags: [Tag] = []
+    
+    @State private var observeQualityProfilesTask: Task<Void, Never>? = nil
+    @State private var observeRootFoldersTask: Task<Void, Never>? = nil
+    @State private var observeTagsTask: Task<Void, Never>? = nil
+
 
     private var instance: Instance? {
         arrTabViewModel.currentInstance
@@ -52,41 +61,28 @@ struct MediaPreviewScreen: View {
                 Button("add", systemImage: "plus") {
                     sheetPresented = true
                 }
-                .glassCompatibleButtonStyle()
             }
         }
         .sheet(isPresented: $sheetPresented) {
-            NavigationStack {
-                Form {
-                    
-                }
-                .toolbar {
-                    toolbarButtons
-                }
+            switch media {
+            case let series as ArrSeries:
+                AddSeriesForm(qualityProfiles: $qualityProfiles, rootFolders: $rootFolders, onDismiss: { sheetPresented = false }, series: series)
+                    .presentationDetents([.medium])
+                    .presentationBackground(.ultraThinMaterial)
+            case let movie as ArrMovie:
+                AddMovieForm(qualityProfiles: $qualityProfiles, rootFolders: $rootFolders, onDismiss: { sheetPresented = false }, movie: movie)
+                    .presentationDetents([.medium])
+                    .presentationBackground(.ultraThinMaterial)
+            default: EmptyView()
             }
-            .presentationDetents([.medium])
-            .presentationBackground(.ultraThinMaterial)
         }
-    }
-    
-    @ToolbarContentBuilder
-    private var toolbarButtons: some ToolbarContent {
-        ToolbarItem(placement: .cancellationAction) {
-            Button {
-                sheetPresented = false
-            } label: {
-                Label("cancel", systemImage: "xmark")
-            }
-            .tint(.primary)
+        .task {
+            await setupViewModel()
         }
-        
-        ToolbarItem(placement: .primaryAction) {
-            Button {
-                // todo - add
-            } label: {
-                Label("save", systemImage: "checkmark")
-            }
-            .glassCompatibleButtonStyle()
+        .onDisappear {
+            observeQualityProfilesTask?.cancel()
+            observeRootFoldersTask?.cancel()
+            observeTagsTask?.cancel()
         }
     }
 
@@ -107,6 +103,65 @@ struct MediaPreviewScreen: View {
                 return nil
             }
         default: return nil
+        }
+    }
+    
+    @ViewBuilder
+    private func seriesForm() -> some View {
+        
+    }
+    
+    @MainActor
+    private func setupViewModel() async {
+        observeQualityProfilesTask?.cancel()
+        observeQualityProfilesTask = Task {
+            await observeQualityProfiles()
+        }
+        
+        observeRootFoldersTask?.cancel()
+        observeRootFoldersTask = Task {
+            await observeRootFolders()
+        }
+        
+        observeTagsTask?.cancel()
+        observeTagsTask = Task {
+            await observeTags()
+        }
+    }
+    
+    @MainActor
+    private func observeQualityProfiles() async {
+        guard let viewModel = arrViewModel else { return }
+        
+        do {
+            let qpFlow = viewModel.qualityProfiles()
+            for try await qp in qpFlow {
+                self.qualityProfiles = qp
+            }
+        }
+    }
+    
+    @MainActor
+    private func observeRootFolders() async {
+        guard let viewModel = arrViewModel else { return }
+        
+        do {
+            let flow = viewModel.rootFolders()
+            for try await rootFolders in flow {
+                self.rootFolders = rootFolders
+            }
+        }
+    }
+    
+    @MainActor
+    private func observeTags() async {
+        guard let viewModel = arrViewModel else { return }
+        
+        do {
+            let flow = viewModel.tags()
+            for try await tags in flow {
+                self.tags = tags
+            }
         }
     }
 }
