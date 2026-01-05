@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -52,6 +53,7 @@ import com.dnfapps.arrmatey.api.arr.model.SeriesType
 import com.dnfapps.arrmatey.api.arr.viewmodel.DetailsUiState
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.entensions.copy
+import com.dnfapps.arrmatey.entensions.headerBarColors
 import com.dnfapps.arrmatey.entensions.stringResource
 import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
@@ -102,7 +104,8 @@ fun MediaPreviewScreen(
                 modifier = Modifier.align(Alignment.TopCenter),
                 navigationIcon = {
                     IconButton(
-                        onClick = { navigation.popBackStack() }
+                        onClick = { navigation.popBackStack() },
+                        colors = IconButtonDefaults.headerBarColors()
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -112,7 +115,8 @@ fun MediaPreviewScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { showBottomSheet = true }
+                        onClick = { showBottomSheet = true },
+                        colors = IconButtonDefaults.headerBarColors()
                     ) {
                         Icon(
                             imageVector = Icons.Default.AddCircle,

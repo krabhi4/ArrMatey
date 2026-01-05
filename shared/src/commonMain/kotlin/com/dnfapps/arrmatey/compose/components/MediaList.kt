@@ -225,8 +225,7 @@ fun BannerView(
             model = bannerModel,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = modifier
-                .cloudy(radius = 10)
+            modifier = modifier.cloudy()
         )
         overlay()
     }
