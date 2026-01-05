@@ -1,6 +1,7 @@
 package com.dnfapps.arrmatey.api.arr
 
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
+import com.dnfapps.arrmatey.api.arr.model.ExtraFile
 import com.dnfapps.arrmatey.api.arr.model.MonitoredResponse
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.api.client.safeGet
@@ -59,6 +60,11 @@ class RadarrClient(instance: Instance): BaseArrClient<ArrMovie>(instance) {
             contentType(ContentType.Application.Json)
             setBody(item)
         }
+        return resp
+    }
+
+    suspend fun getMovieExtraFile(id: Int): NetworkResult<List<ExtraFile>> {
+        val resp = httpClient.safeGet<List<ExtraFile>>("api/v3/extrafile?movieId=$id")
         return resp
     }
 

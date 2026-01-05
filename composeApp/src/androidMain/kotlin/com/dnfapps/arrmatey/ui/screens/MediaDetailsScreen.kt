@@ -93,6 +93,7 @@ import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
 import com.dnfapps.arrmatey.ui.helpers.statusBarHeight
 import com.dnfapps.arrmatey.ui.tabs.LocalArrViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModel
+import com.dnfapps.arrmatey.ui.viewmodel.RadarrViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.SonarrViewModel
 import com.dnfapps.arrmatey.utils.format
 import kotlinx.datetime.TimeZone
@@ -330,12 +331,23 @@ fun FilesArea(item: AnyArrMedia, vm: ArrViewModel) {
 @Composable
 fun MovieFileView(movie: ArrMovie) {
     val arrViewModel = LocalArrViewModel.current
-    if (arrViewModel == null) return
+    if (arrViewModel == null || arrViewModel !is RadarrViewModel) return
 
     val context = LocalContext.current
 
     val searchIds by arrViewModel.automaticSearchIds.collectAsStateWithLifecycle()
     val searchResult by arrViewModel.automaticSearchResult.collectAsStateWithLifecycle()
+
+    val movieExtraFileMap by arrViewModel.movieExtraFilesMap.collectAsStateWithLifecycle()
+    val movieExtraFiles = remember(movieExtraFileMap) {
+        movieExtraFileMap[movie.id] ?: emptyList()
+    }
+
+    LaunchedEffect(Unit) {
+        movie.id?.let {
+            arrViewModel.getMovieExtraFile(it)
+        }
+    }
 
     LaunchedEffect(searchResult) {
         when (searchResult) {
@@ -434,7 +446,29 @@ fun MovieFileView(movie: ArrMovie) {
                     )
                 }
             }
-        } ?:
+        }
+        movieExtraFiles.takeUnless { it.isEmpty() }?.forEach { extraFile ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 18.dp)
+                ) {
+                    Text(
+                        text = extraFile.relativePath,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = extraFile.type.name,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        }
+
+        if (movie.movieFile == null && movieExtraFiles.isEmpty()) {
             Text(
                 text = stringResource(R.string.no_files),
                 modifier = Modifier
@@ -443,6 +477,7 @@ fun MovieFileView(movie: ArrMovie) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
+        }
     }
 }
 
