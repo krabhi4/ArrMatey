@@ -1,13 +1,19 @@
 package com.dnfapps.arrmatey.api.arr
 
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
+import com.dnfapps.arrmatey.api.arr.model.CommandPayload
+import com.dnfapps.arrmatey.api.arr.model.CommandResponse
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
 import com.dnfapps.arrmatey.api.arr.model.RootFolder
 import com.dnfapps.arrmatey.api.arr.model.Tag
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.api.client.safeGet
+import com.dnfapps.arrmatey.api.client.safePost
 import com.dnfapps.arrmatey.model.Instance
 import io.ktor.client.HttpClient
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
@@ -29,6 +35,14 @@ abstract class BaseArrClient<T: AnyArrMedia>(
 
     override suspend fun getTags(): NetworkResult<List<Tag>> {
         val resp = httpClient.safeGet<List<Tag>>("api/v3/tag")
+        return resp
+    }
+
+    override suspend fun command(payload: CommandPayload): NetworkResult<CommandResponse> {
+        val resp = httpClient.safePost<CommandResponse>("api/v3/command") {
+            contentType(ContentType.Application.Json)
+            setBody(payload)
+        }
         return resp
     }
 }

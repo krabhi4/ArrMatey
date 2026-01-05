@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
+import com.dnfapps.arrmatey.api.arr.model.CommandPayload
 import com.dnfapps.arrmatey.api.arr.viewmodel.BaseArrRepository
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
@@ -25,6 +26,9 @@ abstract class ArrViewModel(protected val instance: Instance): ViewModel(), Koin
     val detailsUiState = repository.detailUiState
     val lookupUiState = repository.lookupUiState
     val addItemUiState = repository.addItemUiState
+
+    val automaticSearchIds = repository.automaticSearchIds
+    val automaticSearchResult = repository.automaticSearchResult
 
     val qualityProfiles = repository.qualityProfiles
     val rootFolders = repository.rootFolders
@@ -53,6 +57,15 @@ abstract class ArrViewModel(protected val instance: Instance): ViewModel(), Koin
             repository.lookup(query)
         }
     }
+
+    fun performSearch(ids: List<Int>) {
+        viewModelScope.launch {
+            val payload = searchPayload(ids)
+            repository.command(payload)
+        }
+    }
+
+    protected abstract fun searchPayload(ids: List<Int>): CommandPayload
 
     fun <T: AnyArrMedia> addItem(item: T) {
         viewModelScope.launch {

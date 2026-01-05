@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.ui.screens
 
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
@@ -58,6 +60,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -173,7 +176,7 @@ fun MediaDetailsScreen(
                                     InfoArea(item)
                                 }
 
-                                Spacer(modifier = Modifier.height(0.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                             }
                         }
                     }
@@ -305,7 +308,6 @@ fun UpcomingDateView(item: AnyArrMedia) {
         is ArrMovie -> item.inCinemas?.format()?.takeUnless {
             item.digitalRelease != null || item.physicalRelease != null
         }?.let { "${stringResource(R.string.in_cinemas)} $it" }
-        else -> null
     }?.let { airingString ->
         Text(
             text = airingString,
@@ -327,9 +329,65 @@ fun FilesArea(item: AnyArrMedia, vm: ArrViewModel) {
 @OptIn(ExperimentalTime::class)
 @Composable
 fun MovieFileView(movie: ArrMovie) {
+    val arrViewModel = LocalArrViewModel.current
+    if (arrViewModel == null) return
+
+    val context = LocalContext.current
+
+    val searchIds by arrViewModel.automaticSearchIds.collectAsStateWithLifecycle()
+    val searchResult by arrViewModel.automaticSearchResult.collectAsStateWithLifecycle()
+
+    LaunchedEffect(searchResult) {
+        when (searchResult) {
+            true -> Toast.makeText(context, "Search queued", Toast.LENGTH_SHORT).show()
+            false -> Toast.makeText(context, "Search error", Toast.LENGTH_SHORT).show()
+            else -> {}
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 6.dp)
+                .padding(horizontal = 24.dp)
+        ) {
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = {}
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Interactive"
+                )
+                Text(text = "Interactive")
+            }
+
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    movie.id?.let { id ->
+                        arrViewModel.performSearch(listOf(id))
+                    }
+                },
+                enabled = !searchIds.contains(movie.id)
+            ) {
+                if (searchIds.contains(movie.id)) {
+                    CircularProgressIndicator(modifier = Modifier.size(25.dp))
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Automatic"
+                    )
+                    Text(text = "Automatic")
+                }
+            }
+        }
+
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,

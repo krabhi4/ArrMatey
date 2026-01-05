@@ -1,6 +1,8 @@
 package com.dnfapps.arrmatey.api.arr
 
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
+import com.dnfapps.arrmatey.api.arr.model.CommandPayload
+import com.dnfapps.arrmatey.api.arr.model.CommandResponse
 import com.dnfapps.arrmatey.api.arr.model.MonitoredResponse
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
 import com.dnfapps.arrmatey.api.arr.model.RootFolder
@@ -18,5 +20,6 @@ interface IArrClient<T: AnyArrMedia> {
     suspend fun getRootFolders(): NetworkResult<List<RootFolder>>
     suspend fun getTags(): NetworkResult<List<Tag>>
     suspend fun addItemToLibrary(item: T): NetworkResult<T>
+    suspend fun command(payload: CommandPayload): NetworkResult<CommandResponse>
 
 }

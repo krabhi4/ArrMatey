@@ -2,6 +2,7 @@ package com.dnfapps.arrmatey.ui.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
+import com.dnfapps.arrmatey.api.arr.model.CommandPayload
 import com.dnfapps.arrmatey.api.arr.viewmodel.SonarrRepository
 import com.dnfapps.arrmatey.model.Instance
 import kotlinx.coroutines.launch
@@ -22,6 +23,10 @@ class SonarrViewModel(instance: Instance): ArrViewModel(instance) {
     override fun getDetails(id: Int) {
         super.getDetails(id)
         getEpisodes(id)
+    }
+
+    override fun searchPayload(ids: List<Int>): CommandPayload {
+        return CommandPayload.SonarrSearch(ids)
     }
 
     @OptIn(ExperimentalTime::class)

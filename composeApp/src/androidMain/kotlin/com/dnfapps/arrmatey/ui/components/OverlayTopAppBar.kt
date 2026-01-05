@@ -1,23 +1,23 @@
 package com.dnfapps.arrmatey.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.dnfapps.arrmatey.ui.helpers.statusBarHeight
+import androidx.compose.ui.graphics.Color
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OverlayTopAppBar(
     scrollState: ScrollState,
@@ -34,22 +34,23 @@ fun OverlayTopAppBar(
         }
     }
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.surface.copy(
-                    alpha = headerBackgroundAlpha
-                )
+    TopAppBar(
+        title = {
+            AnimatedVisibility(
+                visible = headerBackgroundAlpha > 0.9f,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                title()
+            }
+        },
+        navigationIcon = navigationIcon,
+        actions = actions,
+        modifier = modifier,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(
+                alpha = headerBackgroundAlpha
             )
-            .padding(top = statusBarHeight())
-            .padding(horizontal = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        navigationIcon()
-        title()
-        Spacer(modifier = Modifier.weight(1f))
-        actions()
-    }
+        )
+    )
 }

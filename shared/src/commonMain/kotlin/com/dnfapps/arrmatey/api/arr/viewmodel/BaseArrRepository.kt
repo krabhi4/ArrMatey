@@ -4,6 +4,7 @@ import com.dnfapps.arrmatey.api.arr.IArrClient
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
+import com.dnfapps.arrmatey.api.arr.model.CommandPayload
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
 import com.dnfapps.arrmatey.api.arr.model.RootFolder
 import com.dnfapps.arrmatey.api.arr.model.Tag
@@ -53,6 +54,12 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
 
     protected val _addItemUiState = MutableStateFlow<DetailsUiState<T>>(DetailsUiState.Initial)
     override val addItemUiState: StateFlow<DetailsUiState<T>> = _addItemUiState
+
+    protected val _automaticSearchIds = MutableStateFlow<List<Int>>(emptyList())
+    override val automaticSearchIds: StateFlow<List<Int>> = _automaticSearchIds
+
+    protected val _automaticSearchResult = MutableStateFlow<Boolean?>(null)
+    override val automaticSearchResult: StateFlow<Boolean?> = _automaticSearchResult
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -220,6 +227,27 @@ abstract class BaseArrRepository<T: AnyArrMedia>(
                 error = ErrorEvent("An unexpected error occurred"),
                 type = UiErrorType.Unexpected
             )
+        }
+    }
+
+    override suspend fun command(payload: CommandPayload) {
+        _automaticSearchResult.emit(null)
+        when(payload) {
+            is CommandPayload.RadarrSearch -> _automaticSearchIds.value = payload.movieIds
+            is CommandPayload.SonarrSearch -> _automaticSearchIds.value = payload.seriesIds
+        }
+
+        val resp = client.command(payload)
+        when(resp) {
+            is NetworkResult.Success -> _automaticSearchResult.emit(true)
+            is NetworkResult.NetworkError,
+                is NetworkResult.HttpError,
+                is NetworkResult.UnexpectedError -> _automaticSearchResult.emit(false)
+        }
+
+        when(payload) {
+            is CommandPayload.RadarrSearch,
+                is CommandPayload.SonarrSearch -> _automaticSearchIds.value = emptyList()
         }
     }
 
