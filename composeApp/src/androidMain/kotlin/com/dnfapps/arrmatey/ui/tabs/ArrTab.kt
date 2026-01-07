@@ -6,6 +6,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
+import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
@@ -51,8 +52,17 @@ fun ArrTab(type: InstanceType) {
                         entry<ArrScreen.Preview<AnyArrMedia>> { preview ->
                             MediaPreviewScreen(preview.item)
                         }
-                        entry<ArrScreen.InteractiveSearch> { item ->
-                            InteractiveSearchScreen(item.id)
+                        entry<ArrScreen.MovieReleases> { params ->
+                            val releaseParams = ReleaseParams.Movie(params.movieId)
+                            InteractiveSearchScreen(releaseParams)
+                        }
+                        entry<ArrScreen.SeriesRelease> { params ->
+                            val releaseParams = ReleaseParams.Series(
+                                params.seriesId,
+                                params.seasonNumber,
+                                params.episodeId
+                            )
+                            InteractiveSearchScreen(releaseParams)
                         }
                     }
                 )

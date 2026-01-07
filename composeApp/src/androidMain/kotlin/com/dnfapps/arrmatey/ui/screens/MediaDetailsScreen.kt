@@ -25,9 +25,7 @@ import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.ExpandCircleDown
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
@@ -68,6 +66,7 @@ import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
+import com.dnfapps.arrmatey.api.arr.model.CommandPayload
 import com.dnfapps.arrmatey.api.arr.model.Episode
 import com.dnfapps.arrmatey.api.arr.model.Season
 import com.dnfapps.arrmatey.api.arr.model.SeriesStatus
@@ -81,20 +80,17 @@ import com.dnfapps.arrmatey.entensions.headerBarColors
 import com.dnfapps.arrmatey.extensions.formatAsRuntime
 import com.dnfapps.arrmatey.extensions.isToday
 import com.dnfapps.arrmatey.extensions.isTodayOrAfter
-import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.ArrTabNavigation
 import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
+import com.dnfapps.arrmatey.ui.components.ReleaseDownloadButtons
 import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
 import com.dnfapps.arrmatey.ui.tabs.LocalArrViewModel
-import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.RadarrViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.SonarrViewModel
 import com.dnfapps.arrmatey.utils.format
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.koin.compose.koinInject
-import org.koin.core.parameter.parametersOf
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -166,7 +162,7 @@ fun MediaDetailsScreen(
 
                                     ItemDescriptionCard(item)
 
-                                    FilesArea(item, arrViewModel)
+                                    FilesArea(item)
 
                                     InfoArea(item)
                                 }
@@ -316,9 +312,9 @@ fun UpcomingDateView(item: AnyArrMedia) {
 }
 
 @Composable
-fun FilesArea(item: AnyArrMedia, vm: ArrViewModel) {
+fun FilesArea(item: AnyArrMedia) {
     when (item) {
-        is ArrSeries -> SeasonsArea(item, vm as SonarrViewModel)
+        is ArrSeries -> SeasonsArea(item)
         is ArrMovie -> MovieFileView(item)
     }
 }
@@ -362,49 +358,23 @@ fun MovieFileView(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        ReleaseDownloadButtons(
+            onInteractiveClicked = {
+                val destination = ArrScreen.MovieReleases(movie.id!!)
+                navigation.navigateTo(destination)
+            },
+            onAutomaticClicked = {
+                movie.id?.let { id ->
+                    val movieSearchCommand = CommandPayload.Movie(listOf(id))
+                    arrViewModel.command(movieSearchCommand)
+                }
+            },
+            automaticSearchEnabled = movie.monitored,
+            automaticSearchInProgress = searchIds.contains(movie.id),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp)
-        ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = {
-                    val interactiveDestination = ArrScreen.InteractiveSearch(movie.id!!)
-                    navigation.navigateTo(interactiveDestination)
-                },
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = stringResource(R.string.interactive)
-                )
-                Text(text = stringResource(R.string.interactive))
-            }
-
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = {
-                    movie.id?.let { id ->
-                        arrViewModel.performSearch(listOf(id))
-                    }
-                },
-                enabled = !searchIds.contains(movie.id),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                if (searchIds.contains(movie.id)) {
-                    CircularProgressIndicator(modifier = Modifier.size(25.dp))
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = stringResource(R.string.automatic)
-                    )
-                    Text(text = stringResource(R.string.automatic))
-                }
-            }
-        }
+        )
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -489,8 +459,11 @@ fun MovieFileView(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
-    val episodeState by vm.episodeState.collectAsStateWithLifecycle()
+fun SeasonsArea(series: ArrSeries) {
+    val arrViewModel = LocalArrViewModel.current
+    if (arrViewModel == null || arrViewModel !is SonarrViewModel) return
+
+    val episodeState by arrViewModel.episodeState.collectAsStateWithLifecycle()
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -548,7 +521,7 @@ fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
                                 stringResource(R.string.unmonitored)
                             },
                             modifier = Modifier.clickable {
-                                vm.toggleSeasonMonitor(series, season.seasonNumber)
+                                arrViewModel.toggleSeasonMonitor(series, season.seasonNumber)
                             }
                         )
                     }
@@ -570,10 +543,10 @@ fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
                                         .sortedByDescending { it.episodeNumber }
 
                                 Spacer(modifier = Modifier.height(6.dp))
-                                SeasonHeader(season, seasonEpisodes)
+                                SeasonHeader(series.id, season, seasonEpisodes)
                                 Spacer(modifier = Modifier.height(12.dp))
                                 seasonEpisodes.forEachIndexed { index, episode ->
-                                    EpisodeRow(episode, vm)
+                                    EpisodeRow(episode)
                                     if (index < seasonEpisodes.size-1) {
                                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                                     }
@@ -593,7 +566,15 @@ fun SeasonsArea(series: ArrSeries, vm: SonarrViewModel) {
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun SeasonHeader(season: Season, episodes: List<Episode>) {
+private fun SeasonHeader(
+    seriesId: Int?,
+    season: Season,
+    episodes: List<Episode>,
+    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+) {
+    val arrViewModel = LocalArrViewModel.current
+    if (arrViewModel == null) return
+
     val tbaLabel = stringResource(R.string.tba)
     val year = remember(episodes) {
         episodes.mapNotNull { it.airDateUtc }.minOrNull()
@@ -615,36 +596,31 @@ private fun SeasonHeader(season: Season, episodes: List<Episode>) {
         text = infoString,
         fontSize = 16.sp
     )
-    if (false) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Button(
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null
-                )
+    ReleaseDownloadButtons(
+        onInteractiveClicked = {
+            seriesId?.let { seriesId ->
+                val destination = ArrScreen.SeriesRelease(seriesId = seriesId, seasonNumber = season.seasonNumber)
+                navigation.navigateTo(destination)
             }
-
-            Button(
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null
-                )
+        },
+        onAutomaticClicked = {
+            seriesId?.let { seriesId ->
+                val seasonSearchCommand = CommandPayload.Season(seriesId, season.seasonNumber)
+                arrViewModel.command(seasonSearchCommand)
             }
-        }
-    }
+        },
+        automaticSearchInProgress = false,
+        modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+        smallSpacing = true,
+        automaticSearchEnabled = episodes.any { it.monitored }
+    )
 }
 
 @Composable
-private fun EpisodeRow(episode: Episode, vm: SonarrViewModel) {
+private fun EpisodeRow(episode: Episode, navigation: ArrTabNavigation = LocalArrTabNavigation.current) {
+    val arrViewModel = LocalArrViewModel.current
+    if (arrViewModel == null || arrViewModel !is SonarrViewModel) return
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -708,22 +684,22 @@ private fun EpisodeRow(episode: Episode, vm: SonarrViewModel) {
                 )
             }
         }
-        if (false) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                modifier = Modifier.clickable {
-
-                }
-            )
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null,
-                modifier = Modifier.clickable {
-
-                }
-            )
-        }
+        Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = null,
+            modifier = Modifier.clickable {
+                val destination = ArrScreen.SeriesRelease(episodeId = episode.id)
+                navigation.navigateTo(destination)
+            }
+        )
+        Icon(
+            imageVector = Icons.Default.Search,
+            contentDescription = null,
+            modifier = Modifier.clickable {
+                val payload = CommandPayload.Episode(listOf(episode.id))
+                arrViewModel.command(payload)
+            }
+        )
         Icon(
             imageVector = if (episode.monitored) {
                 Icons.Default.Bookmark
@@ -732,7 +708,7 @@ private fun EpisodeRow(episode: Episode, vm: SonarrViewModel) {
             },
             contentDescription = null,
             modifier = Modifier.clickable {
-                vm.toggleEpisodeMonitor(episode.id)
+                arrViewModel.toggleEpisodeMonitor(episode.id)
             }
         )
     }

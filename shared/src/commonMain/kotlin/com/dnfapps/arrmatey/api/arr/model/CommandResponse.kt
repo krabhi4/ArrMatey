@@ -24,9 +24,9 @@ data class CommandResponseBody(
     val sendUpdatesToClient: Boolean,
     val updateScheduledTask: Boolean,
     val requiresDiskAccess: Boolean,
-    val isExclusive: Boolean,
-    val isTypeExclusive: Boolean,
-    val isLongRunning: Boolean,
+    val isExclusive: Boolean = false,
+    val isTypeExclusive: Boolean = false,
+    val isLongRunning: Boolean = false,
     val name: String,
     val trigger: String,
     val suppressMessages: String

@@ -62,9 +62,8 @@ abstract class ArrViewModel(protected val instance: Instance): ViewModel(), Koin
         }
     }
 
-    fun performSearch(ids: List<Int>) {
+    fun command(payload: CommandPayload) {
         viewModelScope.launch {
-            val payload = searchPayload(ids)
             repository.command(payload)
         }
     }
@@ -80,8 +79,6 @@ abstract class ArrViewModel(protected val instance: Instance): ViewModel(), Koin
             repository.downloadRelease(release, force)
         }
     }
-
-    protected abstract fun searchPayload(ids: List<Int>): CommandPayload
 
     fun <T: AnyArrMedia> addItem(item: T) {
         viewModelScope.launch {

@@ -68,7 +68,7 @@ import com.dnfapps.arrmatey.ui.tabs.LocalArrViewModel
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun InteractiveSearchScreen(
-    id: Int,
+    releaseParams: ReleaseParams,
     navigation: ArrTabNavigation = LocalArrTabNavigation.current
 ) {
     val arrViewModel = LocalArrViewModel.current
@@ -77,7 +77,7 @@ fun InteractiveSearchScreen(
     val context = LocalContext.current
 
     val releaseUiState by arrViewModel.releaseUiState.collectAsStateWithLifecycle()
-    val downloadState by arrViewModel.downloadReleaseState.collectAsStateWithLifecycle()
+    val downloadState by arrViewModel.downloadReleaseState.collectAsStateWithLifecycle(DownloadState.Initial)
 
     var confirmRelease by remember { mutableStateOf<IArrRelease?>( null) }
     var showSearch by remember { mutableStateOf(false) }
@@ -98,9 +98,8 @@ fun InteractiveSearchScreen(
         }
     }
 
-    LaunchedEffect(Unit, id) {
-        val params = ReleaseParams.Movie(id)
-        arrViewModel.getReleases(params)
+    LaunchedEffect(releaseParams) {
+        arrViewModel.getReleases(releaseParams)
     }
 
     Scaffold(

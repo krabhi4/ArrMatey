@@ -15,17 +15,11 @@ sealed interface DownloadReleasePayload {
     ) : DownloadReleasePayload
 
     @Serializable
-    data class Season(
+    data class Series(
         override val guid: String,
         override val indexerId: Int,
-        val seriesId: Int?,
-        val seasonNumber: Int?
-    ) : DownloadReleasePayload
-
-    @Serializable
-    data class Episode(
-        override val guid: String,
-        override val indexerId: Int,
-        val episodeId: Int?
+        val seriesId: Int? = null,
+        val seasonNumber: Int? = null,
+        val episodeId: Long? = null
     ) : DownloadReleasePayload
 }

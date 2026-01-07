@@ -9,7 +9,6 @@ import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.model.Instance
 import com.dnfapps.arrmatey.model.InstanceType
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.inject
@@ -50,6 +49,7 @@ class RadarrRepository(instance: Instance): BaseArrRepository<ArrMovie, MovieRel
             is NetworkResult.Success -> _downloadReleaseState.value = DownloadState.Success
             else -> _downloadReleaseState.value = DownloadState.Error
         }
+        _downloadReleaseState.value = DownloadState.Initial
     }
 
 }

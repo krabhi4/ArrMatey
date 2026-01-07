@@ -2,6 +2,7 @@ package com.dnfapps.arrmatey.api.arr.viewmodel
 
 import com.dnfapps.arrmatey.api.arr.SonarrClient
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
+import com.dnfapps.arrmatey.api.arr.model.DownloadReleasePayload
 import com.dnfapps.arrmatey.api.arr.model.Episode
 import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.api.arr.model.SeriesRelease
@@ -87,7 +88,21 @@ class SonarrRepository(instance: Instance): BaseArrRepository<ArrSeries, SeriesR
     }
 
     override suspend fun downloadRelease(release: SeriesRelease, force: Boolean) {
-        TODO("Not yet implemented")
+        _downloadReleaseState.value = DownloadState.Loading(release.guid)
+        val payload = DownloadReleasePayload.Series(
+            guid = release.guid,
+            indexerId = release.indexerId,
+            seriesId = release.seriesId,
+            seasonNumber = release.seasonNumber,
+            episodeId = release.episodeId
+        )
+
+        val response = client.downloadRelease(payload)
+        when (response) {
+            is NetworkResult.Success -> _downloadReleaseState.value = DownloadState.Success
+            else -> _downloadReleaseState.value = DownloadState.Error
+        }
+        _downloadReleaseState.value = DownloadState.Initial
     }
 
 }

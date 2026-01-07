@@ -51,7 +51,12 @@ class SonarrClient(instance: Instance) : BaseArrClient<ArrSeries, SeriesRelease,
     }
 
     override suspend fun getReleases(params: ReleaseParams.Series): NetworkResult<List<SeriesRelease>> {
-        TODO("Not yet implemented")
+        val query = when (val epId = params.episodeId) {
+            null -> "?seriesId=${params.seriesId}&seasonNumber=${params.seasonNumber}"
+            else -> "?episodeId=${epId}"
+        }
+        val resp = httpClient.safeGet<List<SeriesRelease>>("api/v3/release$query")
+        return resp
     }
 
     suspend fun updateEpisode(item: Episode): NetworkResult<Episode> {

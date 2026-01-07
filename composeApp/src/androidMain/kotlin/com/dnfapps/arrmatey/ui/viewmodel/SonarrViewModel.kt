@@ -25,10 +25,6 @@ class SonarrViewModel(instance: Instance): ArrViewModel(instance) {
         getEpisodes(id)
     }
 
-    override fun searchPayload(ids: List<Int>): CommandPayload {
-        return CommandPayload.SonarrSearch(ids)
-    }
-
     @OptIn(ExperimentalTime::class)
     fun toggleSeasonMonitor(series: ArrSeries, seasonNumber: Int) {
         viewModelScope.launch {

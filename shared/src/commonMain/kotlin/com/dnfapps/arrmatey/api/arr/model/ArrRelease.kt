@@ -22,15 +22,15 @@ interface IArrRelease: KoinComponent {
     val indexer: String
     val releaseGroup: String?
     val subGroup: String?
-    val releaseHash: String
+    val releaseHash: String?
     val title: String
     val sceneSource: Boolean
     val languages: List<Language>
     val approved: Boolean
     val temporarilyRejected: Boolean
     val rejected: Boolean
-    val imdbId: Int
-    val tmdbId: Int
+    val imdbId: String?
+    val tmdbId: Int?
     val rejections: List<String>
     val publishDate: Instant
     val commentUrl: String
@@ -45,7 +45,6 @@ interface IArrRelease: KoinComponent {
     val seeders: Int
     val leechers: Int
     val protocol: ReleaseProtocol
-    val indexerFlags: List<String>
     val downloadClientId: Int?
     val downloadClient: String?
     val shouldOverride: Boolean?
@@ -92,5 +91,5 @@ enum class ReleaseProtocol {
 
 sealed interface ReleaseParams {
     data class Movie(val movieId: Int): ReleaseParams
-    object Series: ReleaseParams // todo - add params
+    data class Series(val seriesId: Int? = null, val seasonNumber: Int? = null, val episodeId: Long? = null): ReleaseParams
 }

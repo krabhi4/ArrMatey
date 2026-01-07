@@ -241,8 +241,9 @@ abstract class BaseArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParam
     override suspend fun command(payload: CommandPayload) {
         _automaticSearchResult.emit(null)
         when(payload) {
-            is CommandPayload.RadarrSearch -> _automaticSearchIds.value = payload.movieIds
-            is CommandPayload.SonarrSearch -> _automaticSearchIds.value = payload.seriesIds
+            is CommandPayload.Movie -> _automaticSearchIds.value = payload.movieIds
+            is CommandPayload.Series -> _automaticSearchIds.value = listOf(payload.seriesId)
+            else -> {}
         }
 
         val resp = client.command(payload)
@@ -254,8 +255,9 @@ abstract class BaseArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParam
         }
 
         when(payload) {
-            is CommandPayload.RadarrSearch,
-                is CommandPayload.SonarrSearch -> _automaticSearchIds.value = emptyList()
+            is CommandPayload.Movie,
+                is CommandPayload.Series -> _automaticSearchIds.value = emptyList()
+            else -> {}
         }
     }
 
