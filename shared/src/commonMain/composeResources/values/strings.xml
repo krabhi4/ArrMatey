@@ -118,6 +118,7 @@
     <string name="any">Any</string>
     <string name="season_pack">Season Pack</string>
     <string name="single_episode">Single Episode</string>
+    <string name="activity">Activity</string>
 
     <!-- Errors -->
     <string name="instance_connect_error">Failed to connect to instance at %1$s</string>

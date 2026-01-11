@@ -226,6 +226,8 @@
         en = Season Pack
     [single_episode]
         en = Single Episode
+    [activity]
+        en = Activity
 
 [[Errors]]
     [instance_connect_error]

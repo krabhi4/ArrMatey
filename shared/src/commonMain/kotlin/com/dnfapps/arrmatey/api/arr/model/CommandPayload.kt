@@ -12,4 +12,6 @@ sealed class CommandPayload(val name: String) {
     data class Season(val seriesId: Int, val seasonNumber: Int): CommandPayload("SeasonSearch")
     @Serializable
     data class Episode(val episodeIds: List<Long>): CommandPayload("EpisodeSearch")
+    @Serializable
+    data object RefreshMonitoredDownloads: CommandPayload("RefreshMonitoredDownloads")
 }

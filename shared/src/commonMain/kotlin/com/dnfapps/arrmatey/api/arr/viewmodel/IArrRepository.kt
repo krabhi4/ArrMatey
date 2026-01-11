@@ -4,9 +4,11 @@ import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.CommandPayload
 import com.dnfapps.arrmatey.api.arr.model.IArrRelease
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
+import com.dnfapps.arrmatey.api.arr.model.QueuePage
 import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.api.arr.model.RootFolder
 import com.dnfapps.arrmatey.api.arr.model.Tag
+import com.dnfapps.arrmatey.api.client.NetworkResult
 import kotlinx.coroutines.flow.StateFlow
 
 interface IArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParams> {
@@ -19,6 +21,8 @@ interface IArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParams> {
     suspend fun command(payload: CommandPayload)
     suspend fun getReleases(params: P)
     suspend fun downloadRelease(release: R, force: Boolean = false)
+
+    suspend fun fetchActivityTasksSync(instanceId: Long, pageSize: Int = 100): NetworkResult<QueuePage>
 
     val uiState: StateFlow<LibraryUiState<T>>
     val detailUiState: StateFlow<DetailsUiState<T>>

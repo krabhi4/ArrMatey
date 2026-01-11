@@ -7,6 +7,7 @@ import com.dnfapps.arrmatey.api.arr.model.ArrSeries
 import com.dnfapps.arrmatey.api.arr.model.CommandPayload
 import com.dnfapps.arrmatey.api.arr.model.IArrRelease
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
+import com.dnfapps.arrmatey.api.arr.model.QueuePage
 import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.api.arr.model.RootFolder
 import com.dnfapps.arrmatey.api.arr.model.Tag
@@ -239,26 +240,27 @@ abstract class BaseArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParam
     }
 
     override suspend fun command(payload: CommandPayload) {
-        _automaticSearchResult.emit(null)
         when(payload) {
-            is CommandPayload.Movie -> _automaticSearchIds.value = payload.movieIds
-            is CommandPayload.Series -> _automaticSearchIds.value = listOf(payload.seriesId)
-            else -> {}
+            is CommandPayload.Movie -> handleSearchCommand(payload, payload.movieIds)
+            is CommandPayload.Series -> handleSearchCommand(payload, listOf(payload.seriesId))
+            else -> handleOtherCommand(payload)
         }
+    }
 
+    private suspend fun handleSearchCommand(payload: CommandPayload, ids: List<Int>) {
+        _automaticSearchIds.value = ids
         val resp = client.command(payload)
         when(resp) {
             is NetworkResult.Success -> _automaticSearchResult.emit(true)
             is NetworkResult.NetworkError,
-                is NetworkResult.HttpError,
-                is NetworkResult.UnexpectedError -> _automaticSearchResult.emit(false)
+            is NetworkResult.HttpError,
+            is NetworkResult.UnexpectedError -> _automaticSearchResult.emit(false)
         }
+        _automaticSearchIds.value = emptyList()
+    }
 
-        when(payload) {
-            is CommandPayload.Movie,
-                is CommandPayload.Series -> _automaticSearchIds.value = emptyList()
-            else -> {}
-        }
+    private suspend fun handleOtherCommand(payload: CommandPayload) {
+        client.command(payload)
     }
 
     override suspend fun getReleases(params: P) {
@@ -288,6 +290,11 @@ abstract class BaseArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParam
                 )
             }
         }
+    }
+
+    override suspend fun fetchActivityTasksSync(instanceId: Long, pageSize: Int): NetworkResult<QueuePage> {
+        val resp = client.fetchActivityTasks(instanceId, pageSize)
+        return resp
     }
 
 }

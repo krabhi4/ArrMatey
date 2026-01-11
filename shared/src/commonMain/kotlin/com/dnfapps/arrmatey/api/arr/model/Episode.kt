@@ -56,6 +56,9 @@ data class Episode(
     }
 
     fun formatAirDateUtc() = formatAirDateUtc(true, TimeZone.currentSystemDefault())
+
+    val episodeLabel: String
+        get() = "${seasonNumber}x${episodeNumber}"
 }
 
 enum class FinalType(val label: String) {

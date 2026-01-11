@@ -31,14 +31,3 @@ class SettingsNavigation: Navigation<SettingsScreen>(SettingsScreen.Landing)
 abstract class ArrTabNavigation: Navigation<ArrScreen>(ArrScreen.Library)
 class SeriesTabNavigation: ArrTabNavigation()
 class MoviesTabNavigation: ArrTabNavigation()
-
-class HomeTabNavigation: Navigation<HomeTab>(HomeTab.SeriesTab) {
-    fun navigateToHomeTab(tab: TabItem) {
-        val navKey = when (tab) {
-            TabItem.SHOWS -> HomeTab.SeriesTab
-            TabItem.MOVIES -> HomeTab.MoviesTab
-            TabItem.SETTINGS -> HomeTab.SettingsTab
-        }
-        backStack.add(navKey)
-    }
-}

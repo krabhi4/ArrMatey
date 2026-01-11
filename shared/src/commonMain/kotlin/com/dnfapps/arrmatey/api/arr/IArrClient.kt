@@ -6,6 +6,7 @@ import com.dnfapps.arrmatey.api.arr.model.CommandResponse
 import com.dnfapps.arrmatey.api.arr.model.IArrRelease
 import com.dnfapps.arrmatey.api.arr.model.MonitoredResponse
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
+import com.dnfapps.arrmatey.api.arr.model.QueuePage
 import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.api.arr.model.RootFolder
 import com.dnfapps.arrmatey.api.arr.model.Tag
@@ -24,5 +25,6 @@ interface IArrClient<T: AnyArrMedia, R: IArrRelease, P: ReleaseParams> {
     suspend fun addItemToLibrary(item: T): NetworkResult<T>
     suspend fun command(payload: CommandPayload): NetworkResult<CommandResponse>
     suspend fun getReleases(params: P): NetworkResult<List<R>>
+    suspend fun fetchActivityTasks(instanceId: Long, pageSize: Int): NetworkResult<QueuePage>
 
 }

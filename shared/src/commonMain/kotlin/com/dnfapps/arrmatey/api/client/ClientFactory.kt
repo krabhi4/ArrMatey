@@ -12,7 +12,6 @@ import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import org.koin.compose.koinInject
 
 private const val HEADER_X_API_KEY = "X-Api-Key"
 

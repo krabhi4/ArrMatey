@@ -2,7 +2,6 @@ package com.dnfapps.arrmatey
 
 import com.dnfapps.arrmatey.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrTabNavigation
-import com.dnfapps.arrmatey.navigation.HomeTabNavigation
 import com.dnfapps.arrmatey.navigation.MoviesTabNavigation
 import com.dnfapps.arrmatey.navigation.SeriesTabNavigation
 import com.dnfapps.arrmatey.navigation.SettingsNavigation
@@ -10,7 +9,6 @@ import org.koin.dsl.module
 
 val androidModule = module {
     single { SettingsNavigation() }
-    single { HomeTabNavigation() }
 
     single { SeriesTabNavigation() }
     single { MoviesTabNavigation() }

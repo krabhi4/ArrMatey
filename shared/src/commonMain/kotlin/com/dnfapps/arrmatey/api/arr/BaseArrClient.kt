@@ -6,6 +6,7 @@ import com.dnfapps.arrmatey.api.arr.model.CommandResponse
 import com.dnfapps.arrmatey.api.arr.model.DownloadReleasePayload
 import com.dnfapps.arrmatey.api.arr.model.IArrRelease
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
+import com.dnfapps.arrmatey.api.arr.model.QueuePage
 import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.api.arr.model.RootFolder
 import com.dnfapps.arrmatey.api.arr.model.Tag
@@ -45,6 +46,15 @@ abstract class BaseArrClient<T: AnyArrMedia, R: IArrRelease, P: ReleaseParams>(
         val resp = httpClient.safePost<CommandResponse>("api/v3/command") {
             contentType(ContentType.Application.Json)
             setBody(payload)
+        }
+        return resp
+    }
+
+    override suspend fun fetchActivityTasks(instanceId: Long, pageSize: Int): NetworkResult<QueuePage> {
+        val query = "?pageSize=$pageSize&includeMovie=true&includeSeries=true&includeEpisode=true"
+        val resp = httpClient.safeGet<QueuePage>("api/v3/queue$query")
+        if (resp is NetworkResult.Success) {
+            resp.data.records.forEach { it.instanceId = instanceId }
         }
         return resp
     }
