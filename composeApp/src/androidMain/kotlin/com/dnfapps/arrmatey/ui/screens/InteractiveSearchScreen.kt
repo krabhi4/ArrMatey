@@ -69,6 +69,9 @@ import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.compose.utils.applyFiltering
 import com.dnfapps.arrmatey.compose.utils.applySorting
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
+import com.dnfapps.arrmatey.compose.utils.singleLanguageLabel
+import com.dnfapps.arrmatey.entensions.Bullet
+import com.dnfapps.arrmatey.entensions.bullet
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.entensions.stringResource
@@ -333,9 +336,9 @@ fun <T: IArrRelease> ReleaseItem(
                     withStyle(SpanStyle(color = item.peerColor)) {
                         append(item.typeLabel)
                     }
-                    append(" • ")
+                    bullet()
                     append(item.quality.qualityLabel)
-                    append(" • ")
+                    bullet()
                     append(item.size.bytesAsFileSizeString())
                 }
                 Text(
@@ -344,10 +347,10 @@ fun <T: IArrRelease> ReleaseItem(
                 )
 
                 val thirdLine = listOf(
-                    item.languageLabel,
+                    item.languages.singleLanguageLabel(),
                     item.indexerLabel,
                     item.ageMinutes.formatAgeMinutes()
-                ).joinToString(" • ")
+                ).joinToString(Bullet)
                 Text(
                     text = thirdLine,
                     maxLines = 1

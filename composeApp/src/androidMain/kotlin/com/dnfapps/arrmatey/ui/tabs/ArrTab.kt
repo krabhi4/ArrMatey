@@ -20,6 +20,7 @@ import com.dnfapps.arrmatey.ui.screens.ArrSearchScreen
 import com.dnfapps.arrmatey.ui.screens.InteractiveSearchScreen
 import com.dnfapps.arrmatey.ui.screens.MediaDetailsScreen
 import com.dnfapps.arrmatey.ui.screens.MediaPreviewScreen
+import com.dnfapps.arrmatey.ui.screens.MovieFilesScreen
 import com.dnfapps.arrmatey.ui.viewmodel.ArrViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.InstanceViewModel
 import com.dnfapps.arrmatey.ui.viewmodel.rememberArrViewModel
@@ -78,6 +79,9 @@ fun ArrTab(type: InstanceType) {
                             ReleaseFilterBy.SingleEpisode
                         } else ReleaseFilterBy.SeasonPack
                     )
+                }
+                entry<ArrScreen.MovieFiles> { params ->
+                    MovieFilesScreen(movie = params.movie)
                 }
             }
         )

@@ -240,6 +240,8 @@
         en = Added
     [destination]
         en = Destination
+    [no_history]
+        en = No History
 
 [[Errors]]
     [instance_connect_error]

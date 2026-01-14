@@ -5,6 +5,7 @@ import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ArrSeries
 import com.dnfapps.arrmatey.api.arr.model.CommandPayload
+import com.dnfapps.arrmatey.api.arr.model.HistoryItem
 import com.dnfapps.arrmatey.api.arr.model.IArrRelease
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
 import com.dnfapps.arrmatey.api.arr.model.QueuePage
@@ -64,6 +65,12 @@ abstract class BaseArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParam
 
     protected val _automaticSearchResult = MutableStateFlow<Boolean?>(null)
     override val automaticSearchResult: StateFlow<Boolean?> = _automaticSearchResult
+
+    protected val _itemHistoryMap = MutableStateFlow<Map<Long, List<HistoryItem>>>(emptyMap())
+    override val itemHistoryMap: StateFlow<Map<Long, List<HistoryItem>>> = _itemHistoryMap
+
+    protected val _itemHistoryRefreshing = MutableStateFlow(false)
+    override val itemHistoryRefreshing: StateFlow<Boolean> = _itemHistoryRefreshing
 
     protected val _releasesUiState = MutableStateFlow<LibraryUiState<R>>(LibraryUiState.Initial)
     override val releasesUiState: StateFlow<LibraryUiState<R>> = _releasesUiState
@@ -295,6 +302,17 @@ abstract class BaseArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParam
     override suspend fun fetchActivityTasksSync(instanceId: Long, page: Int, pageSize: Int): NetworkResult<QueuePage> {
         val resp = client.fetchActivityTasks(instanceId, page, pageSize)
         return resp
+    }
+
+    override suspend fun getItemHistory(id: Long, page: Int, pageSize: Int) {
+        _itemHistoryRefreshing.value = true
+        val resp = client.getItemHistory(id, page, pageSize)
+        if (resp is NetworkResult.Success) {
+            val newMap = _itemHistoryMap.value.toMutableMap()
+            newMap[id] = resp.data
+            _itemHistoryMap.value = newMap
+        }
+        _itemHistoryRefreshing.value = false
     }
 
 }

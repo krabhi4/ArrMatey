@@ -5,6 +5,7 @@ import com.dnfapps.arrmatey.api.arr.model.Episode
 import com.dnfapps.arrmatey.api.arr.model.MonitoredResponse
 import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.api.arr.model.SeriesRelease
+import com.dnfapps.arrmatey.api.arr.model.SonarrHistoryItem
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.api.client.safeGet
 import com.dnfapps.arrmatey.api.client.safePost
@@ -59,6 +60,27 @@ class SonarrClient(instance: Instance) : BaseArrClient<ArrSeries, SeriesRelease,
         return resp
     }
 
+    override suspend fun setMonitorStatus(id: Long, monitorStatus: Boolean): NetworkResult<List<MonitoredResponse>> {
+        val resp = httpClient.safePut<List<MonitoredResponse>>("api/v3/series/editor") {
+            contentType(ContentType.Application.Json)
+
+            val body = buildJsonObject {
+                put("monitored", JsonPrimitive(monitorStatus))
+                putJsonArray("seriesIds") {
+                    add(JsonPrimitive(id))
+                }
+            }
+            setBody(body)
+        }
+        return resp
+    }
+
+    override suspend fun getItemHistory(id: Long, page: Int, pageSize: Int): NetworkResult<List<SonarrHistoryItem>> {
+        val query = "?episodeId=$id&page=$page&pageSize=$pageSize"
+        val resp = httpClient.safeGet<List<SonarrHistoryItem>>("api/v3/history$query")
+        return resp
+    }
+
     suspend fun updateEpisode(item: Episode): NetworkResult<Episode> {
         val resp = httpClient.safePut<Episode>("api/v3/episode/${item.id}") {
             contentType(ContentType.Application.Json)
@@ -79,21 +101,6 @@ class SonarrClient(instance: Instance) : BaseArrClient<ArrSeries, SeriesRelease,
         ).joinToString("&")
         val query = "?$queryParams"
         val resp = httpClient.safeGet<List<Episode>>("api/v3/episode$query")
-        return resp
-    }
-
-    override suspend fun setMonitorStatus(id: Long, monitorStatus: Boolean): NetworkResult<List<MonitoredResponse>> {
-        val resp = httpClient.safePut<List<MonitoredResponse>>("api/v3/series/editor") {
-            contentType(ContentType.Application.Json)
-
-            val body = buildJsonObject {
-                put("monitored", JsonPrimitive(monitorStatus))
-                putJsonArray("seriesIds") {
-                    add(JsonPrimitive(id))
-                }
-            }
-            setBody(body)
-        }
         return resp
     }
 

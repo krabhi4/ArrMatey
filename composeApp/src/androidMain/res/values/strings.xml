@@ -124,6 +124,7 @@
     <string name="indexer">Indexer</string>
     <string name="langauges">Languages</string>
     <string name="destination">Destination</string>
+    <string name="no_history">No History</string>
 
     <!-- Errors -->
     <string name="instance_connect_error">Failed to connect to instance at %1$s</string>

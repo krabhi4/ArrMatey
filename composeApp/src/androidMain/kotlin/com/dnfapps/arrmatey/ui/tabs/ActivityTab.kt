@@ -59,6 +59,7 @@ import com.dnfapps.arrmatey.compose.utils.applySorting
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.compose.utils.filterBy
 import com.dnfapps.arrmatey.database.InstanceRepository
+import com.dnfapps.arrmatey.entensions.bullet
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.ui.components.DropdownPicker
@@ -186,10 +187,10 @@ fun ActivityItem(item: QueueItem, onClick: () -> Unit) {
                 val statusRow = buildString {
                     append(item.statusLabel)
                     if (item.trackedDownloadState == QueueDownloadState.Downloading) {
-                        append(" • ")
+                        bullet()
                         append(item.progressLabel)
                         item.remainingTimeLabel?.let { remainingTimeLabel ->
-                            append(" • ")
+                            bullet()
                             append(remainingTimeLabel)
                         }
                     }
@@ -306,9 +307,9 @@ fun QueueItemInfoSheet(
                 )) {
                     append(item.statusLabel)
                 }
-                append(" • ")
+                bullet()
                 append(item.quality.qualityLabel)
-                append(" • ")
+                bullet()
                 append(item.size.toLong().bytesAsFileSizeString())
             }
 

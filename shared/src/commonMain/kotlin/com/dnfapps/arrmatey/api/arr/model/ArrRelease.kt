@@ -57,13 +57,6 @@ interface IArrRelease: KoinComponent {
             return protocol.name
         }
 
-    val languageLabel: String
-        get() = when(languages.size) {
-                0 -> "Unknown"
-                1 -> languages.first().name ?: ""
-                else -> "Multilingual"
-            }
-
     val indexerLabel: String
         get() = indexer
 

@@ -3,6 +3,7 @@ package com.dnfapps.arrmatey.api.arr
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.CommandPayload
 import com.dnfapps.arrmatey.api.arr.model.CommandResponse
+import com.dnfapps.arrmatey.api.arr.model.HistoryItem
 import com.dnfapps.arrmatey.api.arr.model.IArrRelease
 import com.dnfapps.arrmatey.api.arr.model.MonitoredResponse
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
@@ -26,5 +27,6 @@ interface IArrClient<T: AnyArrMedia, R: IArrRelease, P: ReleaseParams> {
     suspend fun command(payload: CommandPayload): NetworkResult<CommandResponse>
     suspend fun getReleases(params: P): NetworkResult<List<R>>
     suspend fun fetchActivityTasks(instanceId: Long, page: Int, pageSize: Int): NetworkResult<QueuePage>
+    suspend fun getItemHistory(id: Long, page: Int, pageSize: Int): NetworkResult<List<HistoryItem>>
 
 }

@@ -78,6 +78,8 @@ import com.dnfapps.arrmatey.api.client.ActivityQueue
 import com.dnfapps.arrmatey.compose.components.DetailHeaderBanner
 import com.dnfapps.arrmatey.compose.components.PosterItem
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
+import com.dnfapps.arrmatey.entensions.Bullet
+import com.dnfapps.arrmatey.entensions.bullet
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.headerBarColors
 import com.dnfapps.arrmatey.extensions.formatAsRuntime
@@ -85,6 +87,8 @@ import com.dnfapps.arrmatey.extensions.isToday
 import com.dnfapps.arrmatey.extensions.isTodayOrAfter
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.ui.components.ExtraFileCard
+import com.dnfapps.arrmatey.ui.components.MovieFileCard
 import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
 import com.dnfapps.arrmatey.ui.components.ReleaseDownloadButtons
 import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
@@ -243,16 +247,16 @@ fun DetailsHeader(item: AnyArrMedia) {
                         item.year,
                         item.runtimeString,
                         item.certification
-                    ).joinToString(" • "),
+                    ).joinToString(Bullet),
                     fontSize = 16.sp
                 )
                 Text(
-                    text = listOf(item.releasedBy, item.statusString).joinToString(" • "),
+                    text = listOf(item.releasedBy, item.statusString).joinToString(Bullet),
                     fontSize = 14.sp,
                     lineHeight = 16.sp
                 )
                 Text(
-                    text = item.genres.joinToString(" • "),
+                    text = item.genres.joinToString(Bullet),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.secondary,
                     overflow = TextOverflow.Ellipsis,
@@ -393,59 +397,18 @@ fun MovieFileView(
             Text(
                 text = stringResource(R.string.history),
                 fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier.clickable {
-
+                    navigation.navigateTo(ArrScreen.MovieFiles(movie))
                 }
             )
         }
         movie.movieFile?.let { file ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 18.dp)
-                ) {
-                    Text(
-                        text = file.relativePath,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = listOf(
-                            file.languages.first().name,
-                            file.size.bytesAsFileSizeString(),
-                            file.quality.qualityLabel
-                        ).joinToString(" • "),
-                        fontSize = 14.sp
-                    )
-                    Text(
-                        text = stringResource(R.string.added_on, file.dateAdded.format("MMM d, yyyy")),
-                        fontSize = 14.sp
-                    )
-                }
-            }
+            MovieFileCard(file)
         }
         movieExtraFiles.takeUnless { it.isEmpty() }?.forEach { extraFile ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 18.dp)
-                ) {
-                    Text(
-                        text = extraFile.relativePath,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = extraFile.type.name,
-                        fontSize = 14.sp
-                    )
-                }
-            }
+            ExtraFileCard(extraFile)
         }
 
         if (movie.movieFile == null && movieExtraFiles.isEmpty()) {
@@ -611,7 +574,7 @@ private fun SeasonHeader(
     val seasonInfo = listOfNotNull(
         year, runtime, season.statistics?.sizeOnDisk?.bytesAsFileSizeString()
     )
-    val infoString = seasonInfo.joinToString(" • ")
+    val infoString = seasonInfo.joinToString(Bullet)
     Text(
         text = infoString,
         fontSize = 16.sp
@@ -666,7 +629,7 @@ private fun EpisodeRow(
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.secondary
                         )) {
-                            append(" • ")
+                            bullet()
                             append(finalType.label)
                         }
                     }
@@ -705,7 +668,7 @@ private fun EpisodeRow(
                 else
                     FontWeight.Normal to Color.Unspecified
                 Text(
-                    text = " • ${episode.formatAirDateUtc()}",
+                    text = "$Bullet${episode.formatAirDateUtc()}",
                     color = color,
                     fontWeight = weight,
                     fontSize = 14.sp

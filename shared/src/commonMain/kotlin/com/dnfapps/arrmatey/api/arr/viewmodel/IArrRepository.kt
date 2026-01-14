@@ -2,6 +2,7 @@ package com.dnfapps.arrmatey.api.arr.viewmodel
 
 import com.dnfapps.arrmatey.api.arr.model.AnyArrMedia
 import com.dnfapps.arrmatey.api.arr.model.CommandPayload
+import com.dnfapps.arrmatey.api.arr.model.HistoryItem
 import com.dnfapps.arrmatey.api.arr.model.IArrRelease
 import com.dnfapps.arrmatey.api.arr.model.QualityProfile
 import com.dnfapps.arrmatey.api.arr.model.QueuePage
@@ -23,6 +24,7 @@ interface IArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParams> {
     suspend fun downloadRelease(release: R, force: Boolean = false)
 
     suspend fun fetchActivityTasksSync(instanceId: Long, page: Int = 1, pageSize: Int = 100): NetworkResult<QueuePage>
+    suspend fun getItemHistory(id: Long, page: Int = 1, pageSize: Int = 100)
 
     val uiState: StateFlow<LibraryUiState<T>>
     val detailUiState: StateFlow<DetailsUiState<T>>
@@ -33,6 +35,9 @@ interface IArrRepository<T: AnyArrMedia, R: IArrRelease, P: ReleaseParams> {
 
     val automaticSearchIds: StateFlow<List<Long>>
     val automaticSearchResult: StateFlow<Boolean?>
+
+    val itemHistoryMap: StateFlow<Map<Long, List<HistoryItem>>>
+    val itemHistoryRefreshing: StateFlow<Boolean>
 
     val qualityProfiles: StateFlow<List<QualityProfile>>
     val rootFolders: StateFlow<List<RootFolder>>

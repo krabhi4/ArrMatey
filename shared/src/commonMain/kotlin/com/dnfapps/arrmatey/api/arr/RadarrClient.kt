@@ -2,8 +2,10 @@ package com.dnfapps.arrmatey.api.arr
 
 import com.dnfapps.arrmatey.api.arr.model.ArrMovie
 import com.dnfapps.arrmatey.api.arr.model.ExtraFile
+import com.dnfapps.arrmatey.api.arr.model.HistoryItem
 import com.dnfapps.arrmatey.api.arr.model.MonitoredResponse
 import com.dnfapps.arrmatey.api.arr.model.MovieRelease
+import com.dnfapps.arrmatey.api.arr.model.RadarrHistoryItem
 import com.dnfapps.arrmatey.api.arr.model.ReleaseParams
 import com.dnfapps.arrmatey.api.client.NetworkResult
 import com.dnfapps.arrmatey.api.client.safeGet
@@ -68,6 +70,12 @@ class RadarrClient(instance: Instance): BaseArrClient<ArrMovie, MovieRelease, Re
     override suspend fun getReleases(params: ReleaseParams.Movie): NetworkResult<List<MovieRelease>> {
         val movieId = params.movieId
         val resp = httpClient.safeGet<List<MovieRelease>>("api/v3/release?movieId=$movieId")
+        return resp
+    }
+
+    override suspend fun getItemHistory(id: Long, page: Int, pageSize: Int): NetworkResult<List<RadarrHistoryItem>> {
+        val query = "?movieId=$id&page=$page&pageSize=$pageSize"
+        val resp = httpClient.safeGet<List<RadarrHistoryItem>>("api/v3/history/movie$query")
         return resp
     }
 

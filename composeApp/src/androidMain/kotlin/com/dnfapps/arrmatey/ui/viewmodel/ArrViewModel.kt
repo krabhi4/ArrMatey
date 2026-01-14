@@ -34,6 +34,9 @@ abstract class ArrViewModel(protected val instance: Instance): ViewModel(), Koin
     val automaticSearchIds = repository.automaticSearchIds
     val automaticSearchResult = repository.automaticSearchResult
 
+    val itemHistoryMap = repository.itemHistoryMap
+    val itemHistoryRefreshing = repository.itemHistoryRefreshing
+
     val qualityProfiles = repository.qualityProfiles
     val rootFolders = repository.rootFolders
     val tags = repository.tags
@@ -83,6 +86,12 @@ abstract class ArrViewModel(protected val instance: Instance): ViewModel(), Koin
     fun <T: AnyArrMedia> addItem(item: T) {
         viewModelScope.launch {
             repository.addItem(item)
+        }
+    }
+
+    fun getItemHistory(id: Long, page: Int = 1, pageSize: Int = 100) {
+        viewModelScope.launch {
+            repository.getItemHistory(id, page, pageSize)
         }
     }
 }

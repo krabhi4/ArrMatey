@@ -15,7 +15,6 @@ sealed interface QueueItem {
     /**
      * JSON properties
      */
-
     val id: Int
     var instanceId: Long?
     val downloadId: String?
