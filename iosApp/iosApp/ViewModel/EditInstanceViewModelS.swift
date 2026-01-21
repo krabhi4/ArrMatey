@@ -23,17 +23,11 @@ class EditInstanceViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await state in viewModel.uiState {
-                self.uiState = state
-                self.showError = state.createResult is InsertResultSuccess
-            }
+        viewModel.uiState.observeAsync {
+            self.uiState = $0
+            self.showError = $0.createResult is InsertResultSuccess
         }
-        Task {
-            for try await instance in viewModel.instance {
-                self.instance = instance
-            }
-        }
+        viewModel.instance.observeAsync { self.instance = $0}
     }
     
     func setApiEndpoint(_ endpoint: String) {

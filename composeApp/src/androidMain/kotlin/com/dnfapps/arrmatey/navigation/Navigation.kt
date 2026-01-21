@@ -20,14 +20,10 @@ abstract class Navigation<T>(initialScreen: T) {
 
     fun replaceCurrent(screen: T) {
         backStack.add(screen)
-//        CoroutineScope(Dispatchers.Main).launch {
-//            delay(500)
-            backStack.removeAt(backStack.size - 2)
-//        }
+        backStack.removeAt(backStack.size - 2)
     }
 }
 
 class SettingsNavigation: Navigation<SettingsScreen>(SettingsScreen.Landing)
-abstract class ArrTabNavigation: Navigation<ArrScreen>(ArrScreen.Library)
-class SeriesTabNavigation: ArrTabNavigation()
-class MoviesTabNavigation: ArrTabNavigation()
+class SeriesTabNavigation : Navigation<ArrScreen>(ArrScreen.Library)
+class MoviesTabNavigation: Navigation<ArrScreen>(ArrScreen.Library)

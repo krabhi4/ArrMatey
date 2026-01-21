@@ -17,10 +17,6 @@ class MoreScreenViewModelS: ObservableObject {
     init() {
         self.viewModel = KoinBridge.shared.getMoreScreenViewModel()
         
-        Task {
-            for try await instances in viewModel.instances {
-                self.instances = instances
-            }
-        }
+        viewModel.instances.observeAsync { self.instances = $0 }
     }
 }

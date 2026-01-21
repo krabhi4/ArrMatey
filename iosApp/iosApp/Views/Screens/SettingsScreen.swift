@@ -39,7 +39,7 @@ struct SettingsScreen: View {
                     }
                 }
                 Button(LocalizedStringResource("add_instance")) {
-                    navigationManager.go(to: .newInstance)
+                    navigationManager.go(to: .newInstance())
                 }
             } header: {
                 Text(LocalizedStringResource("instances"))

@@ -21,11 +21,7 @@ class MovieFilesViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await state in viewModel.uiState {
-                self.uiState = state
-            }
-        }
+        viewModel.uiState.observeAsync { self.uiState = $0 }
     }
     
     func refreshHistory() {

@@ -18,18 +18,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.compose.TabItem
 import com.dnfapps.arrmatey.entensions.BadgeContent
 import com.dnfapps.arrmatey.entensions.stringResource
 import com.dnfapps.arrmatey.instances.model.InstanceType
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.tabs.ActivityTab
 import com.dnfapps.arrmatey.ui.tabs.ArrTab
 import com.dnfapps.arrmatey.ui.tabs.SettingsTabNavHost
+import org.koin.compose.koinInject
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun HomeScreen() {
-    var selectedTab by rememberSaveable { mutableStateOf(TabItem.SHOWS) }
+fun HomeScreen(
+    navigationManager: NavigationManager = koinInject()
+) {
+    val selectedTab by navigationManager.selectedTab.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -47,7 +52,7 @@ fun HomeScreen() {
                 NavigationBarItem(
                     selected = entry == selectedTab,
                     onClick = {
-                        selectedTab = entry
+                        navigationManager.setSelectedTab(entry)
                     },
                     icon = {
                         BadgedBox(

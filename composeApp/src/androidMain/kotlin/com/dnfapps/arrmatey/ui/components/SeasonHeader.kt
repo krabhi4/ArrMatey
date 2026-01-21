@@ -16,10 +16,11 @@ import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.entensions.Bullet
 import com.dnfapps.arrmatey.extensions.formatAsRuntime
 import com.dnfapps.arrmatey.navigation.ArrScreen
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.koinInject
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -30,7 +31,8 @@ fun SeasonHeader(
     episodes: List<Episode>,
     onPerformAutomaticSearch: (Int) -> Unit,
     searchInProgress: (Int) -> Boolean,
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.series()
 ) {
     val tbaLabel = stringResource(R.string.tba)
     val year = remember(episodes) {

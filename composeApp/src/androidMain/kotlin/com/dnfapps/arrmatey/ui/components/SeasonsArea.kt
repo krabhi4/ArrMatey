@@ -44,8 +44,8 @@ import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.SonarrQueueItem
 import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.navigation.ArrScreen
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -60,8 +60,10 @@ fun SeasonsArea(
     onEpisodeAutomaticSearch: (Long) -> Unit,
     onSeasonAutomaticSearch: (Int) -> Unit,
     activityQueueViewModel: ActivityQueueViewModel = koinInject(),
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.series()
 ) {
+
     val queueItems by activityQueueViewModel.activityTasks.collectAsStateWithLifecycle()
 
     val context = LocalContext.current

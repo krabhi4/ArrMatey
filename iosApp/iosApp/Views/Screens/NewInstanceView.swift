@@ -14,7 +14,11 @@ struct NewInstanceView: View {
     
     @ObservedObject private var viewModel = AddInstanceViewModelS()
     
-    @State private var instanceType: InstanceType = .sonarr
+    @State private var instanceType: InstanceType// = .sonarr
+    
+    init(initialType: InstanceType) {
+        self.instanceType = initialType
+    }
     
     private var uiState: AddInstanceUiState {
         viewModel.uiState

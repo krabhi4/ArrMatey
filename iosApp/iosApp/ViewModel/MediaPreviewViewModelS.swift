@@ -24,31 +24,11 @@ class MediaPreviewViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await profiles in viewModel.qualityProfiles {
-                self.qualityProfiles = profiles
-            }
-        }
-        Task {
-            for try await folders in viewModel.rootFolders {
-                self.rootFolders = folders
-            }
-        }
-        Task {
-            for try await tags in viewModel.tags {
-                self.tags = tags
-            }
-        }
-        Task {
-            for try await status in viewModel.addItemStatus {
-                self.addItemStatus = status
-            }
-        }
-        Task {
-            for try await id in viewModel.lastAddedItemId {
-                self.lastAddedItemId = id?.int64Value
-            }
-        }
+        viewModel.qualityProfiles.observeAsync { self.qualityProfiles = $0 }
+        viewModel.rootFolders.observeAsync { self.rootFolders = $0 }
+        viewModel.tags.observeAsync { self.tags = $0 }
+        viewModel.addItemStatus.observeAsync { self.addItemStatus = $0 }
+        viewModel.lastAddedItemId.observeAsync { self.lastAddedItemId = $0?.int64Value }
     }
     
     func addItem(_ item: ArrMedia) {

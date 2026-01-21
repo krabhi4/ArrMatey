@@ -21,16 +21,8 @@ class InteractiveSearchViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await state in viewModel.releaseUiState {
-                self.releaseUiState = state
-            }
-        }
-        Task {
-            for try await state in viewModel.downloadReleaseState {
-                self.downloadReleaseState = state
-            }
-        }
+        viewModel.releaseUiState.observeAsync { self.releaseUiState = $0 }
+        viewModel.downloadReleaseState.observeAsync { self.downloadReleaseState = $0 }
     }
     
     func getRelease(_ params: ReleaseParams) {

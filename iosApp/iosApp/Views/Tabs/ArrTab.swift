@@ -242,11 +242,31 @@ struct ArrTab: View {
                 .font(.system(size: 64))
                 .imageScale(.large)
             
-            Text(LocalizedStringResource("no_type_instances \(type)"))
+            Text(LocalizedStringResource("no_type_instances \(type.name)"))
                 .font(.system(size: 20, weight: .medium))
                 .multilineTextAlignment(.center)
-            Text(LocalizedStringResource("no_type_instances_message \(type)"))
+
+            Text(LocalizedStringResource("no_type_instances_message \(type.name)"))
                 .multilineTextAlignment(.center)
+            
+            Button(action: {
+                navigation.selectedTab = .settings
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    navigation.go(to: .newInstance(type))
+                }
+            }) {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.primary)
+                    Text(LocalizedStringResource("add_instance"))
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.primary)
+                }
+                .padding(.horizontal, 32)
+                .padding(.vertical, 12)
+                .background(.primary.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
         }
         .padding(.horizontal, 24)
     }

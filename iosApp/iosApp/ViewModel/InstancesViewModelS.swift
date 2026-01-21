@@ -21,11 +21,7 @@ class InstancesViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await state in viewModel.instancesState {
-                self.instancesState = state
-            }
-        }
+        viewModel.instancesState.observeAsync { self.instancesState = $0 }
     }
     
     func setInstanceActive(_ instance: Instance) {

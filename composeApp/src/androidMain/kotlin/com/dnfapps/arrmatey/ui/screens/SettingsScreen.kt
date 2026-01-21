@@ -101,7 +101,7 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(bottomEnd = radius, bottomStart = radius, topEnd = topR, topStart = topR),
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            settingsNav.navigateTo(SettingsScreen.AddInstance)
+                            settingsNav.navigateTo(SettingsScreen.AddInstance())
                         }
                     ) {
                         Row(

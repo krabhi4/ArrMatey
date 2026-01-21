@@ -42,22 +42,25 @@ import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.headerBarColors
 import com.dnfapps.arrmatey.navigation.ArrScreen
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.components.EpisodeDetailsHeader
 import com.dnfapps.arrmatey.ui.components.FileCard
 import com.dnfapps.arrmatey.ui.components.HistoryItemView
 import com.dnfapps.arrmatey.ui.components.ItemDescriptionCard
 import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
 import com.dnfapps.arrmatey.ui.components.ReleaseDownloadButtons
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import org.koin.compose.koinInject
 
 @Composable
 fun EpisodeDetailsScreen(
     series: ArrSeries,
     episode: Episode,
     viewModel: EpisodeDetailsViewModel = koinInjectParams(series.id, episode),
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current,
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.series()
 ) {
+    val navigation = navigationManager.series()
     val scrollState = rememberScrollState()
 
     val currentEpisode by viewModel.episode.collectAsStateWithLifecycle()

@@ -23,8 +23,9 @@ import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ExtraFile
 import com.dnfapps.arrmatey.navigation.ArrScreen
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
+import org.koin.compose.koinInject
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -35,7 +36,8 @@ fun MovieFileView(
     searchIds: Set<Long>,
     searchResult: Boolean?,
     onAutomaticSearch: (Long) -> Unit,
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.movies()
 ) {
     val context = LocalContext.current
     val searchQueuedMessage = stringResource(R.string.search_queued)

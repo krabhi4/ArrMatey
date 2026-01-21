@@ -15,8 +15,8 @@ struct SettingsTab: View {
             SettingsScreen()
                 .navigationDestination(for: SettingsRoute.self) { value in
                     switch value {
-                    case .newInstance:
-                        NewInstanceView()
+                    case .newInstance(let initialType):
+                        NewInstanceView(initialType: initialType)
                     case .dev:
                         DevSettingsScreen()
                     case .editInstance(let id):

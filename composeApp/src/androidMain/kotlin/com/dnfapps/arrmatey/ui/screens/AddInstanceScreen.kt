@@ -41,11 +41,12 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddInstanceScreen(
+    initialType: InstanceType = InstanceType.Sonarr,
     viewModel: AddInstanceViewModel = koinInject(),
     navigation: SettingsNavigation = koinInject<SettingsNavigation>()
 ) {
     val scope = rememberCoroutineScope()
-    var selectedInstanceType by remember { mutableStateOf(InstanceType.Sonarr) }
+    var selectedInstanceType by remember { mutableStateOf(initialType) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

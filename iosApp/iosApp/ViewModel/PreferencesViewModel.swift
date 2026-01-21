@@ -24,14 +24,8 @@ class PreferencesViewModel: ObservableObject {
     }
     
     private func observeFlows() {
-        Task {
-            for await map in preferenceStore.showInfoCards {
-                var swiftMap: [InstanceType:Bool] = [:]
-                for (key, value) in map {
-                    swiftMap[key] = value.boolValue
-                }
-                self.showInfoCardMap = swiftMap
-            }
+        preferenceStore.showInfoCards.observeAsync {
+            self.showInfoCardMap = $0.mapValues(\.boolValue)
         }
     }
     

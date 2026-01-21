@@ -22,6 +22,8 @@ class ArrSearchViewModelS: ObservableObject {
     }
     
     private func startObserving() {
+        viewModel.lookupUiState.observeAsync { self.uiState = $0 }
+        
         Task {
             for try await state in viewModel.lookupUiState {
                 self.uiState = state

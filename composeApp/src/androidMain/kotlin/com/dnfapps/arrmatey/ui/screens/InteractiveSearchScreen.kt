@@ -57,9 +57,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.arr.api.model.ArrRelease
 import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
-import com.dnfapps.arrmatey.arr.viewmodel.InteractiveSearchViewModel
 import com.dnfapps.arrmatey.arr.state.DownloadState
 import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.viewmodel.InteractiveSearchViewModel
 import com.dnfapps.arrmatey.compose.components.ProgressBox
 import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
 import com.dnfapps.arrmatey.compose.utils.ReleaseSortBy
@@ -76,9 +76,11 @@ import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.entensions.stringResource
 import com.dnfapps.arrmatey.extensions.formatAgeMinutes
 import com.dnfapps.arrmatey.instances.model.InstanceType
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.navigation.ArrScreen
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.components.DropdownPicker
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -88,7 +90,8 @@ fun InteractiveSearchScreen(
     canFilter: Boolean,
     defaultFilter: ReleaseFilterBy = ReleaseFilterBy.Any,
     viewModel: InteractiveSearchViewModel = koinInjectParams(instanceType),
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.arr(instanceType)
 ) {
     val context = LocalContext.current
 

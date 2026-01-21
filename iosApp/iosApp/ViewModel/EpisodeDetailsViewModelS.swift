@@ -23,21 +23,9 @@ class EpisodeDetailsViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await episode in viewModel.episode {
-                self.episode = episode
-            }
-        }
-        Task {
-            for try await history in viewModel.history {
-                self.history = history
-            }
-        }
-        Task {
-            for try await status in viewModel.monitorStatus {
-                self.monitorStatus = status
-            }
-        }
+        viewModel.episode.observeAsync { self.episode = $0 }
+        viewModel.history.observeAsync { self.history = $0 }
+        viewModel.monitorStatus.observeAsync { self.monitorStatus = $0 }
     }
     
     func toggleMonitor() {

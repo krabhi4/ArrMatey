@@ -1,24 +1,28 @@
 package com.dnfapps.arrmatey.ui.screens
 
 import android.annotation.SuppressLint
+import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudQueue
@@ -46,6 +50,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +74,7 @@ import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.ArrMediaViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.InstancesViewModel
 import com.dnfapps.arrmatey.client.ErrorType
+import com.dnfapps.arrmatey.compose.TabItem
 import com.dnfapps.arrmatey.compose.components.MediaList
 import com.dnfapps.arrmatey.compose.components.PosterGrid
 import com.dnfapps.arrmatey.compose.utils.FilterBy
@@ -81,12 +87,13 @@ import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
+import com.dnfapps.arrmatey.navigation.SettingsScreen
 import com.dnfapps.arrmatey.ui.components.DropdownPicker
 import com.dnfapps.arrmatey.ui.components.InstancePicker
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
 import com.dnfapps.arrmatey.ui.theme.ViewType
 import com.dnfapps.arrmatey.ui.viewmodel.NetworkConnectivityViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -98,12 +105,13 @@ fun ArrLibraryScreen(
     arrMediaViewModel: ArrMediaViewModel = koinInjectParams(type),
     instancesViewModel: InstancesViewModel = koinInjectParams(type),
     activityQueueViewModel: ActivityQueueViewModel = koinInject(),
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    networkViewModel: NetworkConnectivityViewModel = viewModel<NetworkConnectivityViewModel>()
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val networkViewModel = viewModel<NetworkConnectivityViewModel>()
+    val navigation = navigationManager.arr(type)
 
     val queueItems by activityQueueViewModel.queueItems.collectAsStateWithLifecycle()
     val uiState by arrMediaViewModel.uiState.collectAsStateWithLifecycle()
@@ -115,12 +123,20 @@ fun ArrLibraryScreen(
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var hasServerConnetivityError by remember { mutableStateOf(false) }
+    val hasServerConnectivityError by remember { derivedStateOf {
+        (uiState as? LibraryUiState.Error)?.type == ErrorType.Network
+    } }
     val hasNetworkConnection by networkViewModel.isConnected.collectAsStateWithLifecycle()
 
     var showFilterSheet by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+
+    LaunchedEffect(uiState) {
+        (uiState as? LibraryUiState.Error)?.message?.let { message ->
+            snackbarHostState.showSnackbarImmediately(message)
+        }
+    }
 
     Scaffold(
         snackbarHost = {
@@ -145,7 +161,7 @@ fun ArrLibraryScreen(
                             onInstanceSelected = { instancesViewModel.setInstanceActive(it) }
                         )
 
-                        if (hasServerConnetivityError) {
+                        if (hasServerConnectivityError) {
                             Icon(
                                 imageVector = Icons.Default.CloudOff,
                                 contentDescription = null,
@@ -211,105 +227,84 @@ fun ArrLibraryScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            when (val state = uiState) {
-                is LibraryUiState.Initial -> {
-                    NoInstanceView(type)
-                }
-                is LibraryUiState.Loading -> {
-                    LoadingIndicator(
-                        modifier = Modifier.size(96.dp)
-                    )
-                }
-                is LibraryUiState.Success -> {
-                    PullToRefreshBox(
-                        isRefreshing = false,
-                        onRefresh = {
-                            arrMediaViewModel.refresh()
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        val items = state.items
-                        if (items.isEmpty()) {
-                            EmptyLibraryView(modifier = Modifier.align(Alignment.Center))
-                        } else {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                AnimatedVisibility(
-                                    visible = showSearchBar,
-                                    enter = expandVertically(),
-                                    exit = shrinkVertically()
+            if (instancesState.selectedInstance == null) {
+                NoInstanceView(type)
+            } else {
+                when (val state = uiState) {
+                    is LibraryUiState.Initial -> {
+                        NoInstanceView(type)
+                    }
+
+                    is LibraryUiState.Loading -> {
+                        LoadingIndicator(
+                            modifier = Modifier.size(96.dp)
+                        )
+                    }
+
+                    is LibraryUiState.Error -> {
+                        InstanceErrorView(
+                            onRefresh = { arrMediaViewModel.refresh() }
+                        )
+                    }
+
+                    is LibraryUiState.Success -> {
+                        PullToRefreshBox(
+                            isRefreshing = false,
+                            onRefresh = {
+                                arrMediaViewModel.refresh()
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            val items = state.items
+                            if (items.isEmpty()) {
+                                EmptyLibraryView(modifier = Modifier.align(Alignment.Center))
+                            } else {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
-                                    OutlinedTextField(
-                                        value = searchQuery,
-                                        onValueChange = { searchQuery = it },
-                                        modifier = Modifier
-                                            .padding(horizontal = 18.dp, vertical = 12.dp)
-                                            .fillMaxWidth(),
-                                        trailingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Default.Close,
-                                                contentDescription = null,
-                                                modifier = Modifier.clickable {
-                                                    searchQuery = ""
-                                                    showSearchBar = false
-                                                }
-                                            )
+                                    AnimatedVisibility(
+                                        visible = showSearchBar,
+                                        enter = expandVertically(),
+                                        exit = shrinkVertically()
+                                    ) {
+                                        OutlinedTextField(
+                                            value = searchQuery,
+                                            onValueChange = { searchQuery = it },
+                                            modifier = Modifier
+                                                .padding(horizontal = 18.dp, vertical = 12.dp)
+                                                .fillMaxWidth(),
+                                            trailingIcon = {
+                                                Icon(
+                                                    imageVector = Icons.Default.Close,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.clickable {
+                                                        searchQuery = ""
+                                                        showSearchBar = false
+                                                    }
+                                                )
+                                            },
+                                            placeholder = { Text(stringResource(R.string.search)) },
+                                            shape = RoundedCornerShape(10.dp)
+                                        )
+                                    }
+
+                                    MediaView(
+                                        items = items,
+                                        onItemClick = {
+                                            it.id?.let { id ->
+                                                navigation.navigateTo(
+                                                    ArrScreen.Details(id = id)
+                                                )
+                                            }
                                         },
-                                        placeholder = { Text(stringResource(R.string.search)) },
-                                        shape = RoundedCornerShape(10.dp)
+                                        viewType = preferences.viewType,
+                                        itemIsActive = { item ->
+                                            queueItems.any { it.mediaId == item.id }
+                                        }
                                     )
                                 }
-
-                                MediaView(
-                                    items = items,
-                                    onItemClick = {
-                                        it.id?.let { id ->
-                                            navigation.navigateTo(
-                                                ArrScreen.Details(id = id)
-                                            )
-                                        }
-                                    },
-                                    viewType = preferences.viewType,
-                                    itemIsActive = { item ->
-                                        queueItems.any { it.mediaId == item.id }
-                                    }
-                                )
                             }
                         }
-                    }
-                }
-
-                is LibraryUiState.Error -> {
-                    LaunchedEffect(state.message) {
-                        snackbarHostState.showSnackbarImmediately(state.message)
-                    }
-
-                    hasServerConnetivityError = state.type == ErrorType.Network
-
-                    var isRefreshing by remember { mutableStateOf(false) }
-
-                    LaunchedEffect(state) {
-                        isRefreshing = false
-                    }
-
-                    LaunchedEffect(isRefreshing) {
-                        if (isRefreshing) {
-                            scope.launch { arrMediaViewModel.refresh() }
-                        }
-                    }
-
-                    PullToRefreshBox(
-                        isRefreshing = isRefreshing,
-                        onRefresh = {
-                            isRefreshing = true
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        InstanceErrorView(
-                            onRefresh = { isRefreshing = true },
-                            modifier = Modifier.align(Alignment.Center)
-                        )
                     }
                 }
             }
@@ -335,7 +330,8 @@ fun ArrLibraryScreen(
 @Composable
 private fun NoInstanceView(
     type: InstanceType,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigationManager: NavigationManager = koinInject()
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -353,6 +349,31 @@ private fun NoInstanceView(
             fontWeight = FontWeight.Medium
         )
         Text(text = stringResource(R.string.no_type_instances_message, type.name))
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Button(
+            onClick = {
+                navigationManager.setSelectedTab(TabItem.SETTINGS)
+                navigationManager.settings()
+                    .navigateTo(SettingsScreen.AddInstance(type))
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.AddCircle,
+                contentDescription = null
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = stringResource(R.string.add_instance),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
 

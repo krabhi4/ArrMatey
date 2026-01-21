@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
 import com.dnfapps.arrmatey.arr.api.model.Episode
+import com.dnfapps.arrmatey.instances.model.InstanceType
 
 sealed interface HomeTab : NavKey {
     data object SeriesTab : HomeTab
@@ -25,7 +26,7 @@ sealed interface ArrScreen : NavKey {
 
 sealed interface SettingsScreen : NavKey {
     data object Landing : SettingsScreen
-    data object AddInstance : SettingsScreen
+    data class AddInstance(val type: InstanceType = InstanceType.Sonarr) : SettingsScreen
     data class EditInstance(val id: Long): SettingsScreen
     data object Dev: SettingsScreen
 }

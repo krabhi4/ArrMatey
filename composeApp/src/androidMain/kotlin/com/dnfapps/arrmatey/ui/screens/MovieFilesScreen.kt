@@ -30,11 +30,13 @@ import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.viewmodel.MovieFilesViewModel
 import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.copy
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.navigation.ArrScreen
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.components.ExtraFileCard
 import com.dnfapps.arrmatey.ui.components.FileCard
 import com.dnfapps.arrmatey.ui.components.HistoryItemView
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import org.koin.compose.koinInject
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
@@ -42,7 +44,8 @@ import kotlin.time.ExperimentalTime
 fun MovieFilesScreen(
     movie: ArrMovie,
     viewModel: MovieFilesViewModel = koinInjectParams(movie.id ?: 0L),
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.movies()
 ) {
     if (movie.id == null) {
         LaunchedEffect(Unit) {

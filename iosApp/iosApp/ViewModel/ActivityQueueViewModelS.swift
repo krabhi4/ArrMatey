@@ -23,26 +23,10 @@ class ActivityQueueViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await items in viewModel.queueItems {
-                self.queueItems = items
-            }
-        }
-        Task {
-            for try await count in viewModel.tasksWithIssues {
-                self.tasksWithIssues = count.intValue
-            }
-        }
-        Task {
-            for try await polling in viewModel.isPolling {
-                self.isPolling = polling.boolValue
-            }
-        }
-        Task {
-            for try await instances in viewModel.instances {
-                self.instance = instances
-            }
-        }
+        viewModel.queueItems.observeAsync { self.queueItems = $0 }
+        viewModel.tasksWithIssues.observeAsync { self.tasksWithIssues = $0.intValue }
+        viewModel.isPolling.observeAsync { self.isPolling = $0.boolValue }
+        viewModel.instances.observeAsync { self.instance = $0 }
     }
     
     func startPolling() {

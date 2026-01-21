@@ -21,26 +21,13 @@ class ArrMediaViewModelS: ObservableObject {
     
     init(type: InstanceType) {
         self.viewModel = KoinBridge.shared.getArrMediaViewModel(type: type)
-        
         startObserving()
     }
     
     private func startObserving() {
-        Task {
-            for try await state in viewModel.uiState {
-                self.uiState = state
-            }
-        }
-        Task {
-            for try await data in viewModel.instanceData {
-                self.instanceData = data
-            }
-        }
-        Task {
-            for try await status in viewModel.addItemStatus {
-                self.addItemStatus = status
-            }
-        }
+        viewModel.uiState.observeAsync { self.uiState = $0 }
+        viewModel.instanceData.observeAsync { self.instanceData = $0 }
+        viewModel.addItemStatus.observeAsync { self.addItemStatus = $0 }
     }
     
     func executeAutomaticSearch(_ seriesId: Int64) {

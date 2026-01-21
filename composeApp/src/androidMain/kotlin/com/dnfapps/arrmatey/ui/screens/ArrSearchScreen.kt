@@ -43,9 +43,9 @@ import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.components.SortMenuButton
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -60,8 +60,10 @@ fun ArrSearchScreen(
     type: InstanceType,
     viewModel: ArrSearchViewModel = koinInjectParams(type),
     activityQueueViewModel: ActivityQueueViewModel = koinInject(),
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.arr(type)
 ) {
+
     var searchQuery by rememberSaveable { mutableStateOf(initialQuery) }
 
     val sortBy by viewModel.sortBy.collectAsStateWithLifecycle()

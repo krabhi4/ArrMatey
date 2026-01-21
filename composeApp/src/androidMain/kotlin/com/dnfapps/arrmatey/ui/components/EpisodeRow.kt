@@ -28,16 +28,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dnfapps.arrmatey.R
-import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.entensions.Bullet
 import com.dnfapps.arrmatey.entensions.bullet
 import com.dnfapps.arrmatey.extensions.isToday
 import com.dnfapps.arrmatey.extensions.isTodayOrAfter
 import com.dnfapps.arrmatey.navigation.ArrScreen
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.theme.SonarrDownloading
+import org.koin.compose.koinInject
 
 @Composable
 fun EpisodeRow(
@@ -49,7 +49,8 @@ fun EpisodeRow(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     progressLabel: String? = null,
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.series()
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,

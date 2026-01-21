@@ -22,11 +22,9 @@ class AddInstanceViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await state in viewModel.uiState {
-                self.uiState = state
-                self.showError = state.createResult is InsertResultSuccess
-            }
+        viewModel.uiState.observeAsync {
+            self.uiState = $0
+            self.showError = $0.createResult is InsertResultSuccess
         }
     }
     

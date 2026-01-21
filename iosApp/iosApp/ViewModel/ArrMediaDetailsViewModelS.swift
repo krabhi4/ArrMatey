@@ -24,31 +24,11 @@ class ArrMediaDetailsViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        Task {
-            for try await state in viewModel.uiState {
-                self.uiState = state
-            }
-        }
-        Task {
-            for try await history in viewModel.history {
-                self.history = history
-            }
-        }
-        Task {
-            for try await status in viewModel.monitorStatus {
-                self.monitorStatus = status
-            }
-        }
-        Task {
-            for try await ids in viewModel.automaticSearchIds {
-                self.automaticSearchIds = Set(ids.map { $0.int64Value })
-            }
-        }
-        Task {
-            for try await result in viewModel.lastSearchResult {
-                self.lastSearchResult = result?.boolValue
-            }
-        }
+        viewModel.uiState.observeAsync { self.uiState = $0 }
+        viewModel.history.observeAsync { self.history = $0 }
+        viewModel.monitorStatus.observeAsync { self.monitorStatus = $0 }
+        viewModel.automaticSearchIds.observeAsync { self.automaticSearchIds = Set($0.map { $0.int64Value }) }
+        viewModel.lastSearchResult.observeAsync { self.lastSearchResult = $0?.boolValue }
     }
     
     func refreshDetails() {

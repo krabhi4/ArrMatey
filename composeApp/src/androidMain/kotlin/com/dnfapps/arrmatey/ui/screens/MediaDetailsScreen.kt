@@ -41,7 +41,9 @@ import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.headerBarColors
 import com.dnfapps.arrmatey.instances.model.InstanceType
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.navigation.ArrScreen
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.components.DetailsHeader
 import com.dnfapps.arrmatey.ui.components.InfoArea
 import com.dnfapps.arrmatey.ui.components.ItemDescriptionCard
@@ -49,7 +51,7 @@ import com.dnfapps.arrmatey.ui.components.MovieFileView
 import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
 import com.dnfapps.arrmatey.ui.components.SeasonsArea
 import com.dnfapps.arrmatey.ui.components.UpcomingDateView
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -57,8 +59,11 @@ fun MediaDetailsScreen(
     id: Long,
     type: InstanceType,
     mediaDetailsViewModel: ArrMediaDetailsViewModel = koinInjectParams(id, type),
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.arr(type)
 ) {
+    val navigation = navigationManager.arr(type)
+
     val uiState by mediaDetailsViewModel.uiState.collectAsStateWithLifecycle()
     val automaticSearchIds by mediaDetailsViewModel.automaticSearchIds.collectAsStateWithLifecycle()
     val lastSearchResult by mediaDetailsViewModel.lastSearchResult.collectAsStateWithLifecycle()

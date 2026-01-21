@@ -13,6 +13,8 @@ class NavigationManager: ObservableObject {
     @Published var seriesPath = NavigationPath()
     @Published var moviePath = NavigationPath()
     
+    @Published var selectedTab: TabItem = .shows
+    
     func go(to route: MediaRoute, of type: InstanceType) {
         switch type {
         case .sonarr:
@@ -45,7 +47,7 @@ enum MediaRoute: Hashable {
 }
 
 enum SettingsRoute : Hashable {
-    case newInstance
+    case newInstance(_ : InstanceType = .sonarr)
     case dev
     case editInstance(Int64)
 }

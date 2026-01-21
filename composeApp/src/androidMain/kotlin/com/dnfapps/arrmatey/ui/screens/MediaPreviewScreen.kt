@@ -48,7 +48,6 @@ import com.dnfapps.arrmatey.arr.api.model.ArrSeries
 import com.dnfapps.arrmatey.arr.api.model.MediaStatus
 import com.dnfapps.arrmatey.arr.api.model.QualityProfile
 import com.dnfapps.arrmatey.arr.api.model.RootFolder
-import com.dnfapps.arrmatey.arr.api.model.SeriesAddOptions
 import com.dnfapps.arrmatey.arr.api.model.SeriesMonitorType
 import com.dnfapps.arrmatey.arr.api.model.SeriesType
 import com.dnfapps.arrmatey.arr.api.model.Tag
@@ -61,13 +60,14 @@ import com.dnfapps.arrmatey.entensions.headerBarColors
 import com.dnfapps.arrmatey.entensions.stringResource
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
-import com.dnfapps.arrmatey.navigation.ArrTabNavigation
+import com.dnfapps.arrmatey.navigation.Navigation
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.components.DetailsHeader
 import com.dnfapps.arrmatey.ui.components.DropdownPicker
 import com.dnfapps.arrmatey.ui.components.ItemDescriptionCard
 import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
 import com.dnfapps.arrmatey.ui.components.UpcomingDateView
-import com.dnfapps.arrmatey.ui.tabs.LocalArrTabNavigation
+import org.koin.compose.koinInject
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,7 +76,8 @@ fun MediaPreviewScreen(
     item: ArrMedia,
     type: InstanceType,
     viewModel: MediaPreviewViewModel = koinInjectParams(type),
-    navigation: ArrTabNavigation = LocalArrTabNavigation.current
+    navigationManager: NavigationManager = koinInject(),
+    navigation: Navigation<ArrScreen> = navigationManager.arr(type)
 ) {
     val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
