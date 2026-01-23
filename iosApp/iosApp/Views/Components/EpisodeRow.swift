@@ -11,6 +11,8 @@ import Shared
 struct EpisodeRow: View {
     let episode: Episode
     let onToggleEpisodeMonitor: (Episode) -> Void
+    let onAutomaticSearch: () -> Void
+    let automaticSearchDisabled: Bool
     
     private var statusString: String? {
         episode.episodeFile?.qualityName ??
@@ -60,6 +62,17 @@ struct EpisodeRow: View {
             }
             
             Spacer()
+            
+            Image(systemName: "person.fill")
+                .onTapGesture {
+                    
+                }
+            
+            Image(systemName: "magnifyingglass")
+                .onTapGesture {
+                    onAutomaticSearch()
+                }
+                .disabled(automaticSearchDisabled)
             
             Image(systemName: episode.monitored ? "bookmark.fill" : "bookmark")
                 .onTapGesture {

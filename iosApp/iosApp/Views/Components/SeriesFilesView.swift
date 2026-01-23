@@ -39,7 +39,8 @@ struct SeriesFilesView: View {
                     onToggleSeasonMonitor: onToggleSeasonMonitor,
                     onToggleEpisodeMonitor: onToggleEpisodeMonitor,
                     onEpisodeAutomaticSearch: onEpisodeAutomaticSearch,
-                    onSeasonAutomaticSearch: onSeasonAutomaticSearch
+                    onSeasonAutomaticSearch: onSeasonAutomaticSearch,
+                    automaticSearchIds: searchIds
                 )
             }
         } header : {

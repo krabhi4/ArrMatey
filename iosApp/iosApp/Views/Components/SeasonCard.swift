@@ -16,6 +16,7 @@ struct SeasonCard: View {
     let onToggleEpisodeMonitor: (Episode) -> Void
     let onEpisodeAutomaticSearch: (Int64) -> Void
     let onSeasonAutomaticSearch: (Int32) -> Void
+    let automaticSearchIds: Set<Int64>
     
     @State private var expanded: Bool = false
     
@@ -35,7 +36,9 @@ struct SeasonCard: View {
                 ForEach(episodes, id: \.self) { episode in
                     EpisodeRow(episode: episode, onToggleEpisodeMonitor: { ep in
                         onToggleEpisodeMonitor(ep)
-                    })
+                    }, onAutomaticSearch: {
+                        onEpisodeAutomaticSearch(episode.id)
+                    }, automaticSearchDisabled: episode.monitored)
                     if episode != episodes.last {
                         Divider()
                     }
