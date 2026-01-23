@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.di
 
+import com.dnfapps.arrmatey.arr.api.client.DynamicLogger
 import com.dnfapps.arrmatey.arr.api.client.GenericClient
 import com.dnfapps.arrmatey.instances.repository.InstanceManager
 import com.dnfapps.arrmatey.arr.usecase.AddMediaItemUseCase
@@ -48,6 +49,7 @@ import com.dnfapps.arrmatey.datastore.PreferencesStore
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.utils.NetworkConnectivityObserverFactory
 import com.dnfapps.arrmatey.utils.NetworkConnectivityRepository
+import io.ktor.client.plugins.logging.Logger
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -67,8 +69,9 @@ val networkModule = module {
         }
     }
 
-    single { HttpClientFactory(get()) }
+    single<Logger> { DynamicLogger(get()) }
 
+    single { HttpClientFactory(get(), get()) }
     single { GenericClient(get()) }
 
     single { NetworkConnectivityObserverFactory().create() }

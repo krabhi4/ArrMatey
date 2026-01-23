@@ -23,11 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.R
+import com.dnfapps.arrmatey.arr.api.client.LoggerLevel
 import com.dnfapps.arrmatey.datastore.PreferencesStore
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.SettingsNavigation
+import com.dnfapps.arrmatey.ui.components.DropdownPicker
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +39,7 @@ fun DevSettingsScreen(
 ) {
     val showInfoCardMap by preferenceStore.showInfoCards.collectAsState(emptyMap())
     val activityPollingOn by preferenceStore.enableActivityPolling.collectAsState(true)
+    val logLevel by preferenceStore.httpLogLevel.collectAsState(LoggerLevel.Headers)
 
     Scaffold(
         topBar = {
@@ -100,6 +102,14 @@ fun DevSettingsScreen(
                         onCheckedChange = null
                     )
                 }
+
+                DropdownPicker(
+                    options = LoggerLevel.entries(),
+                    selectedOption = logLevel,
+                    onOptionSelected = { preferenceStore.setLogLevel(it) },
+                    label = { Text("HTTP Logging Level") },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

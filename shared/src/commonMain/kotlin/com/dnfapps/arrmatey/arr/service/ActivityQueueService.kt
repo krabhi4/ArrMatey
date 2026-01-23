@@ -70,10 +70,6 @@ class ActivityQueueService(
             val issueCount = allTasks.count { task -> task.hasIssue }
             _tasksWithIssues.value = issueCount
         }
-
-        else {
-            println("SKIPPING")
-        }
     }
 
     fun cleanup() {

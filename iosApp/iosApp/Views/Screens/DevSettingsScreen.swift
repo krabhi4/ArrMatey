@@ -30,6 +30,15 @@ struct DevSettingsScreen: View {
                     get: { preferences.enableAcitivityPolling },
                     set: { _ in preferences.toggleAcitivityPolling() }
                 ))
+                
+                Picker("HTTP Logging Level", selection: Binding(
+                    get: { preferences.logLevel },
+                    set: { level in preferences.setLoggingLevel(level)}
+                )) {
+                    ForEach(LoggerLevel.companion.entries(), id: \.self) { level in
+                        Text(level.name).tag(level)
+                    }
+                }
             }
         }
     }

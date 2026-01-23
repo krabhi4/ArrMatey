@@ -14,6 +14,7 @@ class PreferencesViewModel: ObservableObject {
 
     @Published var showInfoCardMap: [InstanceType:Bool] = [:]
     @Published var enableAcitivityPolling: Bool = true
+    @Published var logLevel: LoggerLevel = .headers
     
     init() {
         self.preferenceStore = KoinBridge.shared.getPreferencesStore()
@@ -27,6 +28,7 @@ class PreferencesViewModel: ObservableObject {
         preferenceStore.enableActivityPolling.observeAsync {
             self.enableAcitivityPolling = $0.boolValue
         }
+        preferenceStore.httpLogLevel.observeAsync { self.logLevel = $0 }
     }
     
     func setInfoCardVisibility(type: InstanceType, visible: Bool) {
@@ -35,6 +37,10 @@ class PreferencesViewModel: ObservableObject {
 
     func toggleAcitivityPolling() {
         preferenceStore.toggleActivityPolling()
+    }
+    
+    func setLoggingLevel(_ level: LoggerLevel) {
+        preferenceStore.setLogLevel(level: level)
     }
     
 }
