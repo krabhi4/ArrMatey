@@ -24,6 +24,7 @@ struct MovieFilesView: View {
             if let file = movie.movieFile {
                 fileArea(file)
             }
+            
             extraFilesArea
             
             if movie.movieFile == nil && movieExtraFiles.isEmpty {

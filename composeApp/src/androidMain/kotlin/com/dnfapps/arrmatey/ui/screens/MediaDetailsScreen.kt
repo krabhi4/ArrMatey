@@ -62,23 +62,13 @@ fun MediaDetailsScreen(
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.arr(type)
 ) {
-    val navigation = navigationManager.arr(type)
-
     val uiState by mediaDetailsViewModel.uiState.collectAsStateWithLifecycle()
     val automaticSearchIds by mediaDetailsViewModel.automaticSearchIds.collectAsStateWithLifecycle()
     val lastSearchResult by mediaDetailsViewModel.lastSearchResult.collectAsStateWithLifecycle()
 
-    val isMonitored by remember { derivedStateOf {
-        (uiState as? MediaDetailsUiState.Success)?.item?.monitored ?: false
-    } }
-
-    val qualityProfiles by remember { derivedStateOf {
-        (uiState as? MediaDetailsUiState.Success)?.qualityProfiles ?: emptyList()
-    } }
-
-    val tags by remember { derivedStateOf {
-        (uiState as? MediaDetailsUiState.Success)?.tags ?: emptyList()
-    } }
+    val isMonitored by mediaDetailsViewModel.isMonitored.collectAsStateWithLifecycle()
+    val qualityProfiles by mediaDetailsViewModel.qualityProfiles.collectAsStateWithLifecycle()
+    val tags by mediaDetailsViewModel.tags.collectAsStateWithLifecycle()
 
     val scrollState = rememberScrollState()
 

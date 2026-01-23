@@ -243,16 +243,52 @@ class InstanceScopedRepository(
             }
     }
 
+    suspend fun updateMediaItem(item: ArrMedia): NetworkResult<ArrMedia> {
+        _monitorStatus.value = OperationStatus.InProgress
+
+        return client.update(item)
+            .onSuccess { updateItem ->
+                _monitorStatus.value = OperationStatus.Success("Item updated successfully")
+
+                val id = updateItem.id ?: return@onSuccess
+                val currentCache = _mediaDetailsCache.value.toMutableMap()
+                currentCache[id] = updateItem
+                _mediaDetailsCache.value = currentCache
+
+                updateItemInLibraryCache(updateItem)
+            }
+            .onError { code, message, cause ->
+                _monitorStatus.value = OperationStatus.Error(code, message, cause)
+            }
+    }
+
+    private fun updateItemInLibraryCache(updatedItem: ArrMedia) {
+        val currentLibrary = _library.value
+        if (currentLibrary is NetworkResult.Success) {
+            val updatedItems = currentLibrary.data.map { item ->
+                if (item.id == updatedItem.id) updatedItem else item
+            }
+            _library.value = NetworkResult.Success(
+                updatedItems
+            )
+        }
+    }
+
     suspend fun setMonitorState(id: Long, status: Boolean): NetworkResult<MonitoredResponse?> {
         _monitorStatus.value = OperationStatus.InProgress
 
-        return client.setMonitorStatus(id, status)
+        val result = client.setMonitorStatus(id, status)
+
+        return result
             .map { it.firstOrNull() }
             .onSuccess { response ->
                 _monitorStatus.value = OperationStatus.Success(
                     if (status) "Monitored" else "Unmonitored"
                 )
                 response?.let { updateMonitoredInCache(it.id, it.monitored) }
+            }
+            .onError { code, message, cause ->
+                println("error setting monitor status")
             }
     }
 

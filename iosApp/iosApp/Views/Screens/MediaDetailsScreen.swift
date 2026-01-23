@@ -33,21 +33,15 @@ struct MediaDetailsScreen: View {
     }
     
     private var isMonitored: Bool {
-        if let state = uiState as? MediaDetailsUiStateSuccess {
-            state.item.monitored
-        } else { false }
+        viewModel.isMonitored
     }
     
     private var qualityProfiles: [QualityProfile] {
-        if let state = uiState as? MediaDetailsUiStateSuccess {
-            state.qualityProfiles
-        } else { [] }
+        viewModel.qualityProfiles
     }
     
     private var tags: [Tag] {
-        if let state = uiState as? MediaDetailsUiStateSuccess {
-            state.tags
-        } else { [] }
+        viewModel.tags
     }
     
     var body: some View {

@@ -2,16 +2,23 @@ package com.dnfapps.arrmatey.arr.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dnfapps.arrmatey.arr.api.model.ArrMedia
+import com.dnfapps.arrmatey.arr.api.model.ArrMovie
+import com.dnfapps.arrmatey.arr.api.model.ArrSeries
 import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.HistoryItem
+import com.dnfapps.arrmatey.arr.api.model.QualityProfile
+import com.dnfapps.arrmatey.arr.api.model.Tag
 import com.dnfapps.arrmatey.instances.repository.InstanceScopedRepository
 import com.dnfapps.arrmatey.arr.state.MediaDetailsUiState
 import com.dnfapps.arrmatey.instances.usecase.GetInstanceRepositoryUseCase
 import com.dnfapps.arrmatey.arr.usecase.GetMediaDetailsUseCase
+import com.dnfapps.arrmatey.client.NetworkResult
 import com.dnfapps.arrmatey.client.OperationStatus
 import com.dnfapps.arrmatey.client.onError
 import com.dnfapps.arrmatey.client.onSuccess
+import com.dnfapps.arrmatey.di.repositoryModule
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,11 +46,20 @@ class ArrMediaDetailsViewModel(
     private val _monitorStatus = MutableStateFlow<OperationStatus>(OperationStatus.Idle)
     val monitorStatus: StateFlow<OperationStatus> = _monitorStatus.asStateFlow()
 
+    private val _isMonitored = MutableStateFlow(false)
+    val isMonitored: StateFlow<Boolean> = _isMonitored.asStateFlow()
+
     private val _automaticSearchIds = MutableStateFlow<Set<Long>>(emptySet())
     val automaticSearchIds: StateFlow<Set<Long>> = _automaticSearchIds.asStateFlow()
 
     private val _lastSearchResult = MutableStateFlow<Boolean?>(null)
     val lastSearchResult: StateFlow<Boolean?> = _lastSearchResult.asStateFlow()
+
+    private val _qualityProfiles = MutableStateFlow<List<QualityProfile>>(emptyList())
+    val qualityProfiles: StateFlow<List<QualityProfile>> = _qualityProfiles.asStateFlow()
+
+    private val _tags = MutableStateFlow<List<Tag>>(emptyList())
+    val tags: StateFlow<List<Tag>> = _tags.asStateFlow()
 
     private var currentRepository: InstanceScopedRepository? = null
 
@@ -59,29 +75,20 @@ class ArrMediaDetailsViewModel(
                     currentRepository = repository
                     loadMediaDetails(repository)
                     observeMonitorStatus(repository)
+                    observeQualityProfiles(repository)
+                    observeTags(repository)
                 }
         }
     }
 
     private suspend fun loadMediaDetails(repository: InstanceScopedRepository) {
-        combine(
-            getMediaDetailsUseCase(mediaId, repository.instance.id),
-            repository.qualityProfiles,
-            repository.tags
-        ) { details, qualityProfiles, tags ->
-            when (details) {
-                is MediaDetailsUiState.Success -> {
-                    details.copy(
-                        qualityProfiles = qualityProfiles,
-                        tags = tags
-                    )
-                }
-                else -> details
-            }
-        }.collect { state -> _uiState.value = state }
-
         getMediaDetailsUseCase(mediaId, repository.instance.id)
-            .collect { state -> _uiState.value = state }
+            .collect { state ->
+                _uiState.value = state
+                if (state is MediaDetailsUiState.Success) {
+                    _isMonitored.value = state.item.monitored
+                }
+            }
 
         repository.getItemHistory(mediaId)
             .onSuccess { _history.value = it }
@@ -90,6 +97,18 @@ class ArrMediaDetailsViewModel(
     private suspend fun observeMonitorStatus(repository: InstanceScopedRepository) {
         repository.monitorStatus.collect { status ->
             _monitorStatus.value = status
+        }
+    }
+
+    private suspend fun observeQualityProfiles(repository: InstanceScopedRepository) {
+        repository.qualityProfiles.collect { profiles ->
+            _qualityProfiles.value = profiles
+        }
+    }
+
+    private suspend fun observeTags(repository: InstanceScopedRepository) {
+        repository.tags.collect { tags ->
+            _tags.value = tags
         }
     }
 
@@ -104,13 +123,15 @@ class ArrMediaDetailsViewModel(
     fun toggleMonitored() {
         viewModelScope.launch {
             val repository = currentRepository ?: return@launch
+            val state = _uiState.value as? MediaDetailsUiState.Success ?: return@launch
 
-            val currentMonitored = when (val state = _uiState.value) {
-                is MediaDetailsUiState.Success -> state.item.monitored
-                else -> return@launch
+            val currentMonitored = state.item.monitored
+            val updatedItem = when (val item = state.item) {
+                is ArrSeries -> item.copy(monitored = !currentMonitored)
+                is ArrMovie -> item.copy(monitored = !currentMonitored)
             }
 
-            repository.setMonitorState(mediaId, !currentMonitored)
+            repository.updateMediaItem(updatedItem)
         }
     }
 
