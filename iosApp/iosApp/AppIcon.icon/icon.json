@@ -1,8 +1,8 @@
 {
   "fill" : {
     "linear-gradient" : [
-      "srgb:1.00000,0.15632,0.07476,1.00000",
-      "srgb:1.00000,0.00000,0.35129,1.00000"
+      "display-p3:0.92129,0.16359,0.00000,1.00000",
+      "display-p3:0.91747,0.00000,0.00000,1.00000"
     ],
     "orientation" : {
       "start" : {
@@ -18,6 +18,11 @@
   "groups" : [
     {
       "layers" : [
+        {
+          "glass" : true,
+          "image-name" : "parrot-facing-left-svgrepo-com.svg",
+          "name" : "parrot-facing-left-svgrepo-com"
+        },
         {
           "fill-specializations" : [
             {
@@ -38,6 +43,7 @@
               }
             }
           ],
+          "hidden" : true,
           "image-name" : "pirate-scarf-svgrepo-com.svg",
           "name" : "pirate-scarf-svgrepo-com"
         }
