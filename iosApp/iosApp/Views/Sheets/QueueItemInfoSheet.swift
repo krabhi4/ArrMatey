@@ -15,6 +15,8 @@ struct QueueItemInfoSheet: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
+                Spacer(minLength: 12)
+                
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.titleLabel)
                         .font(.system(size: 22, weight: .bold))
@@ -72,7 +74,7 @@ struct QueueItemInfoSheet: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 24)
         }
-        .presentationDetents([.large])
+//        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
     

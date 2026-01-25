@@ -38,7 +38,6 @@ class ActivityQueueService(
     fun startPolling() {
         if (pollingJob?.isActive == true) return
 
-        _isPolling.value = true
         pollingJob = scope.launch {
             while (isActive) {
                 pollActivityTasks()
@@ -50,11 +49,11 @@ class ActivityQueueService(
     fun stopPolling() {
         pollingJob?.cancel()
         pollingJob = null
-        _isPolling.value = false
     }
 
     private suspend fun pollActivityTasks() {
         if (preferencesStore.isPollingEnabled) {
+            _isPolling.value = true
             val repositories = instanceManager.getAllRepositories()
                 .filter { it.instance.type.supportsActivityQueue }
 
@@ -64,6 +63,7 @@ class ActivityQueueService(
                     repo.activityTasks.value
                 }
             }.awaitAll().flatten()
+            _isPolling.value = false
 
             _allActivityTasks.value = allTasks
 

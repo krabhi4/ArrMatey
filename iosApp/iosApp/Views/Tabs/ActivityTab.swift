@@ -12,18 +12,26 @@ struct ActivityTab: View {
     
     @ObservedObject private var viewModel = ActivityQueueViewModelS()
     
-    @State private var selectedItem: QueueItem? = nil
+    @State private var selectedItem: IdentifiableQueueItem? = nil
     
     private var titleText: String {
         guard !viewModel.queueItems.isEmpty else { return String(localized: LocalizedStringResource("activity")) }
-        return "\(LocalizedStringResource("activity")) (\(viewModel.queueItems.count))"
+        return "\(String(localized: LocalizedStringResource("activity"))) (\(viewModel.queueItems.count))"
     }
     
     var body: some View {
         queueItemContent
             .navigationTitle(titleText)
             .toolbar {
-                
+                if viewModel.isPolling {
+                    ToolbarItem(placement: .primaryAction) {
+                        ProgressView().progressViewStyle(.circular)
+                    }
+                }
+            }
+            .sheet(item: $selectedItem) { wrapper in
+                QueueItemInfoSheet(item: wrapper.item)
+                    .presentationDetents([.fraction(0.7)])
             }
     }
     
@@ -36,12 +44,14 @@ struct ActivityTab: View {
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(viewModel.queueItems, id: \.id) { item in
-                        ActivityQueueItem(item: item, onClick: { selectedItem = item })
+                        ActivityQueueItem(item: item, onClick: { selectedItem = IdentifiableQueueItem(item: item) })
                     }
                     if viewModel.queueItems.isEmpty {
                         emptyActivityView
                     }
                 }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 18)
             }
         }
     }
