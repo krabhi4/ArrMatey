@@ -10,7 +10,7 @@ import Shared
 
 struct ArrLibraryView: View {
     let type: InstanceType
-    let state: LibraryUiStateSuccess<AnyObject>
+    let state: ArrLibrarySuccess
     @Binding var searchQuery: String
     @Binding var searchPresented: Bool
     
@@ -23,20 +23,13 @@ struct ArrLibraryView: View {
     }
     
     var body: some View {
-        if let items = state.items as? [ArrMedia] {
-            if items.isEmpty {
-                VStack {
-                    EmptyLibraryView()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                contentView(items: items, prefs: state.preferences)
-            }
-        } else {
+        if state.items.isEmpty {
             VStack {
                 EmptyLibraryView()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            contentView(items: state.items, prefs: state.preferences)
         }
     }
     

@@ -35,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.R
-import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.ArrSearchViewModel
 import com.dnfapps.arrmatey.compose.components.PosterGrid
@@ -142,8 +142,8 @@ fun ArrSearchScreen(
                     .padding(horizontal = 12.dp)
                 ) {
                     when (val state = lookupState) {
-                        is LibraryUiState.Initial -> {}
-                        is LibraryUiState.Loading -> {
+                        is ArrLibrary.Initial -> {}
+                        is ArrLibrary.Loading -> {
                             LoadingIndicator(
                                 modifier = Modifier
                                     .size(96.dp)
@@ -151,7 +151,7 @@ fun ArrSearchScreen(
                             )
                         }
 
-                        is LibraryUiState.Success -> {
+                        is ArrLibrary.Success -> {
                             if (state.items.isEmpty()) {
                                 Text(
                                     text = stringResource(R.string.empty_library),
@@ -173,7 +173,7 @@ fun ArrSearchScreen(
                             }
                         }
 
-                        is LibraryUiState.Error -> {
+                        is ArrLibrary.Error -> {
                             Text("An error occurred")
                         }
                     }

@@ -1,7 +1,7 @@
 package com.dnfapps.arrmatey.arr.usecase
 
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
-import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.client.ErrorType
 import com.dnfapps.arrmatey.client.NetworkResult
 import com.dnfapps.arrmatey.compose.utils.FilterBy
@@ -20,15 +20,15 @@ class GetLibraryUseCase(
     private val instanceManager: InstanceManager,
     private val preferencesStoreRepository: InstancePreferenceStoreRepository
 ) {
-    operator fun invoke(instanceId: Long): Flow<LibraryUiState<ArrMedia>> = flow {
+    operator fun invoke(instanceId: Long): Flow<ArrLibrary> = flow {
         val repository = instanceManager.getRepository(instanceId)
         if (repository == null) {
-            emit(LibraryUiState.Error("Instance not found", ErrorType.Unexpected))
+            emit(ArrLibrary.Error("Instance not found", ErrorType.Unexpected))
             return@flow
         }
         val preferencesRepository = preferencesStoreRepository.getInstancePreferences(instanceId)
 
-        emit(LibraryUiState.Loading)
+        emit(ArrLibrary.Loading)
         coroutineScope {
             launch {
                 repository.refreshLibrary()
@@ -40,14 +40,14 @@ class GetLibraryUseCase(
             preferencesRepository.observePreferences()
         ) { libraryResult, preferences ->
             when (libraryResult) {
-                is NetworkResult.Loading -> LibraryUiState.Loading
-                is NetworkResult.Error -> LibraryUiState.Error(libraryResult.message ?: "")
+                is NetworkResult.Loading -> ArrLibrary.Loading
+                is NetworkResult.Error -> ArrLibrary.Error(libraryResult.message ?: "")
                 is NetworkResult.Success -> {
                     val sorted = applySorting(libraryResult.data, preferences)
                     val filtered = applyFiltering(sorted, preferences)
-                    LibraryUiState.Success(filtered, preferences)
+                    ArrLibrary.Success(filtered, preferences)
                 }
-                null -> LibraryUiState.Initial
+                null -> ArrLibrary.Initial
             }
         }.collect { emit(it) }
     }

@@ -8,7 +8,7 @@ import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
 import com.dnfapps.arrmatey.arr.api.model.SeriesRelease
 import com.dnfapps.arrmatey.arr.state.DownloadState
 import com.dnfapps.arrmatey.arr.state.InteractiveSearchUiState
-import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.state.ReleaseLibrary
 import com.dnfapps.arrmatey.arr.usecase.DownloadReleaseUseCase
 import com.dnfapps.arrmatey.arr.usecase.GetReleasesUseCase
 import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
@@ -33,8 +33,8 @@ class InteractiveSearchViewModel(
     private val getInstanceRepositoryUseCase: GetInstanceRepositoryUseCase
 ): ViewModel() {
 
-    private val _releaseUiState = MutableStateFlow<LibraryUiState<ArrRelease>>(LibraryUiState.Initial)
-    val releaseUiState: StateFlow<LibraryUiState<ArrRelease>> = _releaseUiState.asStateFlow()
+    private val _releaseUiState = MutableStateFlow<ReleaseLibrary>(ReleaseLibrary.Initial)
+    val releaseUiState: StateFlow<ReleaseLibrary> = _releaseUiState.asStateFlow()
 
     private val _downloadReleaseState = MutableStateFlow<DownloadState>(DownloadState.Initial)
     val downloadReleaseState: StateFlow<DownloadState> = _downloadReleaseState.asStateFlow()
@@ -61,7 +61,7 @@ class InteractiveSearchViewModel(
                 _searchQuery
             ) { release, filter, query ->
                 when (release) {
-                    is LibraryUiState.Success -> {
+                    is ReleaseLibrary.Success -> {
                         val sorted = applySorting(release.items, filter)
                         val filtered = applyFiltering(sorted, filter, query)
                         release.copy(items = filtered)

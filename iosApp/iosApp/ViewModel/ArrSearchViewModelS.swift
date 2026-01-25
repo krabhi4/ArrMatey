@@ -12,7 +12,7 @@ import SwiftUI
 class ArrSearchViewModelS: ObservableObject {
     private let viewModel: ArrSearchViewModel
     
-    @Published private(set) var uiState: LibraryUiState = LibraryUiStateInitial()
+    @Published private(set) var uiState: ArrLibrary = ArrLibraryInitial()
     @Published private(set) var sortBy: SortBy = .relevance
     @Published private(set) var sortOrder: Shared.SortOrder = .asc
     

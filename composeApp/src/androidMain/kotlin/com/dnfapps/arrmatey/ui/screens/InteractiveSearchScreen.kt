@@ -58,7 +58,7 @@ import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.arr.api.model.ArrRelease
 import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
 import com.dnfapps.arrmatey.arr.state.DownloadState
-import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.state.ReleaseLibrary
 import com.dnfapps.arrmatey.arr.viewmodel.InteractiveSearchViewModel
 import com.dnfapps.arrmatey.compose.components.ProgressBox
 import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
@@ -165,14 +165,14 @@ fun InteractiveSearchScreen(
                 .fillMaxSize()
         ) {
             when (val state = releaseUiState) {
-                is LibraryUiState.Loading -> {
+                is ReleaseLibrary.Loading -> {
                     LoadingIndicator(
                         modifier = Modifier
                             .size(96.dp)
                             .align(Alignment.Center)
                     )
                 }
-                is LibraryUiState.Success -> {
+                is ReleaseLibrary.Success -> {
                     LazyColumn(
                         modifier = Modifier
                             .padding(horizontal = 18.dp)
@@ -225,7 +225,7 @@ fun InteractiveSearchScreen(
                         }
                     }
                 }
-                is LibraryUiState.Error -> {
+                is ReleaseLibrary.Error -> {
                     Text(state.message)
                 }
                 else -> {}

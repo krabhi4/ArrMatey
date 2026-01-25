@@ -1,7 +1,6 @@
 package com.dnfapps.arrmatey.ui.screens
 
 import android.annotation.SuppressLint
-import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -50,7 +49,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,18 +67,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
-import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.ArrMediaViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.InstancesViewModel
-import com.dnfapps.arrmatey.client.ErrorType
 import com.dnfapps.arrmatey.compose.TabItem
 import com.dnfapps.arrmatey.compose.components.MediaList
 import com.dnfapps.arrmatey.compose.components.PosterGrid
 import com.dnfapps.arrmatey.compose.utils.FilterBy
 import com.dnfapps.arrmatey.compose.utils.SortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
-import com.dnfapps.arrmatey.datastore.InstancePreferences
 import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.getString
@@ -93,7 +89,6 @@ import com.dnfapps.arrmatey.ui.components.DropdownPicker
 import com.dnfapps.arrmatey.ui.components.InstancePicker
 import com.dnfapps.arrmatey.ui.theme.ViewType
 import com.dnfapps.arrmatey.ui.viewmodel.NetworkConnectivityViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -226,23 +221,23 @@ fun ArrLibraryScreen(
                 NoInstanceView(type)
             } else {
                 when (val state = uiState) {
-                    is LibraryUiState.Initial -> {
+                    is ArrLibrary.Initial -> {
                         NoInstanceView(type)
                     }
 
-                    is LibraryUiState.Loading -> {
+                    is ArrLibrary.Loading -> {
                         LoadingIndicator(
                             modifier = Modifier.size(96.dp)
                         )
                     }
 
-                    is LibraryUiState.Error -> {
+                    is ArrLibrary.Error -> {
                         InstanceErrorView(
                             onRefresh = { arrMediaViewModel.refresh() }
                         )
                     }
 
-                    is LibraryUiState.Success -> {
+                    is ArrLibrary.Success -> {
                         PullToRefreshBox(
                             isRefreshing = false,
                             onRefresh = {

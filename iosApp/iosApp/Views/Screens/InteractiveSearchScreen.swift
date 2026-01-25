@@ -55,29 +55,27 @@ struct InteractiveSearchScreen: View {
     @ViewBuilder
     private func contentForState() -> some View {
         switch viewModel.releaseUiState {
-        case is LibraryUiStateLoading:
+        case is ReleaseLibraryLoading:
             ProgressView()
                 .progressViewStyle(.circular)
-        case let success as LibraryUiStateSuccess<ArrRelease>:
-            if let items = success.items as? [ArrRelease] {
-                ScrollView {
-                    LazyVStack(spacing: 18) {
-                        ForEach(items, id: \.guid) { item in
-                            let isLoading = (viewModel.downloadReleaseState as? DownloadStateLoading)?.guid == item.guid
-                            
-                            ReleaseItemView(item: item, animate: isLoading, onItemClick: { release in
-                                if release.downloadAllowed {
-                                    viewModel.downloadRelease(release, false)
-                                } else {
-                                    confirmRelease = release
-                                }
-                            })
-                        }
+        case let success as ReleaseLibrarySuccess:
+            ScrollView {
+                LazyVStack(spacing: 18) {
+                    ForEach(success.items, id: \.guid) { item in
+                        let isLoading = (viewModel.downloadReleaseState as? DownloadStateLoading)?.guid == item.guid
+                        
+                        ReleaseItemView(item: item, animate: isLoading, onItemClick: { release in
+                            if release.downloadAllowed {
+                                viewModel.downloadRelease(release, false)
+                            } else {
+                                confirmRelease = release
+                            }
+                        })
                     }
-                    .padding(.horizontal, 18)
                 }
+                .padding(.horizontal, 18)
             }
-        case let error as LibraryUiStateError:
+        case let error as ReleaseLibraryError:
             Text(error.message)
                 .foregroundColor(.red)
         default:

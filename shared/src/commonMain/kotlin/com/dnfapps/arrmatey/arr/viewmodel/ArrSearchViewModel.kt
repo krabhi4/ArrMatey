@@ -2,8 +2,7 @@ package com.dnfapps.arrmatey.arr.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dnfapps.arrmatey.arr.api.model.ArrMedia
-import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.arr.usecase.GetLookupResultsUseCase
 import com.dnfapps.arrmatey.arr.usecase.PerformLookupUseCase
 import com.dnfapps.arrmatey.compose.utils.SortBy
@@ -23,7 +22,7 @@ class ArrSearchViewModel(
     private val performLookupUseCase: PerformLookupUseCase
 ): ViewModel() {
 
-    private val _lookupUiState = MutableStateFlow<LibraryUiState<ArrMedia>>(LibraryUiState.Initial)
+    private val _lookupUiState = MutableStateFlow<ArrLibrary>(ArrLibrary.Initial)
 
     private val _sortBy = MutableStateFlow(SortBy.Relevance)
     val sortBy: StateFlow<SortBy> = _sortBy.asStateFlow()
@@ -31,13 +30,13 @@ class ArrSearchViewModel(
     private val _sortOrder = MutableStateFlow(SortOrder.Asc)
     val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
 
-    val lookupUiState: StateFlow<LibraryUiState<ArrMedia>> = combine(
+    val lookupUiState: StateFlow<ArrLibrary> = combine(
         _lookupUiState,
         _sortBy,
         _sortOrder
     ) { state, sortBy, sortOrder ->
         when (state) {
-            is LibraryUiState.Success -> {
+            is ArrLibrary.Success -> {
                 val sorted = when (sortBy) {
                     SortBy.Relevance -> state.items
                     SortBy.Year -> state.items.sortedBy { it.year }
@@ -45,14 +44,14 @@ class ArrSearchViewModel(
                     else -> state.items
                 }
                 val finalList = if (sortOrder == SortOrder.Desc) sorted.reversed() else sorted
-                LibraryUiState.Success(items = finalList, preferences = state.preferences)
+                ArrLibrary.Success(items = finalList, preferences = state.preferences)
             }
             else -> state
         }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = LibraryUiState.Initial
+        initialValue = ArrLibrary.Initial
     )
 
     init {

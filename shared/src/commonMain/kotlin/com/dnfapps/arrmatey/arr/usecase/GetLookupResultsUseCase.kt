@@ -1,7 +1,6 @@
 package com.dnfapps.arrmatey.arr.usecase
 
-import com.dnfapps.arrmatey.arr.api.model.ArrMedia
-import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.client.NetworkResult
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.instances.repository.InstanceManager
@@ -15,17 +14,17 @@ class GetLookupResultsUseCase(
     private val instanceManager: InstanceManager
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
-    operator fun invoke(type: InstanceType): Flow<LibraryUiState<ArrMedia>> =
+    operator fun invoke(type: InstanceType): Flow<ArrLibrary> =
         instanceManager.getSelectedRepository(type)
             .filterNotNull()
             .flatMapLatest { repository ->
                 repository.lookupResults.map { result ->
                     when (result) {
-                        null -> LibraryUiState.Initial
-                        is NetworkResult.Loading -> LibraryUiState.Loading
-                        is NetworkResult.Error -> LibraryUiState.Error(result.message ?: "")
+                        null -> ArrLibrary.Initial
+                        is NetworkResult.Loading -> ArrLibrary.Loading
+                        is NetworkResult.Error -> ArrLibrary.Error(result.message ?: "")
                         is NetworkResult.Success ->
-                            LibraryUiState.Success(items = result.data)
+                            ArrLibrary.Success(items = result.data)
                     }
                 }
             }

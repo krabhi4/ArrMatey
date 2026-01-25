@@ -26,7 +26,7 @@ struct MediaSearchScreen: View {
         self.viewModel = ArrSearchViewModelS(type: type)
     }
     
-    private var uiState: LibraryUiState {
+    private var uiState: ArrLibrary {
         viewModel.uiState
     }
     
@@ -53,17 +53,17 @@ struct MediaSearchScreen: View {
     
     @ViewBuilder
     private func contentForState() -> some View {
-        if uiState is LibraryUiStateInitial {
+        if uiState is ArrLibraryInitial {
             Color.clear
-        } else if uiState is LibraryUiStateLoading {
+        } else if uiState is ArrLibraryLoading {
             ZStack {
                 ProgressView()
                     .progressViewStyle(.circular)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if let state = uiState as? LibraryUiStateSuccess<AnyObject> {
+        } else if let state = uiState as? ArrLibrarySuccess {
             resultsArea(state)
-        } else if uiState is LibraryUiStateError {
+        } else if uiState is ArrLibraryError {
             Text("error state")
         } else {
             EmptyView()
@@ -71,21 +71,17 @@ struct MediaSearchScreen: View {
     }
     
     @ViewBuilder
-    private func resultsArea(_ state: LibraryUiStateSuccess<AnyObject>) -> some View {
-        if let items = state.items as? [ArrMedia] {
-            PosterGridView(items: items, onItemClick: { media in
-                if let id = media.id?.int64Value {
-                    navigation.go(to: .details(id), of: type)
-                } else {
-                    let json = media.toJson()
-                    navigation.go(to: .preview(json), of: type)
-                }
-            }, itemIsActive: { media in
-                queueItems.contains(where: { $0.mediaId == media.id })
-            })
-        } else {
-            EmptyView()
-        }
+    private func resultsArea(_ state: ArrLibrarySuccess) -> some View {
+        PosterGridView(items: state.items, onItemClick: { media in
+            if let id = media.id?.int64Value {
+                navigation.go(to: .details(id), of: type)
+            } else {
+                let json = media.toJson()
+                navigation.go(to: .preview(json), of: type)
+            }
+        }, itemIsActive: { media in
+            queueItems.contains(where: { $0.mediaId == media.id })
+        })
     }
     
     @ToolbarContentBuilder

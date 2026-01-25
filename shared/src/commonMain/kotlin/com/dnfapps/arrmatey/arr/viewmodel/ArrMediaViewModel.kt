@@ -2,8 +2,7 @@ package com.dnfapps.arrmatey.arr.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dnfapps.arrmatey.arr.api.model.ArrMedia
-import com.dnfapps.arrmatey.arr.state.LibraryUiState
+import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.arr.usecase.GetLibraryUseCase
 import com.dnfapps.arrmatey.client.ErrorType
 import com.dnfapps.arrmatey.client.OperationStatus
@@ -17,7 +16,6 @@ import com.dnfapps.arrmatey.instances.repository.InstanceScopedRepository
 import com.dnfapps.arrmatey.instances.usecase.GetInstanceRepositoryUseCase
 import com.dnfapps.arrmatey.instances.usecase.UpdatePreferencesUseCase
 import com.dnfapps.arrmatey.ui.theme.ViewType
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,8 +33,8 @@ class ArrMediaViewModel(
     private val updatePreferencesUseCase: UpdatePreferencesUseCase
 ): ViewModel() {
 
-    private val _uiState = MutableStateFlow<LibraryUiState<ArrMedia>>(LibraryUiState.Initial)
-    val uiState: StateFlow<LibraryUiState<ArrMedia>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<ArrLibrary>(ArrLibrary.Initial)
+    val uiState: StateFlow<ArrLibrary> = _uiState.asStateFlow()
 
     private val _instanceData = MutableStateFlow<InstanceData?>(null)
     val instanceData: StateFlow<InstanceData?> = _instanceData.asStateFlow()
@@ -81,11 +79,11 @@ class ArrMediaViewModel(
         getLibraryUseCase(instanceId)
             .combine(_searchQuery) { state, query ->
                 when (state) {
-                    is LibraryUiState.Success<ArrMedia> -> {
+                    is ArrLibrary.Success -> {
                         _preferences.value = state.preferences
                         filterSuccessState(state, query)
                     }
-                    is LibraryUiState.Error -> {
+                    is ArrLibrary.Error -> {
                         handleErrorState(state)
                         state
                     }
@@ -96,14 +94,14 @@ class ArrMediaViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun filterSuccessState(state: LibraryUiState.Success<ArrMedia>, query: String) =
+    private fun filterSuccessState(state: ArrLibrary.Success, query: String) =
         state.copy(
             items = state.items.filter {
                 it.sortTitle?.contains(query, ignoreCase = true) == true
             }
         )
 
-    private fun handleErrorState(state: LibraryUiState.Error) {
+    private fun handleErrorState(state: ArrLibrary.Error) {
         _errorMessage.value = state.message
         _hasServerConnectivityError.value = (state.type == ErrorType.Network)
     }
@@ -155,7 +153,7 @@ class ArrMediaViewModel(
     private fun safeSavePreference(transform: (InstancePreferences) -> InstancePreferences) {
         viewModelScope.launch {
             val repository = currentRepository ?: return@launch
-            val currentState = _uiState.value as? LibraryUiState.Success ?: return@launch
+            val currentState = _uiState.value as? ArrLibrary.Success ?: return@launch
             val preferences = currentState.preferences
 
             val updatedPreferences = transform(preferences)

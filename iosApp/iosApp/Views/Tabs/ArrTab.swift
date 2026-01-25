@@ -21,7 +21,7 @@ struct ArrTab: View {
     
     @State private var searchPresented: Bool = false
     
-    private var uiState: LibraryUiState {
+    private var uiState: ArrLibrary {
         arrMediaViewModel.uiState
     }
     
@@ -72,19 +72,20 @@ struct ArrTab: View {
                 noInstanceView()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if uiState is LibraryUiStateInitial {
+        } else if uiState is ArrLibraryInitial {
             VStack {
                 noInstanceView()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if uiState is LibraryUiStateLoading {
+        } else if uiState is ArrLibraryLoading {
             ZStack {
                 ProgressView()
                     .progressViewStyle(.circular)
             }
-        } else if let success = uiState as? LibraryUiStateSuccess<AnyObject> {
+        } else if let success = uiState as? ArrLibrarySuccess
+        {
             ArrLibraryView(type: type, state: success, searchQuery: $arrMediaViewModel.searchQuery, searchPresented: $searchPresented)
-        } else if uiState is LibraryUiStateError {
+        } else if uiState is ArrLibraryError {
             ZStack {
                 errorView()
             }
@@ -112,7 +113,7 @@ struct ArrTab: View {
             }
         }
         
-        if let error = uiState as? LibraryUiStateError {
+        if let error = uiState as? ArrLibraryError {
             if error.type == .network {
                 ToolbarItem(placement: .navigation) {
                     Image(systemName: "externaldrive.badge.xmark")
@@ -128,7 +129,7 @@ struct ArrTab: View {
             }
         }
         
-        if uiState is LibraryUiStateSuccess<AnyObject> {
+        if uiState is ArrLibrarySuccess {
             toolbarViewOptions
         }
         

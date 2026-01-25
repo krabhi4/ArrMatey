@@ -13,7 +13,7 @@ import Combine
 class ArrMediaViewModelS: ObservableObject {
     private let viewModel: ArrMediaViewModel
     
-    @Published private(set) var uiState: LibraryUiState = LibraryUiStateInitial()
+    @Published private(set) var uiState: ArrLibrary = ArrLibraryInitial()
     @Published private(set) var instanceData: InstanceData?
     @Published private(set) var addItemStatus: OperationStatus = OperationStatusIdle()
     @Published private(set) var preferences: InstancePreferences = InstancePreferences.companion.empty()

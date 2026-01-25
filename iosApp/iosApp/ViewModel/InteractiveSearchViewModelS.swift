@@ -12,7 +12,7 @@ import SwiftUI
 class InteractiveSearchViewModelS: ObservableObject {
     private let viewModel: InteractiveSearchViewModel
     
-    @Published private(set) var releaseUiState: LibraryUiState = LibraryUiStateInitial()
+    @Published private(set) var releaseUiState: ReleaseLibrary = ReleaseLibraryInitial()
     @Published private(set) var downloadReleaseState: DownloadState = DownloadStateInitial()
     @Published private(set) var filterUiState: InteractiveSearchUiState
     @Published private(set) var downloadStatus: Bool? = nil
