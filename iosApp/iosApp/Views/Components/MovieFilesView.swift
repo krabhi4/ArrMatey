@@ -20,7 +20,9 @@ struct MovieFilesView: View {
     var body: some View {
         Section {
             ReleaseDownloadButtons(onInteractiveClicked: {
-                //todo
+                if let id = movie.id?.int64Value {
+                    navigation.go(to: .movieRelease(id), of: .radarr)
+                }
             }, automaticSearchEnabled: movie.monitored, onAutomaticClicked: onAutomaticSearch, automaticSearchInProgress: searchIds.contains(movie.id as! Int64))
             
             if let file = movie.movieFile {

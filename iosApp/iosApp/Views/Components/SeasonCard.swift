@@ -20,6 +20,8 @@ struct SeasonCard: View {
     
     @State private var expanded: Bool = false
     
+    @EnvironmentObject private var navigation: NavigationManager
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             seasonHeader
@@ -28,7 +30,10 @@ struct SeasonCard: View {
                 seasonDetails
                 
                 ReleaseDownloadButtons(onInteractiveClicked: {
-                    //todo
+                    if let id = series.id?.int64Value {
+                        let route: MediaRoute = .seriesReleases(seriesId: id, seasonNumber: season.seasonNumber)
+                        navigation.go(to: route, of: .sonarr)
+                    }
                 }, automaticSearchEnabled: episodes.contains(where: { $0.monitored }), onAutomaticClicked: {
                     onSeasonAutomaticSearch(season.seasonNumber)
                 }, automaticSearchInProgress: false)

@@ -38,10 +38,7 @@ class ActivityQueueViewModelS: ObservableObject {
     }
     
     func setInstanceId(_ id: Int64?) {
-        let kotlinLong: KotlinLong? = if let id = id {
-            KotlinLong(value: id)
-        } else {nil }
-        viewModel.setInstanceId(id: kotlinLong)
+        viewModel.setInstanceId(id: id?.asKotlinLong)
     }
     
     func setSortBy(_ sortBy: QueueSortBy) {

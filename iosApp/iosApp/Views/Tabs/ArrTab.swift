@@ -143,7 +143,7 @@ struct ArrTab: View {
     
     @ToolbarContentBuilder
     private var toolbarViewOptions: some ToolbarContent {
-        ToolbarItem(placement: .navigation) {
+        ToolbarItem(placement: .primaryAction) {
             SortByPickerMenu(
                 type: type,
                 sortBy: preferences.sortBy,
@@ -158,7 +158,7 @@ struct ArrTab: View {
             .menuIndicator(.hidden)
         }
         
-        ToolbarItem(placement: .navigation) {
+        ToolbarItem(placement: .primaryAction) {
             FilterByPickerMenu(
                 type: type,
                 filterBy: preferences.filterBy,
@@ -181,7 +181,7 @@ struct ArrTab: View {
         case .grid: "rectangle.grid.2x2"
         case .list: "rectangle.grid.1x2"
         }
-        ToolbarItem(placement: .primaryAction) {
+        ToolbarItem(placement: .navigation) {
             Image(systemName: image)
                 .imageScale(.medium)
                 .onTapGesture {
@@ -193,7 +193,7 @@ struct ArrTab: View {
             ToolbarSpacer(.flexible, placement: .primaryAction)
         }
         
-        ToolbarItem(placement: .primaryAction) {
+        ToolbarItem(placement: .navigation) {
             Image(systemName: "plus")
                 .imageScale(.medium)
                 .onTapGesture {

@@ -68,6 +68,16 @@ sealed interface ArrRelease {
             seeders >= 1 -> DownloadOrange
             else -> DownloadRed
         }
+
+    val peerColorHex: String
+        get() = when {
+            protocol == ReleaseProtocol.Usenet -> "#01b801"
+            rejections.any { it.contains("Not enough seeders") } -> "#ff3e3e"
+            seeders >= 50 -> "#01b801"
+            seeders >= 10 -> "#00b2ff"
+            seeders >= 1 -> "#FFA505"
+            else -> "#ff3e3e"
+        }
 }
 
 enum class ReleaseProtocol {

@@ -32,6 +32,11 @@ struct MoviesTab: View {
             MediaPreviewScreen(json: json, type: .radarr)
         case .movieFiles(let json):
             MovieFilesScreen(json: json)
+        case .movieRelease(let id):
+            let releaseParams = ReleaseParamsMovie(movieId: id)
+            InteractiveSearchScreen(type: .radarr, canFilter: true, releaseParams: releaseParams)
+        case .seriesReleases(_, _, _):
+            EmptyView() // should never happen on this tab
         }
     }
 }

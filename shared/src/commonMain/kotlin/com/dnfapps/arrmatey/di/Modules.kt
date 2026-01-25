@@ -40,6 +40,7 @@ import com.dnfapps.arrmatey.arr.viewmodel.MovieFilesViewModel
 import com.dnfapps.arrmatey.arr.service.ActivityQueueService
 import com.dnfapps.arrmatey.arr.api.client.HttpClientFactory
 import com.dnfapps.arrmatey.arr.api.model.Episode
+import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
 import com.dnfapps.arrmatey.database.ArrMateyDatabase
 import com.dnfapps.arrmatey.database.InstanceRepository
 import com.dnfapps.arrmatey.database.getRoomDatabase
@@ -137,8 +138,8 @@ val viewModelModule = module {
     factory { (type: InstanceType) ->
         MediaPreviewViewModel(type, get(), get())
     }
-    factory { (type: InstanceType) ->
-        InteractiveSearchViewModel(type, get(), get(), get())
+    factory { (type: InstanceType, defaultFilter: ReleaseFilterBy) ->
+        InteractiveSearchViewModel(type, defaultFilter, get(), get(), get())
     }
     factory { (movieId: Long) ->
         MovieFilesViewModel(movieId, get())

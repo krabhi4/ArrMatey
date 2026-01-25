@@ -27,7 +27,15 @@ struct SeriesTab: View {
             MediaSearchScreen(query: query, type: .sonarr)
         case .preview(let json):
             MediaPreviewScreen(json: json, type: .sonarr)
+        case .seriesReleases(let seriesId, let seasonNumber, let episodeId):
+            let releaseParams = ReleaseParamsSeries(seriesId: seriesId?.asKotlinLong, seasonNumber: seasonNumber?.asKotlinInt, episodeId: episodeId?.asKotlinLong)
+            let defaultFilter: ReleaseFilterBy = if episodeId != nil { .singleEpisode } else { .seasonPack }
+            InteractiveSearchScreen(type: .sonarr, canFilter: true, releaseParams: releaseParams, defaultFilter: defaultFilter)
+            
+        // unused
         case .movieFiles(_):
+            EmptyView()
+        case .movieRelease(_):
             EmptyView()
         }
     }

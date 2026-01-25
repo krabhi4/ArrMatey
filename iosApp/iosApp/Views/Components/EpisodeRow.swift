@@ -14,6 +14,8 @@ struct EpisodeRow: View {
     let onAutomaticSearch: () -> Void
     let automaticSearchDisabled: Bool
     
+    @EnvironmentObject private var navigation: NavigationManager
+    
     private var statusString: String? {
         episode.episodeFile?.qualityName ??
         (episode.airDate?.isTodayOrAfter() == true ? String(localized: LocalizedStringResource("unaired")) : nil)
@@ -26,7 +28,7 @@ struct EpisodeRow: View {
                     Text("\(episode.episodeNumber). ")
                         .font(.system(size: 16))
                         .fontWeight(.medium)
-                        .foregroundColor(.accentColor) // primary color
+                        .foregroundColor(.accentColor)
                     
                     Text(episode.title ?? "")
                         .font(.system(size: 16))
@@ -40,7 +42,6 @@ struct EpisodeRow: View {
                     }
                 }
                 
-                // Status row
                 HStack(spacing: 4) {
                     if let statusString = statusString {
                         Text(statusString)
@@ -65,7 +66,8 @@ struct EpisodeRow: View {
             
             Image(systemName: "person.fill")
                 .onTapGesture {
-                    
+                    let route: MediaRoute = .seriesReleases(episodeId: episode.id)
+                    navigation.go(to: route, of: .sonarr)
                 }
             
             Image(systemName: "magnifyingglass")

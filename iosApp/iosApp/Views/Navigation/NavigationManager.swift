@@ -44,7 +44,13 @@ enum MediaRoute: Hashable {
     case details(Int64)
     case search(String)
     case preview(String)
+    case movieRelease(Int64)
     case movieFiles(String)
+    case seriesReleases(
+        seriesId: Int64? = nil,
+        seasonNumber: Int32? = nil,
+        episodeId: Int64? = nil
+    )
 }
 
 enum SettingsRoute : Hashable {

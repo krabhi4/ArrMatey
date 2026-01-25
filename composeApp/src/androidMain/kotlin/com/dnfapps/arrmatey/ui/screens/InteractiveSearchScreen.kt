@@ -64,8 +64,6 @@ import com.dnfapps.arrmatey.compose.components.ProgressBox
 import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
 import com.dnfapps.arrmatey.compose.utils.ReleaseSortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
-import com.dnfapps.arrmatey.compose.utils.applyFiltering
-import com.dnfapps.arrmatey.compose.utils.applySorting
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.compose.utils.singleLanguageLabel
 import com.dnfapps.arrmatey.di.koinInjectParams
@@ -89,7 +87,7 @@ fun InteractiveSearchScreen(
     releaseParams: ReleaseParams,
     canFilter: Boolean,
     defaultFilter: ReleaseFilterBy = ReleaseFilterBy.Any,
-    viewModel: InteractiveSearchViewModel = koinInjectParams(instanceType),
+    viewModel: InteractiveSearchViewModel = koinInjectParams(instanceType, defaultFilter),
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.arr(instanceType)
 ) {
@@ -97,32 +95,29 @@ fun InteractiveSearchScreen(
 
     val releaseUiState by viewModel.releaseUiState.collectAsStateWithLifecycle()
     val downloadState by viewModel.downloadReleaseState.collectAsStateWithLifecycle()
+    val downloadStatus by viewModel.downloadStatus.collectAsStateWithLifecycle()
+    val filterState by viewModel.filterUiState.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     var confirmRelease by remember { mutableStateOf<ArrRelease?>( null) }
     var showSearch by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
 
     val downloadQueueSuccessMessage = stringResource(R.string.download_queue_success)
     val downloadQueueErrorMessage = stringResource(R.string.download_queue_error)
 
     var showFilterSheet by remember { mutableStateOf(false) }
-    var sortBy by remember { mutableStateOf(ReleaseSortBy.Weight) }
-    var sortOrder by remember { mutableStateOf(SortOrder.Asc) }
-    var filterBy by remember { mutableStateOf(defaultFilter) }
 
     LaunchedEffect(releaseParams) {
         viewModel.getRelease(releaseParams)
     }
 
-    LaunchedEffect(downloadState) {
-        when(downloadState) {
-            is DownloadState.Success -> {
-                Toast.makeText(context, downloadQueueSuccessMessage, Toast.LENGTH_SHORT).show()
-            }
-            is DownloadState.Error -> {
-                Toast.makeText(context, downloadQueueErrorMessage, Toast.LENGTH_SHORT).show()
-            }
-            else -> {}
+    LaunchedEffect(downloadStatus) {
+        when(downloadStatus) {
+            true -> downloadQueueSuccessMessage
+            false -> downloadQueueErrorMessage
+            else -> null
+        }?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -144,7 +139,7 @@ fun InteractiveSearchScreen(
                     IconButton(
                         onClick = {
                             showSearch = !showSearch
-                            if (!showSearch) searchQuery = ""
+                            if (!showSearch) viewModel.updateSearchQuery("")
                         }
                     ) {
                         Icon(
@@ -178,18 +173,6 @@ fun InteractiveSearchScreen(
                     )
                 }
                 is LibraryUiState.Success -> {
-                    val filteredItems = remember(searchQuery, sortOrder, sortBy, filterBy) {
-                        state.items
-                            .applyFiltering(filterBy)
-                            .applySorting(sortBy, sortOrder)
-                            .let { lst ->
-                                if (searchQuery.isEmpty()) lst
-                                else lst.filter {
-                                    it.title.contains(searchQuery, ignoreCase = true)
-                                }
-                            }
-                    }
-
                     LazyColumn(
                         modifier = Modifier
                             .padding(horizontal = 18.dp)
@@ -204,7 +187,7 @@ fun InteractiveSearchScreen(
                             ) {
                                 OutlinedTextField(
                                     value = searchQuery,
-                                    onValueChange = { searchQuery = it },
+                                    onValueChange = { viewModel.updateSearchQuery(it) },
                                     modifier = Modifier
                                         .padding(vertical = 12.dp)
                                         .fillMaxWidth(),
@@ -213,7 +196,7 @@ fun InteractiveSearchScreen(
                                             imageVector = Icons.Default.Close,
                                             contentDescription = null,
                                             modifier = Modifier.clickable {
-                                                searchQuery = ""
+                                                viewModel.updateSearchQuery("")
                                                 showSearch = false
                                             }
                                         )
@@ -223,7 +206,7 @@ fun InteractiveSearchScreen(
                                 )
                             }
                         }
-                        items(filteredItems) { item ->
+                        items(state.items) { item ->
                             val shouldAnimate = (downloadState as? DownloadState.Loading)?.guid == item.guid
                             ReleaseItem(
                                 item = item,
@@ -291,12 +274,12 @@ fun InteractiveSearchScreen(
             FilterSheet(
                 canFilter = canFilter,
                 onDismiss = { showFilterSheet = false },
-                selectedSortBy = sortBy,
-                onSortByChanged = { sortBy = it },
-                selectedSortOrder = sortOrder,
-                onSortOrderChanged = { sortOrder = it },
-                selectedFilter = filterBy,
-                onFilterChanged = { filterBy = it }
+                selectedSortBy = filterState.sortBy,
+                onSortByChanged = { viewModel.setSortBy(it) },
+                selectedSortOrder = filterState.sortOrder,
+                onSortOrderChanged = { viewModel.setSortOrder(it) },
+                selectedFilter = filterState.filterBy,
+                onFilterChanged = { viewModel.setFilterBy(it) }
             )
         }
     }

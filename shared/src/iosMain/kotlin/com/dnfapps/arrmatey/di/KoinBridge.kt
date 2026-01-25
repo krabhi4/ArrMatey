@@ -14,6 +14,7 @@ import com.dnfapps.arrmatey.arr.viewmodel.InteractiveSearchViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.MediaPreviewViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.MoreScreenViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.MovieFilesViewModel
+import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
 import com.dnfapps.arrmatey.datastore.PreferencesStore
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import org.koin.core.component.KoinComponent
@@ -38,8 +39,8 @@ object KoinBridge: KoinComponent {
     fun getMediaPreviewViewModel(type: InstanceType): MediaPreviewViewModel =
         getKoin().get { parametersOf(type) }
 
-    fun getInteractiveSearchViewModel(type: InstanceType): InteractiveSearchViewModel =
-        getKoin().get { parametersOf(type) }
+    fun getInteractiveSearchViewModel(type: InstanceType, defaultFilter: ReleaseFilterBy): InteractiveSearchViewModel =
+        getKoin().get { parametersOf(type, defaultFilter) }
 
     fun getMovieFilesViewModel(movieId: Long): MovieFilesViewModel =
         getKoin().get { parametersOf(movieId) }

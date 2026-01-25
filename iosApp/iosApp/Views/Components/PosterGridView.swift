@@ -21,7 +21,7 @@ struct PosterGridView: UIViewControllerRepresentable {
         self.items = items
         self.onItemClick = onItemClick
         self.itemIsActive = { item in
-            KotlinBoolean(bool: itemIsActive(item))
+            itemIsActive(item).asKotlinBool
         }
     }
     

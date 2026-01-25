@@ -43,10 +43,7 @@ class AddInstanceViewModelS: ObservableObject {
     }
     
     func setCustomTimeout(_ customTimeout: Int64?) {
-        let newValue: KotlinLong? = if let timeout = customTimeout {
-            KotlinLong(value: timeout)
-        } else { nil }
-        viewModel.setCustomTimeout(value: newValue)
+        viewModel.setCustomTimeout(value: customTimeout?.asKotlinLong)
     }
     
     func setInstanceLabel(_ instanceLabel: String) {

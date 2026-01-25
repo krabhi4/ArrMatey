@@ -149,7 +149,6 @@ class ArrMediaViewModel(
     }
 
     fun updateSearchQuery(query: String) {
-        println("new query $query")
         _searchQuery.value = query
     }
 
