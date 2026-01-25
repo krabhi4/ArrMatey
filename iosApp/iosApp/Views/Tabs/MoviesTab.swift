@@ -35,8 +35,12 @@ struct MoviesTab: View {
         case .movieRelease(let id):
             let releaseParams = ReleaseParamsMovie(movieId: id)
             InteractiveSearchScreen(type: .radarr, canFilter: true, releaseParams: releaseParams)
+            
+        // unused
         case .seriesReleases(_, _, _):
-            EmptyView() // should never happen on this tab
+            EmptyView()
+        case .episodeDetails(_, _):
+            EmptyView()
         }
     }
 }

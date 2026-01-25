@@ -51,6 +51,7 @@ enum MediaRoute: Hashable {
         seasonNumber: Int32? = nil,
         episodeId: Int64? = nil
     )
+    case episodeDetails(String, String)
 }
 
 enum SettingsRoute : Hashable {

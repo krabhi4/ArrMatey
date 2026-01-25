@@ -1,5 +1,5 @@
 //
-//  MovieFileCard.swift
+//  MediaFileCard.swift
 //  iosApp
 //
 //  Created by Owen LeJeune on 2026-01-23.
@@ -8,8 +8,8 @@
 import Shared
 import SwiftUI
 
-struct MovieFileCard: View {
-    let file: MovieFile
+struct MediaFileCard: View {
+    let file: MediaFile
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -33,7 +33,7 @@ struct MovieFileCard: View {
         )
     }
     
-    private func fileInfoLine(file: MovieFile) -> String {
+    private func fileInfoLine(file: MediaFile) -> String {
         let languageName = file.languages.first?.name ?? ""
         let sizeString = file.size.bytesAsFileSizeString()
         let qualityName = file.quality?.quality.name ?? ""

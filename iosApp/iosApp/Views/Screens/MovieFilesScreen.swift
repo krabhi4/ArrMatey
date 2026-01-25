@@ -32,7 +32,7 @@ struct MovieFilesScreen: View {
                         .font(.system(size: 22, weight: .medium))
                     
                     if let file = movie.movieFile {
-                        MovieFileCard(file: file)
+                        MediaFileCard(file: file)
                     }
                     
                     MovieExtraFilesView(extraFiles: uiState.extraFiles)

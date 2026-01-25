@@ -1,10 +1,7 @@
 package com.dnfapps.arrmatey.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
 
 val DarkColorPalette = darkColorScheme(
     primary = primaryDark,
@@ -81,19 +78,3 @@ val LightColorPalette = lightColorScheme(
     surfaceContainerHigh = surfaceContainerHighLight,
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
-
-@Composable
-fun BasicTheme(
-    content: @Composable () -> Unit
-) {
-    val darkTheme = isSystemInDarkTheme()
-
-    val colorScheme = when {
-        darkTheme -> DarkColorPalette
-        else -> LightColorPalette
-    }
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
-    )
-}

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.HistoryItem
+import com.dnfapps.arrmatey.arr.state.HistoryState
 import com.dnfapps.arrmatey.instances.repository.InstanceScopedRepository
 import com.dnfapps.arrmatey.instances.usecase.GetInstanceRepositoryUseCase
 import com.dnfapps.arrmatey.client.NetworkResult
@@ -29,8 +30,8 @@ class EpisodeDetailsViewModel(
     private val _episode = MutableStateFlow(episode)
     val episode: StateFlow<Episode> = _episode.asStateFlow()
 
-    private val _history = MutableStateFlow<NetworkResult<List<HistoryItem>>?>(null)
-    val history: StateFlow<NetworkResult<List<HistoryItem>>?> = _history.asStateFlow()
+    private val _history = MutableStateFlow<HistoryState>(HistoryState.Initial)
+    val history: StateFlow<HistoryState> = _history.asStateFlow()
 
     private val _monitorStatus = MutableStateFlow<OperationStatus>(OperationStatus.Idle)
     val monitorStatus: StateFlow<OperationStatus> = _monitorStatus.asStateFlow()
@@ -65,12 +66,11 @@ class EpisodeDetailsViewModel(
     }
 
     private suspend fun loadHistory(repository: InstanceScopedRepository) {
-
-        _history.value = NetworkResult.Loading
+        _history.value = HistoryState.Loading
         repository.getItemHistory(episode.value.id)
-            .onSuccess { _history.value = NetworkResult.Success(it) }
-            .onError { code, message, cause ->
-                _history.value = NetworkResult.Error(code, message, cause)
+            .onSuccess { _history.value = HistoryState.Success(it) }
+            .onError { _, message, _ ->
+                _history.value = HistoryState.Error(message)
             }
     }
 
@@ -97,11 +97,11 @@ class EpisodeDetailsViewModel(
     fun refreshHistory() {
         viewModelScope.launch {
             val repository = currentRepository ?: return@launch
-            _history.value = NetworkResult.Loading
+            _history.value = HistoryState.Loading
             repository.getItemHistory(episode.value.id)
-                .onSuccess { _history.value = NetworkResult.Success(it) }
-                .onError { code, message, cause ->
-                    NetworkResult.Error(code, message, cause)
+                .onSuccess { _history.value = HistoryState.Success(it) }
+                .onError { _, message, _ ->
+                    HistoryState.Error(message)
                 }
         }
     }

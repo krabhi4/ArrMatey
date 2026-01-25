@@ -8,11 +8,11 @@
 import SwiftUI
 import Shared
 
-struct MediaHeaderBanner<T: ArrMedia>: UIViewControllerRepresentable {
-    let item: T
+struct MediaHeaderBanner: UIViewControllerRepresentable {
+    let bannerUrl: String?
     
     func makeUIViewController(context: Context) -> some UIViewController {
-        DetailHeaderBannerViewController(item: item)
+        return MediaHeaderBannerViewController(bannerUrl: bannerUrl)
     }
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {

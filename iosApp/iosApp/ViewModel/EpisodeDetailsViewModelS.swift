@@ -13,7 +13,7 @@ class EpisodeDetailsViewModelS: ObservableObject {
     private let viewModel: EpisodeDetailsViewModel
     
     @Published private(set) var episode: Episode
-    @Published private(set) var history: NetworkResult? = nil
+    @Published private(set) var history: HistoryState = HistoryStateInitial()
     @Published private(set) var monitorStatus: OperationStatus = OperationStatusIdle()
     
     init(seriesId: Int64, episode: Episode) {

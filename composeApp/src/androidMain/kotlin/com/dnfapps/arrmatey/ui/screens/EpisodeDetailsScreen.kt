@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
 import com.dnfapps.arrmatey.arr.api.model.Episode
+import com.dnfapps.arrmatey.arr.state.HistoryState
 import com.dnfapps.arrmatey.arr.viewmodel.EpisodeDetailsViewModel
 import com.dnfapps.arrmatey.client.NetworkResult
 import com.dnfapps.arrmatey.client.OperationStatus
@@ -60,7 +61,6 @@ fun EpisodeDetailsScreen(
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.series()
 ) {
-    val navigation = navigationManager.series()
     val scrollState = rememberScrollState()
 
     val currentEpisode by viewModel.episode.collectAsStateWithLifecycle()
@@ -69,7 +69,6 @@ fun EpisodeDetailsScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Show snackbar for monitor status changes
     LaunchedEffect(monitorStatus) {
         when (monitorStatus) {
             is OperationStatus.Success -> {
@@ -131,7 +130,7 @@ fun EpisodeDetailsScreen(
                     }
 
                     when (val historyResult = history) {
-                        is NetworkResult.Loading -> {
+                        is HistoryState.Loading -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
@@ -139,20 +138,20 @@ fun EpisodeDetailsScreen(
                                 CircularProgressIndicator()
                             }
                         }
-                        is NetworkResult.Success -> {
-                            if (historyResult.data.isEmpty()) {
+                        is HistoryState.Success -> {
+                            if (historyResult.items.isEmpty()) {
                                 Text(
                                     text = stringResource(R.string.no_history),
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                             } else {
-                                historyResult.data.forEach { historyItem ->
+                                historyResult.items.forEach { historyItem ->
                                     HistoryItemView(historyItem)
                                 }
                             }
                         }
-                        is NetworkResult.Error -> {}
+                        is HistoryState.Error -> {}
                         else -> {}
                     }
                     Spacer(modifier = Modifier.height(12.dp))

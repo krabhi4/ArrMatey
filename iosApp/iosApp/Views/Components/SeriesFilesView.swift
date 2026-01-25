@@ -35,7 +35,7 @@ struct SeriesFilesView: View {
                 SeasonCard(
                     series: series,
                     season: season,
-                    episodes: seasonEpisodes[season.seasonNumber] ?? [],
+                    episodes: seasonEpisodes[season.seasonNumber]?.reversed() ?? [],
                     onToggleSeasonMonitor: onToggleSeasonMonitor,
                     onToggleEpisodeMonitor: onToggleEpisodeMonitor,
                     onEpisodeAutomaticSearch: onEpisodeAutomaticSearch,

@@ -43,7 +43,9 @@ struct SeasonCard: View {
                         onToggleEpisodeMonitor(ep)
                     }, onAutomaticSearch: {
                         onEpisodeAutomaticSearch(episode.id)
-                    }, automaticSearchDisabled: episode.monitored)
+                    }, automaticSearchDisabled: episode.monitored, onClicked: {
+                        navigation.go(to: .episodeDetails(series.toJson(), episode.toJson()), of: .sonarr)
+                    })
                     if episode != episodes.last {
                         Divider()
                     }

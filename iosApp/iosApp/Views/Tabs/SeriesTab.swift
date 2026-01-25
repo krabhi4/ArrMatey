@@ -31,6 +31,8 @@ struct SeriesTab: View {
             let releaseParams = ReleaseParamsSeries(seriesId: seriesId?.asKotlinLong, seasonNumber: seasonNumber?.asKotlinInt, episodeId: episodeId?.asKotlinLong)
             let defaultFilter: ReleaseFilterBy = if episodeId != nil { .singleEpisode } else { .seasonPack }
             InteractiveSearchScreen(type: .sonarr, canFilter: true, releaseParams: releaseParams, defaultFilter: defaultFilter)
+        case .episodeDetails(let seriesJson, let episodeJson):
+            EpisodeDetailsScreen(seriesJson: seriesJson, episodeJson: episodeJson)
             
         // unused
         case .movieFiles(_):

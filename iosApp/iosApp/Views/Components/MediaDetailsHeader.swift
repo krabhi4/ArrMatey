@@ -13,7 +13,7 @@ struct MediaDetailsHeader: View {
     
     var body: some View {
         ZStack {
-            MediaHeaderBanner(item: item)
+            MediaHeaderBanner(bannerUrl: item.getBanner()?.remoteUrl)
             HStack(alignment: .top, spacing: 12) {
                 PosterItemView(
                     item: item,

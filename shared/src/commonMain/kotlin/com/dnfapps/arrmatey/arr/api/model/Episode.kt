@@ -11,6 +11,7 @@ import kotlinx.datetime.todayIn
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -89,6 +90,12 @@ data class Episode(
             airDate?.isBeforeToday() == true -> "Unaired"
             else -> "Missing"
         }
+
+    fun toJson(): String = ArrMedia.json.encodeToString(this)
+
+    companion object {
+        fun fromJson(json: String) = ArrMedia.json.decodeFromString<Episode>(json)
+    }
 }
 
 enum class FinalType(val label: String) {

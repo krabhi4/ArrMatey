@@ -26,7 +26,7 @@ struct MovieFilesView: View {
             }, automaticSearchEnabled: movie.monitored, onAutomaticClicked: onAutomaticSearch, automaticSearchInProgress: searchIds.contains(movie.id as! Int64))
             
             if let file = movie.movieFile {
-                MovieFileCard(file: file)
+                MediaFileCard(file: file)
             }
             
             MovieExtraFilesView(extraFiles: movieExtraFiles)
