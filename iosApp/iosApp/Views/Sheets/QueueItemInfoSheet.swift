@@ -74,7 +74,6 @@ struct QueueItemInfoSheet: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 24)
         }
-//        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
     

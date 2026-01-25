@@ -24,6 +24,7 @@ class PreferencesStore(
     private val radarrInfoCardKey = booleanPreferencesKey("radarrInfoCard")
     private val activityPollingKey = booleanPreferencesKey("enableActivityPolling")
     private val httpLogLevelKey = stringPreferencesKey("httpLogLevel")
+    private val useDynamicThemeKey = booleanPreferencesKey("useDynamicTheme")
 
     private fun infoCardKey(type: InstanceType): Preferences.Key<Boolean> = when (type) {
         InstanceType.Sonarr -> sonarrInfoCardKey
@@ -50,12 +51,14 @@ class PreferencesStore(
 
     val httpLogLevel: Flow<LoggerLevel> = dataStore.data
         .map { preferences ->
-//            setLogLevel(LoggerLevel.Headers)
-//            LoggerLevel.Headers
-
             preferences[httpLogLevelKey]?.let { logLevel ->
                 LoggerLevel.valueOf(logLevel)
             } ?: LoggerLevel.Headers
+        }
+
+    val useDynamicTheme: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[useDynamicThemeKey] ?: true
         }
 
     fun dismissInfoCard(type: InstanceType) {
@@ -83,6 +86,15 @@ class PreferencesStore(
         scope.launch {
             dataStore.edit { preferences ->
                 preferences[httpLogLevelKey] = level.name
+            }
+        }
+    }
+
+    fun toggleUseDynamicTheme() {
+        scope.launch {
+            dataStore.edit { preferences ->
+                val current = preferences[useDynamicThemeKey] ?: true
+                preferences[useDynamicThemeKey] = !current
             }
         }
     }

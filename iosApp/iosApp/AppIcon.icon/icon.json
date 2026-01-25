@@ -1,8 +1,8 @@
 {
   "fill" : {
     "linear-gradient" : [
-      "display-p3:0.92129,0.16359,0.00000,1.00000",
-      "display-p3:0.91747,0.00000,0.00000,1.00000"
+      "display-p3:0.92129,0.78884,0.28111,1.00000",
+      "display-p3:0.91747,0.64259,0.02526,1.00000"
     ],
     "orientation" : {
       "start" : {
@@ -49,6 +49,28 @@
           "name" : "pirate-scarf-svgrepo-com"
         },
         {
+          "blend-mode-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "display-p3:0.96611,0.81009,0.27209,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "display-p3:0.83403,0.96611,0.06536,1.00000"
+              }
+            }
+          ],
+          "glass" : true,
+          "hidden" : false,
           "image-name" : "parrot-svgrepo-com.svg",
           "name" : "parrot-svgrepo-com",
           "position" : {

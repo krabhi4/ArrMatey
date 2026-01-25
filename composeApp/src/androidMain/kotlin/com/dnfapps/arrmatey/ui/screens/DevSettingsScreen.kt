@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.ui.screens
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.arr.api.client.LoggerLevel
 import com.dnfapps.arrmatey.datastore.PreferencesStore
@@ -40,6 +42,7 @@ fun DevSettingsScreen(
     val showInfoCardMap by preferenceStore.showInfoCards.collectAsState(emptyMap())
     val activityPollingOn by preferenceStore.enableActivityPolling.collectAsState(true)
     val logLevel by preferenceStore.httpLogLevel.collectAsState(LoggerLevel.Headers)
+    val useDynamicTheme by preferenceStore.useDynamicTheme.collectAsStateWithLifecycle(true)
 
     Scaffold(
         topBar = {
@@ -110,6 +113,27 @@ fun DevSettingsScreen(
                     label = { Text("HTTP Logging Level") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .toggleable(
+                                value = useDynamicTheme,
+                                onValueChange = { preferenceStore.toggleUseDynamicTheme() }
+                            ),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Use dynamic themeing"
+                        )
+                        Switch(
+                            checked = useDynamicTheme,
+                            onCheckedChange = null
+                        )
+                    }
+                }
             }
         }
     }
