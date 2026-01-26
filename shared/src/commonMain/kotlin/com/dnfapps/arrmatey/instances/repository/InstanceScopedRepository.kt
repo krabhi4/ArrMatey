@@ -262,6 +262,18 @@ class InstanceScopedRepository(
             }
     }
 
+    suspend fun delete(
+        id: Long,
+        deleteFiles: Boolean,
+        addImportExclusion: Boolean
+    ): NetworkResult<Unit> =
+        client.delete(id, deleteFiles, addImportExclusion)
+            .onSuccess {
+                val currentCache = _mediaDetailsCache.value.toMutableMap()
+                currentCache.remove(id)
+                _mediaDetailsCache.value = currentCache
+            }
+
     private fun updateItemInLibraryCache(updatedItem: ArrMedia) {
         val currentLibrary = _library.value
         if (currentLibrary is NetworkResult.Success) {

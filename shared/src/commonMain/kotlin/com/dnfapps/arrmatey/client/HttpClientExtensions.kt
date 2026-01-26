@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.plugins.*
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -33,6 +34,15 @@ suspend inline fun <reified T> HttpClient.safePut(
 ): NetworkResult<T> {
     return safeCall {
         put(url, builder).body()
+    }
+}
+
+suspend inline fun <reified T> HttpClient.safeDelete(
+    url: String,
+    crossinline builder: HttpRequestBuilder.() -> Unit = {}
+): NetworkResult<T> {
+    return safeCall {
+        delete(url, builder).body()
     }
 }
 

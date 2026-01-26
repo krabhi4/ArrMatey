@@ -11,8 +11,12 @@ import Shared
 struct MediaDetailsScreen: View {
     private let id: Int64
     private let type: InstanceType
+    
+    @Environment(\.dismiss) private var dismiss
 
     @ObservedObject private var viewModel: ArrMediaDetailsViewModelS
+    
+    @State private var showConfirmSheet: Bool = false
     
     init(id: Int64, type: InstanceType) {
         self.id = id
@@ -44,6 +48,10 @@ struct MediaDetailsScreen: View {
         viewModel.tags
     }
     
+    private var deleteInProgress: Bool {
+        viewModel.deleteStatus is OperationStatusInProgress
+    }
+    
     var body: some View {
         contentForState()
             .toolbar {
@@ -54,9 +62,35 @@ struct MediaDetailsScreen: View {
                             viewModel.toggleMonitor()
                         }
                 }
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Button("edit", systemImage: "pencil") {
+                            // todo
+                        }
+                        Button("delete", systemImage: "trash") {
+                            showConfirmSheet = true
+                        }
+                        .tint(.red)
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .imageScale(.medium)
+                    }
+                }
             }
             .task {
                 viewModel.refreshDetails()
+            }
+            .sheet(isPresented: $showConfirmSheet) {
+                DeleteMediaSheet(isLoading: deleteInProgress, onConfirm: { addExclusion, deleteFiles in
+                    viewModel.delete(addExclusion, deleteFiles)
+                })
+                .presentationDetents([.fraction(0.33)])
+                .presentationBackground(.ultraThinMaterial)
+            }
+            .onChange(of: viewModel.deleteSucceeded) { _, success in
+                if success {
+                    dismiss()
+                }
             }
     }
     

@@ -32,6 +32,8 @@
     <string name="search">Search</string>
     <string name="grab">Grab</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 
     <!-- Labels -->
     <string name="label">Label</string>
@@ -152,6 +154,10 @@
     <string name="instance_label_exists">An instance with this label already exists</string>
     <string name="instance_url_exists">An instance with this host already exists</string>
     <string name="download_queue_error">Error queuing download</string>
+    <string name="add_exclusion">Add Exclusion</string>
+    <string name="add_exclusion_description">Prevent this item from being readded to your library by lists</string>
+    <string name="delete_files">Delete Files</string>
+    <string name="delete_files_description">Permanently erase the folder and its contents</string>
 
     <!-- Instances -->
     <string name="sonarr_description">Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.</string>

@@ -61,6 +61,9 @@ class ArrMediaDetailsViewModel(
     private val _tags = MutableStateFlow<List<Tag>>(emptyList())
     val tags: StateFlow<List<Tag>> = _tags.asStateFlow()
 
+    private val _deleteStatus = MutableStateFlow<OperationStatus>(OperationStatus.Idle)
+    val deleteStatus: StateFlow<OperationStatus> = _deleteStatus.asStateFlow()
+
     private var currentRepository: InstanceScopedRepository? = null
 
     init {
@@ -196,6 +199,21 @@ class ArrMediaDetailsViewModel(
             if (instanceType != InstanceType.Radarr) return@launch
             val payload = CommandPayload.Movie(movieIds = listOf(movieId))
             performAutomaticSearch(movieId, payload, repository)
+        }
+    }
+
+    fun deleteMedia(deleteFiles: Boolean, addImportExclusion: Boolean) {
+        viewModelScope.launch {
+            val repository = currentRepository ?: return@launch
+            _deleteStatus.value = OperationStatus.InProgress
+
+            repository.delete(mediaId, deleteFiles, addImportExclusion)
+                .onSuccess {
+                    _deleteStatus.value = OperationStatus.Success("Deleted successfully")
+                }
+                .onError { code, message, cause ->
+                    _deleteStatus.value = OperationStatus.Error(code, message, cause)
+                }
         }
     }
 

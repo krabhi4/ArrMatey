@@ -65,6 +65,7 @@ import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.components.DetailsHeader
 import com.dnfapps.arrmatey.ui.components.DropdownPicker
 import com.dnfapps.arrmatey.ui.components.ItemDescriptionCard
+import com.dnfapps.arrmatey.ui.components.LabelledSwitch
 import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
 import com.dnfapps.arrmatey.ui.components.UpcomingDateView
 import org.koin.compose.koinInject
@@ -249,29 +250,6 @@ fun AddSeriesForm(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Button(
-                onClick = {
-                    val newItem = item.copyForCreation(
-                        monitor = monitor,
-                        qualityProfileId = qualityProfile.id,
-                        seriesType = seriesType,
-                        seasonFolder = seasonFolders,
-                        rootFolderPath = rootFolder.path
-                    )
-                    onAddItem(newItem)
-                },
-                enabled = addItemStatus !is OperationStatus.InProgress
-            ) {
-                if (addItemStatus is OperationStatus.InProgress) {
-                    CircularProgressIndicator(Modifier.size(24.dp))
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null
-                    )
-                }
-            }
-
             DropdownPicker(
                 options = SeriesMonitorType.entries.filter {
                     it != SeriesMonitorType.Unknown &&
@@ -285,24 +263,11 @@ fun AddSeriesForm(
                 label = { Text(stringResource(R.string.monitor)) }
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .toggleable(
-                        value = seasonFolders,
-                        onValueChange = { seasonFolders = it }
-                    ),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.season_folders)
-                )
-                Switch(
-                    checked = seasonFolders,
-                    onCheckedChange = null
-                )
-            }
+            LabelledSwitch(
+                label = stringResource(R.string.season_folders),
+                checked = seasonFolders,
+                onCheckedChange = { seasonFolders = it }
+            )
 
             DropdownPicker(
                 options = qualityProfiles,
@@ -331,6 +296,33 @@ fun AddSeriesForm(
                     label = { Text(stringResource(R.string.root_folder)) },
                     getOptionLabel = { "${it.path} (${it.freeSpace.bytesAsFileSizeString()})" }
                 )
+            }
+
+
+            Button(
+                onClick = {
+                    val newItem = item.copyForCreation(
+                        monitor = monitor,
+                        qualityProfileId = qualityProfile.id,
+                        seriesType = seriesType,
+                        seasonFolder = seasonFolders,
+                        rootFolderPath = rootFolder.path
+                    )
+                    onAddItem(newItem)
+                },
+                enabled = addItemStatus !is OperationStatus.InProgress
+            ) {
+                if (addItemStatus is OperationStatus.InProgress) {
+                    CircularProgressIndicator(Modifier.size(24.dp))
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null
+                    )
+                    Text(
+                        text = stringResource(R.string.save)
+                    )
+                }
             }
         }
     }
@@ -371,48 +363,11 @@ fun AddMovieForm(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Button(
-                onClick = {
-                    val newItem = item.copyForCreation(
-                        monitored = monitored,
-                        minimumAvailability = minimumAvailability,
-                        qualityProfileId = qualityProfile.id,
-                        rootFolderPath = rootFolder.path
-                    )
-                    onAddItem(newItem)
-                },
-                enabled = addItemStatus !is OperationStatus.InProgress
-            ) {
-                if (addItemStatus is OperationStatus.InProgress) {
-                    CircularProgressIndicator(Modifier.size(24.dp))
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .toggleable(
-                        value = monitored,
-                        onValueChange = { monitored = it }
-                    ),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.monitored),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Switch(
-                    checked = monitored,
-                    onCheckedChange = null
-                )
-            }
+            LabelledSwitch(
+                label = stringResource(R.string.monitored),
+                checked = monitored,
+                onCheckedChange = { monitored = it }
+            )
 
             DropdownPicker(
                 options = qualityProfiles,
@@ -445,6 +400,31 @@ fun AddMovieForm(
                     label = { Text(stringResource(R.string.root_folder)) },
                     getOptionLabel = { "${it.path} (${it.freeSpace.bytesAsFileSizeString()})" }
                 )
+            }
+
+            Button(
+                onClick = {
+                    val newItem = item.copyForCreation(
+                        monitored = monitored,
+                        minimumAvailability = minimumAvailability,
+                        qualityProfileId = qualityProfile.id,
+                        rootFolderPath = rootFolder.path
+                    )
+                    onAddItem(newItem)
+                },
+                enabled = addItemStatus !is OperationStatus.InProgress
+            ) {
+                if (addItemStatus is OperationStatus.InProgress) {
+                    CircularProgressIndicator(Modifier.size(24.dp))
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null
+                    )
+                    Text(
+                        text = stringResource(R.string.save)
+                    )
+                }
             }
         }
     }

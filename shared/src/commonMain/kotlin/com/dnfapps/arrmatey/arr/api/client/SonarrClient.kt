@@ -28,6 +28,19 @@ class SonarrClient(
     override suspend fun update(item: ArrMedia): NetworkResult<ArrSeries> =
         post("series/${item.id}", item)
 
+    override suspend fun delete(
+        id: Long,
+        deleteFiles: Boolean,
+        addImportListExclusion: Boolean
+    ): NetworkResult<Unit> =
+        delete(
+            endpoint = "series/$id",
+            params = mapOf(
+                "deleteFiles" to deleteFiles,
+                "addImportListExclusion" to addImportListExclusion
+            )
+        )
+
     override suspend fun lookup(query: String): NetworkResult<List<ArrSeries>> =
         get("series/lookup", mapOf("term" to query))
 

@@ -58,6 +58,10 @@
         en = Grab
     [cancel]
         en = Cancel
+    [delete]
+        en = Delete
+    [edit]
+        en = Edit
 
 [[Labels]]
     [label]
@@ -292,6 +296,14 @@
         en = An instance with this host already exists
     [download_queue_error]
         en = Error queuing download
+    [add_exclusion]
+        en = Add Exclusion
+    [add_exclusion_description]
+        en = Prevent this item from being readded to your library by lists
+    [delete_files]
+        en = Delete Files
+    [delete_files_description]
+        en = Permanently erase the folder and its contents
 
 [[Instances]]
     [sonarr_description]

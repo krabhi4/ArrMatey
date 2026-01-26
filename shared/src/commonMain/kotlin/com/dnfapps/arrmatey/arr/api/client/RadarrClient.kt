@@ -27,6 +27,19 @@ class RadarrClient(
     override suspend fun update(item: ArrMedia): NetworkResult<ArrMovie> =
         put("movie/${item.id}", item)
 
+    override suspend fun delete(
+        id: Long,
+        deleteFiles: Boolean,
+        addImportListExclusion: Boolean
+    ): NetworkResult<Unit> =
+        delete(
+            endpoint = "movie/$id",
+            params = mapOf(
+                "deleteFiles" to deleteFiles,
+                "addImportListExclusion" to addImportListExclusion
+            )
+        )
+
     override suspend fun setMonitorStatus(
         id: Long,
         monitorStatus: Boolean

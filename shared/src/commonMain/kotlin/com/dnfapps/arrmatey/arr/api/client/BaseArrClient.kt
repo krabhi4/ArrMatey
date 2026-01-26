@@ -8,6 +8,7 @@ import com.dnfapps.arrmatey.arr.api.model.QueuePage
 import com.dnfapps.arrmatey.arr.api.model.RootFolder
 import com.dnfapps.arrmatey.arr.api.model.Tag
 import com.dnfapps.arrmatey.client.NetworkResult
+import com.dnfapps.arrmatey.client.safeDelete
 import com.dnfapps.arrmatey.client.safeGet
 import com.dnfapps.arrmatey.client.safePost
 import com.dnfapps.arrmatey.client.safePut
@@ -87,5 +88,17 @@ abstract class BaseArrClient(
         httpClient.safePut("$baseUrl/$endpoint") {
             contentType(ContentType.Application.Json)
             setBody(body)
+        }
+
+    protected suspend inline fun <reified T> delete(
+        endpoint: String,
+        params: Map<String, Any> = emptyMap()
+    ): NetworkResult<T> =
+        httpClient.safeDelete("$baseUrl/$endpoint") {
+            url {
+                params.forEach { (key, value) ->
+                    parameters.append(key, value.toString())
+                }
+            }
         }
 }

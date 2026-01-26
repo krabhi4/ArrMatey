@@ -20,6 +20,8 @@ class ArrMediaDetailsViewModelS: ObservableObject {
     @Published private(set) var lastSearchResult: Bool? = nil
     @Published private(set) var qualityProfiles: [QualityProfile] = []
     @Published private(set) var tags: [Tag] = []
+    @Published private(set) var deleteStatus: OperationStatus = OperationStatusIdle()
+    @Published private(set) var deleteSucceeded: Bool = false
     
     init(id: Int64, type: InstanceType) {
         self.viewModel = KoinBridge.shared.getArrMediaDetailsViewModel(id: id, type: type)
@@ -35,6 +37,10 @@ class ArrMediaDetailsViewModelS: ObservableObject {
         viewModel.lastSearchResult.observeAsync { self.lastSearchResult = $0?.boolValue }
         viewModel.qualityProfiles.observeAsync { self.qualityProfiles = $0 }
         viewModel.tags.observeAsync { self.tags = $0 }
+        viewModel.deleteStatus.observeAsync {
+            self.deleteStatus = $0
+            self.deleteSucceeded = $0 is OperationStatusSuccess
+        }
     }
     
     func refreshDetails() {
@@ -63,5 +69,9 @@ class ArrMediaDetailsViewModelS: ObservableObject {
     
     func performMovieAutomaticLookup(movieId: Int64) {
         viewModel.performMovieAutomaticLookup(movieId: movieId)
+    }
+    
+    func delete(_ addExclusion: Bool, _ deleteFiles: Bool) {
+        viewModel.deleteMedia(deleteFiles: deleteFiles, addImportExclusion: addExclusion)
     }
 }
