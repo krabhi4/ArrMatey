@@ -91,12 +91,6 @@ class ArrMediaDetailsViewModel(
                 .collectLatest { repository ->
                     currentRepository = repository
                     loadData(repository)
-//                    loadMediaDetails(repository)
-//                    observeMonitorStatus(repository)
-//                    observeQualityProfiles(repository)
-//                    observeRootFolders(repository)
-//                    observeTags(repository)
-//                    repository.refreshAllMetadata()
                 }
         }
     }

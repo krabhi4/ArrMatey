@@ -51,6 +51,9 @@ data class Episode(
     val seasonEpLabel: String
         get() = "${seasonNumber}x${episodeNumber.padStart(2, '0')}"
 
+    val fileQualityName: String?
+        get() = episodeFile?.qualityName
+
     fun formatAirDateUtc(
         friendlyTodayFormat: Boolean = true,
         timeZone: TimeZone = TimeZone.currentSystemDefault()

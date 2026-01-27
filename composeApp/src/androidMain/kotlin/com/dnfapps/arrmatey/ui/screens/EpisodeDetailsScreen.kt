@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -13,22 +14,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,8 +47,11 @@ import com.dnfapps.arrmatey.arr.state.HistoryState
 import com.dnfapps.arrmatey.arr.viewmodel.EpisodeDetailsViewModel
 import com.dnfapps.arrmatey.client.OperationStatus
 import com.dnfapps.arrmatey.di.koinInjectParams
+import com.dnfapps.arrmatey.entensions.SafeSnackbar
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.headerBarColors
+import com.dnfapps.arrmatey.entensions.showErrorImmediately
+import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
 import com.dnfapps.arrmatey.navigation.NavigationManager
@@ -65,8 +76,11 @@ fun EpisodeDetailsScreen(
     val currentEpisode by viewModel.episode.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsStateWithLifecycle()
     val monitorStatus by viewModel.monitorStatus.collectAsStateWithLifecycle()
+    val deleteStatus by viewModel.deleteStatus.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
+
+    var confirmDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(monitorStatus) {
         when (monitorStatus) {
@@ -86,8 +100,24 @@ fun EpisodeDetailsScreen(
         }
     }
 
+    LaunchedEffect(deleteStatus) {
+        when (val status = deleteStatus) {
+            is OperationStatus.Success -> {
+                snackbarHostState.showSnackbarImmediately(status.message ?: "")
+            }
+            is OperationStatus.Error -> {
+                snackbarHostState.showErrorImmediately(status.message ?: "")
+            }
+            else -> {}
+        }
+    }
+
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                SafeSnackbar(data)
+            }
+        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -101,7 +131,7 @@ fun EpisodeDetailsScreen(
                 EpisodeDetailsHeader(currentEpisode, series)
 
                 Column(
-                    modifier = Modifier.padding(horizontal = 24.dp),
+                    modifier = Modifier.padding(horizontal = 24.dp).padding(top = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     currentEpisode.overview?.let { overview ->
@@ -126,6 +156,13 @@ fun EpisodeDetailsScreen(
                     )
                     currentEpisode.episodeFile?.let { file ->
                         FileCard(file)
+                    } ?: run {
+                        Text(
+                            text = stringResource(R.string.no_files),
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
 
                     when (val historyResult = history) {
@@ -138,11 +175,17 @@ fun EpisodeDetailsScreen(
                             }
                         }
                         is HistoryState.Success -> {
+                            Text(
+                                stringResource(R.string.history),
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                             if (historyResult.items.isEmpty()) {
                                 Text(
                                     text = stringResource(R.string.no_history),
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             } else {
                                 historyResult.items.forEach { historyItem ->
@@ -181,6 +224,40 @@ fun EpisodeDetailsScreen(
                             contentDescription = null
                         )
                     }
+                    IconButton(
+                        onClick = { confirmDelete = true },
+                        colors = IconButtonDefaults.headerBarColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        enabled = episode.episodeFile != null
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+        }
+
+        if (confirmDelete) {
+            AlertDialog(
+                onDismissRequest = { confirmDelete = false },
+                title = { Text("Are you sure?") },
+                text = { Text("This files will be deleted permanently") },
+                dismissButton = {
+                    TextButton(
+                        onClick = { confirmDelete = false }
+                    ) { Text(stringResource(R.string.cancel)) }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            confirmDelete = false
+                            viewModel.deleteEpisode()
+                        }
+                    ) { Text(stringResource(R.string.yes)) }
                 }
             )
         }

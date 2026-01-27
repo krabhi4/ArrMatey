@@ -34,23 +34,10 @@ fun MovieFileView(
     movie: ArrMovie,
     movieExtraFiles: List<ExtraFile>,
     searchIds: Set<Long>,
-    searchResult: Boolean?,
     onAutomaticSearch: (Long) -> Unit,
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.movies()
 ) {
-    val context = LocalContext.current
-    val searchQueuedMessage = stringResource(R.string.search_queued)
-    val searchErrorMessage = stringResource(R.string.search_error)
-
-    LaunchedEffect(searchResult) {
-        when (searchResult) {
-            true -> Toast.makeText(context, searchQueuedMessage, Toast.LENGTH_SHORT).show()
-            false -> Toast.makeText(context, searchErrorMessage, Toast.LENGTH_SHORT).show()
-            else -> {}
-        }
-    }
-
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

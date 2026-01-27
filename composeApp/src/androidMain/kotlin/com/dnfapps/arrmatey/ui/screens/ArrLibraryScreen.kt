@@ -44,6 +44,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -78,6 +79,7 @@ import com.dnfapps.arrmatey.compose.utils.FilterBy
 import com.dnfapps.arrmatey.compose.utils.SortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.di.koinInjectParams
+import com.dnfapps.arrmatey.entensions.SafeSnackbar
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
@@ -131,11 +133,7 @@ fun ArrLibraryScreen(
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                )
+                SafeSnackbar(snackbarData = data)
             }
         },
         topBar = {

@@ -21,7 +21,7 @@ class ActivityQueueService(
     private val instanceManager: InstanceManager,
     private val preferencesStore: PreferencesStore
 ) {
-    private val pollingDelay = 15_000L
+    private val pollingDelay = 10_000L
 
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var pollingJob: Job? = null

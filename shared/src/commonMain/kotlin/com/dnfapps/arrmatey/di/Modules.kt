@@ -40,8 +40,10 @@ import com.dnfapps.arrmatey.arr.viewmodel.MovieFilesViewModel
 import com.dnfapps.arrmatey.arr.service.ActivityQueueService
 import com.dnfapps.arrmatey.arr.api.client.HttpClientFactory
 import com.dnfapps.arrmatey.arr.api.model.Episode
+import com.dnfapps.arrmatey.arr.usecase.DeleteEpisodeFileUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteMediaUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteSeasonFilesUseCase
+import com.dnfapps.arrmatey.arr.usecase.GetEpisodeHistoryUseCase
 import com.dnfapps.arrmatey.arr.usecase.PerformAutomaticSearchUseCase
 import com.dnfapps.arrmatey.arr.usecase.ToggleMonitorUseCase
 import com.dnfapps.arrmatey.arr.usecase.UpdateMediaUseCase
@@ -129,6 +131,8 @@ val useCaseModule = module {
     factory { PerformAutomaticSearchUseCase() }
     factory { UpdateMediaUseCase() }
     factory { DeleteMediaUseCase() }
+    factory { GetEpisodeHistoryUseCase() }
+    factory { DeleteEpisodeFileUseCase() }
 }
 
 val viewModelModule = module {
@@ -155,7 +159,7 @@ val viewModelModule = module {
         MovieFilesViewModel(movieId, get())
     }
     factory { (seriesId: Long, episode: Episode) ->
-        EpisodeDetailsViewModel(seriesId, episode, get())
+        EpisodeDetailsViewModel(seriesId, episode, get(), get(), get(), get(), get())
     }
     factory { ActivityQueueViewModel(get(), get(), get()) }
     factory { MoreScreenViewModel(get()) }

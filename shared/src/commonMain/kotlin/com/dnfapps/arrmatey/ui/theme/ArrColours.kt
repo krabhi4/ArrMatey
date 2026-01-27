@@ -15,6 +15,7 @@ val SonarrEndedAllDownloaded = RadarrDownloadedMonitored
 val SonarrMissingEpsSeriesMonitored = RadarrMissingMonitored
 val SonarrMissingEpsSeriesUnmonitored = RadarrMissingUnmonitored
 val SonarrDownloading = RadarrQueued
+val SonarrDownloadingText = Color(0xffaf6cff)
 
 
 val DownloadGreen = Color(0xff01b801)

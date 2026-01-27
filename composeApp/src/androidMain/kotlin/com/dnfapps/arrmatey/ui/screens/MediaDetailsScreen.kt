@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,8 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -55,8 +58,11 @@ import com.dnfapps.arrmatey.arr.state.MediaDetailsUiState
 import com.dnfapps.arrmatey.arr.viewmodel.ArrMediaDetailsViewModel
 import com.dnfapps.arrmatey.client.OperationStatus
 import com.dnfapps.arrmatey.di.koinInjectParams
+import com.dnfapps.arrmatey.entensions.SafeSnackbar
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.headerBarColors
+import com.dnfapps.arrmatey.entensions.showErrorImmediately
+import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
@@ -95,10 +101,26 @@ fun MediaDetailsScreen(
     val monitorStatus by mediaDetailsViewModel.monitorStatus.collectAsStateWithLifecycle()
     val seasonDeleteStatus by mediaDetailsViewModel.deleteSeasonStatus.collectAsStateWithLifecycle()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(deleteStatus) {
         when (deleteStatus) {
             is OperationStatus.Success -> navigation.popBackStack()
             is OperationStatus.Error -> {}
+            else -> {}
+        }
+    }
+
+    val searchQueuedMessage = stringResource(R.string.search_queued)
+    val searchErrorMessage = stringResource(R.string.search_error)
+    LaunchedEffect(lastSearchResult) {
+        when (lastSearchResult) {
+            true -> {
+                snackbarHostState.showSnackbarImmediately(searchQueuedMessage)
+            }
+            false -> {
+                snackbarHostState.showErrorImmediately(searchErrorMessage)
+            }
             else -> {}
         }
     }
@@ -108,7 +130,13 @@ fun MediaDetailsScreen(
     var confirmDelete by remember { mutableStateOf(false) }
     var showEditSheet by remember { mutableStateOf(false) }
 
-    Scaffold { paddingValues ->
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                SafeSnackbar(data)
+            }
+        }
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .padding(paddingValues.copy(bottom = 0.dp, top = 0.dp))
@@ -153,7 +181,6 @@ fun MediaDetailsScreen(
                                         series = item,
                                         episodes = state.episodes,
                                         searchIds = automaticSearchIds,
-                                        searchResult = lastSearchResult,
                                         onToggleSeasonMonitor = {
                                             mediaDetailsViewModel.toggleSeasonMonitored(it)
                                         },
@@ -175,7 +202,6 @@ fun MediaDetailsScreen(
                                         movie = item,
                                         movieExtraFiles = state.extraFiles,
                                         searchIds = automaticSearchIds,
-                                        searchResult = lastSearchResult,
                                         onAutomaticSearch = {
                                             mediaDetailsViewModel.performMovieAutomaticLookup(it)
                                         }

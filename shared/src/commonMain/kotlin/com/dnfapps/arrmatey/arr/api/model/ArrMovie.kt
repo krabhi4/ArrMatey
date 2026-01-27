@@ -78,7 +78,7 @@ data class ArrMovie(
         get() = status.name
 
     override val statusProgress: Float
-        get() = 1f
+        get() = if(movieFile == null) 0f else 1f
 
     override val statusColor: Color
         get() = when {

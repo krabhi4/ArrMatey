@@ -34,6 +34,8 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -68,9 +70,12 @@ import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.compose.utils.singleLanguageLabel
 import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.Bullet
+import com.dnfapps.arrmatey.entensions.SafeSnackbar
 import com.dnfapps.arrmatey.entensions.bullet
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.getString
+import com.dnfapps.arrmatey.entensions.showErrorImmediately
+import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.entensions.stringResource
 import com.dnfapps.arrmatey.extensions.formatAgeMinutes
 import com.dnfapps.arrmatey.instances.model.InstanceType
@@ -107,21 +112,26 @@ fun InteractiveSearchScreen(
 
     var showFilterSheet by remember { mutableStateOf(false) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(releaseParams) {
         viewModel.getRelease(releaseParams)
     }
 
     LaunchedEffect(downloadStatus) {
-        when(downloadStatus) {
-            true -> downloadQueueSuccessMessage
-            false -> downloadQueueErrorMessage
-            else -> null
-        }?.let { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        when (downloadStatus) {
+            true -> snackbarHostState.showSnackbarImmediately(downloadQueueSuccessMessage)
+            false -> snackbarHostState.showErrorImmediately(downloadQueueErrorMessage)
+            else -> {}
         }
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                SafeSnackbar(data)
+            }
+        },
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -219,6 +229,15 @@ fun InteractiveSearchScreen(
                                 },
                                 animate = shouldAnimate
                             )
+                        }
+                        if (state.items.isEmpty()) {
+                            item {
+                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = "No results found"
+                                    )
+                                }
+                            }
                         }
                         item {
                             Spacer(modifier = Modifier.height(0.dp))

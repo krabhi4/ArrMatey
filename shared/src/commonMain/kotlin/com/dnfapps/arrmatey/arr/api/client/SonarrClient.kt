@@ -27,7 +27,7 @@ class SonarrClient(
         get("series/$id")
 
     override suspend fun update(item: ArrMedia): NetworkResult<ArrSeries> =
-        post("series/${item.id}", item)
+        put("series/${item.id}", item)
 
     override suspend fun delete(
         id: Long,
@@ -109,5 +109,8 @@ class SonarrClient(
             endpoint = "episodefile/bulk",
             body = DeleteEpisodeBody(fileIds)
         )
+
+    suspend fun deleteEpisode(id: Long): NetworkResult<Unit> =
+        delete("episodefile/$id")
 
 }

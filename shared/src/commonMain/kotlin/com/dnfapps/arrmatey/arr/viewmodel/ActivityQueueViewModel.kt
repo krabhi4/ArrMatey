@@ -2,6 +2,7 @@ package com.dnfapps.arrmatey.arr.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.QueueItem
 import com.dnfapps.arrmatey.arr.api.model.RadarrQueueItem
 import com.dnfapps.arrmatey.arr.api.model.SonarrQueueItem
@@ -97,6 +98,18 @@ class ActivityQueueViewModel(
         _activityQueueUiState.value = currentState.copy(sortOrder = order)
     }
 
+    fun getQueueItemForEpisode(episode: Episode): SonarrQueueItem? {
+        val tasks = activityTasks.value.filterIsInstance<SonarrQueueItem>()
+
+        val episodeMatch = tasks.firstOrNull { it.calcEpisodeId == episode.id }
+        if (episodeMatch != null) return episodeMatch
+
+        return tasks.firstOrNull {
+            it.calcSeriesId == episode.seriesId &&
+                it.seasonNumber == episode.seasonNumber &&
+                it.calcEpisodeId == null
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

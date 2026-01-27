@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -36,7 +37,7 @@ import com.dnfapps.arrmatey.extensions.isTodayOrAfter
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
 import com.dnfapps.arrmatey.navigation.NavigationManager
-import com.dnfapps.arrmatey.ui.theme.SonarrDownloading
+import com.dnfapps.arrmatey.ui.theme.SonarrDownloadingText
 import org.koin.compose.koinInject
 
 @Composable
@@ -89,25 +90,23 @@ fun EpisodeRow(
                 maxLines = 1
             )
 
-            val statusString = if (isActive) progressLabel else
-                episode.episodeFile?.qualityName
-                    ?: episode.airDate?.takeIf { it.isTodayOrAfter() }?.let {
-                        stringResource(R.string.unaired)
-                    }
+            val airDate = episode.airDate?.takeIf { it.isTodayOrAfter() }
+            val (statusText, statusColor) = when {
+                isActive && progressLabel != null -> progressLabel to SonarrDownloadingText
+                episode.fileQualityName != null -> episode.fileQualityName!! to MaterialTheme.colorScheme.tertiary
+                airDate != null -> stringResource(R.string.unaired) to Color.Unspecified
+                else -> stringResource(R.string.missing) to MaterialTheme.colorScheme.error
+            }
+
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                statusString?.let {
-                    Text(
-                        text = statusString,
-                        fontSize = 14.sp,
-                        color = if (isActive) SonarrDownloading else Color.Unspecified
-                    )
-                } ?:
                 Text(
-                    text = stringResource(R.string.missing),
+                    text = statusText,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.error
+                    color = statusColor,
+                    fontStyle = if (statusColor != Color.Unspecified) FontStyle.Italic else FontStyle.Normal
                 )
 
                 val (weight, color) = if (episode.airDate?.isToday() == true)

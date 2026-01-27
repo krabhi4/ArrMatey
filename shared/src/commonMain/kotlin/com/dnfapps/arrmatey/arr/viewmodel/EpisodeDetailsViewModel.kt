@@ -2,17 +2,16 @@ package com.dnfapps.arrmatey.arr.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.Episode
-import com.dnfapps.arrmatey.arr.api.model.HistoryItem
 import com.dnfapps.arrmatey.arr.state.HistoryState
+import com.dnfapps.arrmatey.arr.usecase.DeleteEpisodeFileUseCase
+import com.dnfapps.arrmatey.arr.usecase.GetEpisodeHistoryUseCase
+import com.dnfapps.arrmatey.arr.usecase.PerformAutomaticSearchUseCase
+import com.dnfapps.arrmatey.arr.usecase.ToggleMonitorUseCase
+import com.dnfapps.arrmatey.client.OperationStatus
+import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.instances.repository.InstanceScopedRepository
 import com.dnfapps.arrmatey.instances.usecase.GetInstanceRepositoryUseCase
-import com.dnfapps.arrmatey.client.NetworkResult
-import com.dnfapps.arrmatey.client.OperationStatus
-import com.dnfapps.arrmatey.client.onError
-import com.dnfapps.arrmatey.client.onSuccess
-import com.dnfapps.arrmatey.instances.model.InstanceType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +23,11 @@ import kotlinx.coroutines.launch
 class EpisodeDetailsViewModel(
     private val seriesId: Long,
     episode: Episode,
-    private val getInstanceRepositoryUseCase: GetInstanceRepositoryUseCase
+    private val getInstanceRepositoryUseCase: GetInstanceRepositoryUseCase,
+    private val toggleMonitorUseCase: ToggleMonitorUseCase,
+    private val performAutomaticSearchUseCase: PerformAutomaticSearchUseCase,
+    private val getEpisodeHistoryUseCase: GetEpisodeHistoryUseCase,
+    private val deleteEpisodeUseCase: DeleteEpisodeFileUseCase
 ): ViewModel() {
 
     private val _episode = MutableStateFlow(episode)
@@ -35,6 +38,9 @@ class EpisodeDetailsViewModel(
 
     private val _monitorStatus = MutableStateFlow<OperationStatus>(OperationStatus.Idle)
     val monitorStatus: StateFlow<OperationStatus> = _monitorStatus.asStateFlow()
+
+    private val _deleteStatus = MutableStateFlow<OperationStatus>(OperationStatus.Idle)
+    val deleteStatus: StateFlow<OperationStatus> = _deleteStatus.asStateFlow()
 
     private var currentRepository: InstanceScopedRepository? = null
 
@@ -48,61 +54,71 @@ class EpisodeDetailsViewModel(
                 .filterNotNull()
                 .collectLatest { repository ->
                     currentRepository = repository
-                    observeEpisode(repository)
-                    loadHistory(repository)
-                    observeMonitorStatus(repository)
+                    observeData(repository)
+                    refreshHistory()
                 }
         }
     }
 
-    private suspend fun observeEpisode(repository: InstanceScopedRepository) {
-        repository.episodes
-            .map { episodesMap ->
-                episodesMap[seriesId]?.firstOrNull { it.id == episode.value.id }
-            }
-            .collect { episode ->
-                episode?.let { _episode.value = it }
-            }
-    }
+    private fun observeData(repository: InstanceScopedRepository) {
+        viewModelScope.launch {
+            repository.episodes
+                .map { episodesMap ->
+                    episodesMap[seriesId]?.firstOrNull { it.id == episode.value.id }
+                }
+                .collect { episode ->
+                    episode?.let { _episode.value = it }
+                }
+        }
 
-    private suspend fun loadHistory(repository: InstanceScopedRepository) {
-        _history.value = HistoryState.Loading
-        repository.getItemHistory(episode.value.id)
-            .onSuccess { _history.value = HistoryState.Success(it) }
-            .onError { _, message, _ ->
-                _history.value = HistoryState.Error(message)
+        viewModelScope.launch {
+            repository.monitorStatus.collect { status ->
+                _monitorStatus.value = status
             }
-    }
-
-    private suspend fun observeMonitorStatus(repository: InstanceScopedRepository) {
-        repository.monitorStatus.collect { status ->
-            _monitorStatus.value = status
         }
     }
 
     fun toggleMonitor() {
         viewModelScope.launch {
-            currentRepository?.toggleEpisodeMonitor(episode.value)
+            currentRepository?.let {
+               toggleMonitorUseCase.toggleEpisode(_episode.value, it)
+            }
         }
     }
 
     fun executeAutomaticSearch() {
         viewModelScope.launch {
-            val repository = currentRepository ?: return@launch
-            val payload = CommandPayload.Episode(listOf(episode.value.id))
-            repository.executeCommand(payload)
+            currentRepository?.let {
+                performAutomaticSearchUseCase(
+                    mediaId = seriesId,
+                    type = InstanceType.Sonarr,
+                    repository = it,
+                    episodeId = _episode.value.id
+                )
+            }
         }
     }
 
     fun refreshHistory() {
         viewModelScope.launch {
             val repository = currentRepository ?: return@launch
-            _history.value = HistoryState.Loading
-            repository.getItemHistory(episode.value.id)
-                .onSuccess { _history.value = HistoryState.Success(it) }
-                .onError { _, message, _ ->
-                    HistoryState.Error(message)
+            getEpisodeHistoryUseCase(_episode.value.id, repository)
+                .collect { state ->
+                    _history.value = state
                 }
+        }
+    }
+
+    fun deleteEpisode() {
+        viewModelScope.launch {
+            val repository = currentRepository ?: return@launch
+            _episode.value.episodeFileId?.let { fileId ->
+                deleteEpisodeUseCase(seriesId, fileId, repository)
+                    .collect { state ->
+                        _deleteStatus.value = state
+                        refreshHistory()
+                    }
+            }
         }
     }
 

@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -185,6 +184,9 @@ class InstanceScopedRepository(
             .onError { code, error, cause ->
                 _addItemStatus.value = OperationStatus.Error(code, error, cause)
             }
+            .also {
+                _addItemStatus.value = OperationStatus.Idle
+            }
     }
 
     suspend fun getReleases(params: ReleaseParams) {
@@ -211,6 +213,9 @@ class InstanceScopedRepository(
             .onError { code, error, cause ->
                 _downloadStatus.value = DownloadState.Error
             }
+            .also {
+                _downloadStatus.value = DownloadState.Initial
+            }
     }
 
     suspend fun executeAutomaticSearch(itemId: Long) {
@@ -222,6 +227,9 @@ class InstanceScopedRepository(
             }
             .onError { code, error, cause ->
                 _searchStatus.value = OperationStatus.Error(code, error, cause)
+            }
+            .also {
+                _searchStatus.value = OperationStatus.Idle
             }
     }
 
@@ -242,6 +250,9 @@ class InstanceScopedRepository(
             .onError { code, message, cause ->
                 _historyStatus.value = OperationStatus.Error(code, message, cause)
             }
+            .also {
+                _historyStatus.value = OperationStatus.Idle
+            }
     }
 
     suspend fun updateMediaItem(item: ArrMedia): NetworkResult<ArrMedia> {
@@ -260,6 +271,8 @@ class InstanceScopedRepository(
             }
             .onError { code, message, cause ->
                 _monitorStatus.value = OperationStatus.Error(code, message, cause)
+            }.also {
+                _monitorStatus.value = OperationStatus.Idle
             }
     }
 
@@ -302,6 +315,8 @@ class InstanceScopedRepository(
             }
             .onError { code, message, cause ->
                 println("error setting monitor status")
+            }.also {
+                _monitorStatus.value = OperationStatus.Idle
             }
     }
 
@@ -333,6 +348,8 @@ class InstanceScopedRepository(
                 _mediaDetailsCache.value = currentCache
 
                 updateSeriesInLibraryCache(resultSeries)
+            }.also {
+                _monitorStatus.value = OperationStatus.Idle
             }
     }
 
@@ -358,6 +375,9 @@ class InstanceScopedRepository(
             }
             .onError { code, message, cause ->
                 _monitorStatus.value = OperationStatus.Error(code, message, cause)
+            }
+            .also {
+                _monitorStatus.value = OperationStatus.Idle
             }
     }
 
@@ -492,6 +512,17 @@ class InstanceScopedRepository(
                     val currentEpisodes = currentMap[seriesId] ?: emptyList()
                     currentMap[seriesId] = currentEpisodes.filter { !fileIds.contains(it.id) }
                     _episodes.value = currentMap
+                }
+        }
+
+    suspend fun deleteEpisodeFile(
+        seriesId: Long,
+        fileId: Long
+    ): NetworkResult<Unit> =
+        safePerformSonarr { client ->
+            client.deleteEpisode(fileId)
+                .onSuccess {
+                    getEpisodes(seriesId)
                 }
         }
 

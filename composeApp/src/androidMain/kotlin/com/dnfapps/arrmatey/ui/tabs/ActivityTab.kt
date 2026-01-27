@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.ui.tabs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,6 +20,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Card
@@ -38,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -99,19 +104,25 @@ fun ActivityTab(
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues.copy(bottom = 0.dp))) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(horizontal = 12.dp)
-            ) {
-                items(items = queueItems) { item ->
-                    ActivityItem(item) {
-                        selectedItem = item
-                    }
-                }
-                if (queueItems.isEmpty()) {
-                    item {
-                        EmptyActivityState()
+        Box(
+            modifier = Modifier
+                .padding(paddingValues.copy(bottom = 0.dp))
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (queueItems.isEmpty()) {
+                EmptyActivityState()
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .fillMaxSize()
+                ) {
+                    items(items = queueItems) { item ->
+                        ActivityItem(item) {
+                            selectedItem = item
+                        }
                     }
                 }
             }
@@ -390,7 +401,7 @@ fun EmptyActivityState(
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
         Icon(
-            imageVector = Icons.Default.CheckCircle,
+            imageVector = Icons.Default.Download,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant

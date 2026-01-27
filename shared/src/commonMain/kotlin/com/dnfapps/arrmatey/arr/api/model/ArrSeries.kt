@@ -75,7 +75,7 @@ data class ArrSeries(
         get() = status.name
 
     override val statusProgress: Float
-        get() = statistics?.percentOfEpisodes?.toFloat() ?: 0f
+        get() = (statistics?.percentOfEpisodes?.toFloat() ?: 0f) / 100f
 
     override val statusColor: Color
         get() = when {

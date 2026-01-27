@@ -1,6 +1,5 @@
 package com.dnfapps.arrmatey.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +15,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,8 +38,10 @@ import com.dnfapps.arrmatey.arr.api.model.Tag
 import com.dnfapps.arrmatey.arr.viewmodel.MediaPreviewViewModel
 import com.dnfapps.arrmatey.client.OperationStatus
 import com.dnfapps.arrmatey.di.koinInjectParams
+import com.dnfapps.arrmatey.entensions.SafeSnackbar
 import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.headerBarColors
+import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
@@ -61,7 +63,6 @@ fun MediaPreviewScreen(
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.arr(type)
 ) {
-    val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
@@ -73,11 +74,16 @@ fun MediaPreviewScreen(
 
     val successMessage = stringResource(R.string.success)
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(addItemStatus) {
-        when (addItemStatus) {
+        when (val status = addItemStatus) {
             is OperationStatus.Success -> {
                 showBottomSheet = false
-                Toast.makeText(context, successMessage, Toast.LENGTH_SHORT).show()
+                snackbarHostState.showSnackbarImmediately(status.message ?: successMessage)
+            }
+            is OperationStatus.Error -> {
+                snackbarHostState.showSnackbarImmediately(status.message ?: "")
             }
             else -> {}
         }
@@ -93,7 +99,13 @@ fun MediaPreviewScreen(
         }
     }
 
-    Scaffold { paddingValues ->
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                SafeSnackbar(data)
+            }
+        }
+    ) { paddingValues ->
         Box(modifier = Modifier
             .padding(paddingValues.copy(bottom = 0.dp, top = 0.dp))
             .fillMaxSize()
