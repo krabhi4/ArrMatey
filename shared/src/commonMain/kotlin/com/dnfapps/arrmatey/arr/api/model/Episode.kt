@@ -74,7 +74,7 @@ data class Episode(
     fun formatAirDateUtc() = formatAirDateUtc(true, TimeZone.currentSystemDefault())
 
     val episodeLabel: String
-        get() = "${seasonNumber}x${episodeNumber}"
+        get() = "s${seasonNumber.padStart(2, '0')}e${episodeNumber.padStart(2, '0')}"
 
     fun getPoster(): ArrImage?  {
         return images.firstOrNull { it.coverType == CoverType.Poster }
