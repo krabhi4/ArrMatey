@@ -35,11 +35,4 @@ class MediaPreviewViewModelS: ObservableObject {
         viewModel.addItem(item: item)
     }
     
-    func resetAddStatus() {
-        viewModel.resetAddStatus()
-    }
-    
-    func clearLastAddedItemId() {
-        viewModel.clearLastAddedItemId()
-    }
 }

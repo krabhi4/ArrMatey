@@ -55,6 +55,9 @@ struct ActivityQueueItem: View {
                     Text(statusText)
                         .font(.system(size: 14))
                         .foregroundColor(contentColor.opacity(0.8))
+                    
+                    Text(item.instanceName ?? "")
+                        .font(.system(size: 12))
                 }
                 
                 Spacer()
