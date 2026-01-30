@@ -212,7 +212,8 @@ fun InteractiveSearchScreen(
                                         )
                                     },
                                     placeholder = { Text(stringResource(R.string.search)) },
-                                    shape = RoundedCornerShape(10.dp)
+                                    shape = RoundedCornerShape(10.dp),
+                                    singleLine = true
                                 )
                             }
                         }

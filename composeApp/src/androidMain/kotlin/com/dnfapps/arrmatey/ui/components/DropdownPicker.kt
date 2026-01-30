@@ -62,6 +62,7 @@ fun <T> DropdownPicker(
                 onValueChange = {},
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isDropDownExpanded) },
                 colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                singleLine = true
             )
         }
         ExposedDropdownMenu(
@@ -84,16 +85,18 @@ fun <T> DropdownPicker(
                 DropdownMenuItem(
                     modifier = Modifier.padding(horizontal = 6.dp),
                     text = {
+                        Text(
+                            text = getOptionLabel(t),
+                            fontSize = 16.sp
+                        )
+                    },
+                    leadingIcon = {
                         getOptionIcon?.let {
                             Icon(
                                 imageVector = it(t),
                                 contentDescription = null
                             )
                         }
-                        Text(
-                            text = getOptionLabel(t),
-                            fontSize = 16.sp
-                        )
                     },
                     onClick = {
                         isDropDownExpanded = false

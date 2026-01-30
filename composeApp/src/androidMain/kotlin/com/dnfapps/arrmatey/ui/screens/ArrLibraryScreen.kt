@@ -244,7 +244,7 @@ fun ArrLibraryScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             val items = state.items
-                            if (items.isEmpty()) {
+                            if (items.isEmpty() && searchQuery.isEmpty()) {
                                 EmptyLibraryView(modifier = Modifier.align(Alignment.Center))
                             } else {
                                 Column(
@@ -272,7 +272,8 @@ fun ArrLibraryScreen(
                                                 )
                                             },
                                             placeholder = { Text(stringResource(R.string.search)) },
-                                            shape = RoundedCornerShape(10.dp)
+                                            shape = RoundedCornerShape(10.dp),
+                                            singleLine = true
                                         )
                                     }
 
