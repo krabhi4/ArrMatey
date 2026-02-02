@@ -124,6 +124,7 @@
     <string name="download_client">Download Client</string>
     <string name="indexer">Indexer</string>
     <string name="langauges">Languages</string>
+    <string name="language">Language</string>
     <string name="destination">Destination</string>
     <string name="no_history">No History</string>
     <string name="ended">Ended</string>

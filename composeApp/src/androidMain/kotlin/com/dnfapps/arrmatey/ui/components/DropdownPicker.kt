@@ -28,7 +28,7 @@ import com.dnfapps.arrmatey.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> DropdownPicker(
-    options: List<T>,
+    options: Collection<T>,
     selectedOption: T?,
     onOptionSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
@@ -36,6 +36,7 @@ fun <T> DropdownPicker(
     getOptionIcon: (@Composable (T) -> ImageVector)? = null,
     label: @Composable () -> Unit = {},
     includeAllOption: Boolean = false,
+    allLabel: String = stringResource(R.string.all),
     onAllSelected: () -> Unit = {}
 ) {
     var isDropDownExpanded by remember { mutableStateOf(false) }
@@ -56,8 +57,8 @@ fun <T> DropdownPicker(
                 readOnly = true,
                 value = when {
                     selectedOption != null -> getOptionLabel(selectedOption)
-                    includeAllOption -> "All"
-                    else -> "Unknown"
+                    includeAllOption -> allLabel
+                    else -> stringResource(R.string.unknown)
                 },
                 onValueChange = {},
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isDropDownExpanded) },
@@ -71,15 +72,14 @@ fun <T> DropdownPicker(
         ) {
             if (includeAllOption) {
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.all)) },
+                    text = { Text(allLabel) },
                     onClick = {
                         isDropDownExpanded = false
                         onAllSelected()
                     },
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 6.dp))
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 6.dp))
             }
             options.forEach { t ->
                 DropdownMenuItem(
@@ -90,8 +90,8 @@ fun <T> DropdownPicker(
                             fontSize = 16.sp
                         )
                     },
-                    leadingIcon = {
-                        getOptionIcon?.let {
+                    leadingIcon = getOptionIcon?.let {
+                        {
                             Icon(
                                 imageVector = it(t),
                                 contentDescription = null

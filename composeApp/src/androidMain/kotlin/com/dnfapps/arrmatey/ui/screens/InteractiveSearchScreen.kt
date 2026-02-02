@@ -1,6 +1,5 @@
 package com.dnfapps.arrmatey.ui.screens
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -8,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -47,7 +48,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -58,7 +58,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.R
 import com.dnfapps.arrmatey.arr.api.model.ArrRelease
+import com.dnfapps.arrmatey.arr.api.model.CustomFormat
+import com.dnfapps.arrmatey.arr.api.model.Language
+import com.dnfapps.arrmatey.arr.api.model.QualityInfo
 import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
+import com.dnfapps.arrmatey.arr.api.model.ReleaseProtocol
 import com.dnfapps.arrmatey.arr.state.DownloadState
 import com.dnfapps.arrmatey.arr.state.ReleaseLibrary
 import com.dnfapps.arrmatey.arr.viewmodel.InteractiveSearchViewModel
@@ -96,8 +100,6 @@ fun InteractiveSearchScreen(
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.arr(instanceType)
 ) {
-    val context = LocalContext.current
-
     val releaseUiState by viewModel.releaseUiState.collectAsStateWithLifecycle()
     val downloadState by viewModel.downloadReleaseState.collectAsStateWithLifecycle()
     val downloadStatus by viewModel.downloadStatus.collectAsStateWithLifecycle()
@@ -304,7 +306,18 @@ fun InteractiveSearchScreen(
                 selectedSortOrder = filterState.sortOrder,
                 onSortOrderChanged = { viewModel.setSortOrder(it) },
                 selectedFilter = filterState.filterBy,
-                onFilterChanged = { viewModel.setFilterBy(it) }
+                onFilterChanged = { viewModel.setFilterBy(it) },
+                libraryState = (releaseUiState as? ReleaseLibrary.Success),
+                filterLanguage = filterState.language,
+                onLanguageChange = { viewModel.setFilterLanguage(it) },
+                filterCustomFormat = filterState.customFormat,
+                onCustomFormatChange = { viewModel.setFilterCustomFormat(it) },
+                filterQualityInfo = filterState.quality,
+                onQualityChange = { viewModel.setFilterQuality(it) },
+                filterIndexer = filterState.indexer,
+                onIndexerChange = { viewModel.setFilterIndexer(it) },
+                filterProtocol = filterState.protocol,
+                onProtocolChange = { viewModel.setFilterProtocol(it) }
             )
         }
     }
@@ -379,48 +392,130 @@ fun FilterSheet(
     selectedSortOrder: SortOrder,
     onSortOrderChanged: (SortOrder) -> Unit,
     selectedSortBy: ReleaseSortBy,
-    onSortByChanged: (ReleaseSortBy) -> Unit
+    onSortByChanged: (ReleaseSortBy) -> Unit,
+    libraryState: ReleaseLibrary.Success?,
+    filterLanguage: Language?,
+    onLanguageChange: (Language?) -> Unit,
+    filterCustomFormat: CustomFormat?,
+    onCustomFormatChange: (CustomFormat?) -> Unit,
+    filterQualityInfo: QualityInfo?,
+    onQualityChange: (QualityInfo?) -> Unit,
+    filterIndexer: String?,
+    onIndexerChange: (String?) -> Unit,
+    filterProtocol: ReleaseProtocol?,
+    onProtocolChange: (ReleaseProtocol?) -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss
     ) {
-        Column(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 24.dp)
         ) {
-            if (canFilter) {
-                DropdownPicker(
-                    options = ReleaseFilterBy.entries,
-                    selectedOption = selectedFilter,
-                    onOptionSelected = onFilterChanged,
-                    label = { Text(stringResource(R.string.filter_by)) },
-                    getOptionLabel = { stringResource(it.stringResource()) }
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            item {
                 DropdownPicker(
                     options = ReleaseSortBy.entries,
                     selectedOption = selectedSortBy,
                     onOptionSelected = onSortByChanged,
                     label = { Text(stringResource(R.string.sort_by)) },
-                    getOptionLabel = { stringResource(it.stringResource()) },
-                    modifier = Modifier.weight(1f)
+                    getOptionLabel = { stringResource(it.stringResource()) }
                 )
+            }
+            item {
                 DropdownPicker(
                     options = SortOrder.entries,
                     selectedOption = selectedSortOrder,
                     onOptionSelected = onSortOrderChanged,
                     label = { Text(stringResource(R.string.sort_order)) },
                     getOptionLabel = { getString(it.iosText) },
-                    getOptionIcon = { it.androidIcon },
-                    modifier = Modifier.weight(1f)
+                    getOptionIcon = { it.androidIcon }
                 )
+            }
+
+            if (canFilter) {
+                item(span = { GridItemSpan(maxLineSpan)} ) {
+                    DropdownPicker(
+                        options = ReleaseFilterBy.entries,
+                        selectedOption = selectedFilter,
+                        onOptionSelected = onFilterChanged,
+                        label = { Text(stringResource(R.string.filter_by)) },
+                        getOptionLabel = { stringResource(it.stringResource()) }
+                    )
+                }
+            }
+
+            libraryState?.filterQualities?.takeUnless { it.size < 2 }?.let { qualities ->
+                item {
+                    DropdownPicker(
+                        options = qualities,
+                        selectedOption = filterQualityInfo,
+                        onOptionSelected = onQualityChange,
+                        label = { Text(stringResource(R.string.quality))},
+                        getOptionLabel = { it.qualityLabel },
+                        includeAllOption = true,
+                        allLabel = stringResource(R.string.any),
+                        onAllSelected = { onQualityChange(null) }
+                    )
+                }
+            }
+            libraryState?.filterLanguages?.takeUnless { it.size < 2 }?.let { languages ->
+                item {
+                    DropdownPicker(
+                        options = languages,
+                        selectedOption = filterLanguage,
+                        onOptionSelected = onLanguageChange,
+                        label = { Text(stringResource(R.string.language)) },
+                        getOptionLabel = { it.name ?: stringResource(R.string.unknown) },
+                        includeAllOption = true,
+                        allLabel = stringResource(R.string.any),
+                        onAllSelected = { onLanguageChange(null) }
+                    )
+                }
+            }
+            libraryState?.filterCustomFormats?.takeUnless { it.size < 2 }?.let { customFormats ->
+                item {
+                    DropdownPicker(
+                        options = customFormats,
+                        selectedOption = filterCustomFormat,
+                        onOptionSelected = onCustomFormatChange,
+                        label = { Text("Custom Format") },
+                        getOptionLabel = { it.name },
+                        includeAllOption = true,
+                        allLabel = stringResource(R.string.any),
+                        onAllSelected = { onLanguageChange(null) }
+                    )
+                }
+            }
+            libraryState?.filterProtocols?.takeUnless { it.size < 2 }?.let { protocols ->
+                item {
+                    DropdownPicker(
+                        options = protocols,
+                        selectedOption = filterProtocol,
+                        onOptionSelected = onProtocolChange,
+                        label = { Text(stringResource(R.string.protocol)) },
+                        getOptionLabel = { it.name },
+                        includeAllOption = true,
+                        allLabel = stringResource(R.string.any),
+                        onAllSelected = { onProtocolChange(null) }
+                    )
+                }
+            }
+            libraryState?.filterIndexers?.takeUnless { it.size < 2 }?.let { indexers ->
+                item {
+                    DropdownPicker(
+                        options = indexers,
+                        selectedOption = filterIndexer,
+                        onOptionSelected = onIndexerChange,
+                        label = { Text(stringResource(R.string.indexer)) },
+                        includeAllOption = true,
+                        allLabel = stringResource(R.string.any),
+                        onAllSelected = { onIndexerChange(null) }
+                    )
+                }
             }
         }
     }

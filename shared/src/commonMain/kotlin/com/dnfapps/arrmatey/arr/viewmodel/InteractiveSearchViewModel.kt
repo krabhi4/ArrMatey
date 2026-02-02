@@ -3,8 +3,12 @@ package com.dnfapps.arrmatey.arr.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dnfapps.arrmatey.arr.api.model.ArrRelease
+import com.dnfapps.arrmatey.arr.api.model.CustomFormat
+import com.dnfapps.arrmatey.arr.api.model.Language
 import com.dnfapps.arrmatey.arr.api.model.MovieRelease
+import com.dnfapps.arrmatey.arr.api.model.QualityInfo
 import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
+import com.dnfapps.arrmatey.arr.api.model.ReleaseProtocol
 import com.dnfapps.arrmatey.arr.api.model.SeriesRelease
 import com.dnfapps.arrmatey.arr.state.DownloadState
 import com.dnfapps.arrmatey.arr.state.InteractiveSearchUiState
@@ -100,35 +104,30 @@ class InteractiveSearchViewModel(
     ): List<T> {
         if (items.isEmpty()) return items
 
-        return when (items.first()) {
+        val filtered = items.filter { item ->
+            (filter.language == null || item.languages.any { it.id == filter.language.id }) &&
+            (filter.protocol == null || item.protocol == filter.protocol) &&
+            (filter.indexer == null || item.indexer == filter.indexer) &&
+            (filter.quality == null || item.quality.quality.id == filter.quality.quality.id) &&
+            (filter.customFormat == null || item.customFormats.any { it.id == filter.customFormat.id }) &&
+            (query.isEmpty() || item.title.contains(query, ignoreCase = true))
+        }
+        return when (filtered.first()) {
             is SeriesRelease -> {
                 @Suppress("UNCHECKED_CAST")
-                seriesFiltering(items as List<SeriesRelease>, filter, query) as List<T>
+                seriesFiltering(filtered as List<SeriesRelease>, filter) as List<T>
             }
-            is MovieRelease -> {
-                @Suppress("UNCHECKED_CAST")
-                movieFiltering(items as List<MovieRelease>, query) as List<T>
-            }
+            is MovieRelease -> filtered
         }
     }
 
     private fun seriesFiltering(
         items: List<SeriesRelease>,
-        filter: InteractiveSearchUiState,
-        query: String
+        filter: InteractiveSearchUiState
     ): List<SeriesRelease> = when (filter.filterBy) {
         ReleaseFilterBy.Any -> items
         ReleaseFilterBy.SeasonPack -> items.filter { it.fullSeason }
         ReleaseFilterBy.SingleEpisode -> items.filter { !it.fullSeason }
-    }.filter {
-        it.title.contains(query, ignoreCase = true)
-    }
-
-    private fun movieFiltering(
-        items: List<MovieRelease>,
-        query: String
-    ): List<MovieRelease> = items.filter {
-        it.title.contains(query, ignoreCase = true)
     }
 
     private fun observeDownloadStatus() {
@@ -184,6 +183,36 @@ class InteractiveSearchViewModel(
     fun setFilterBy(filterBy: ReleaseFilterBy) {
         _filterUiState.update {
             it.copy(filterBy = filterBy)
+        }
+    }
+
+    fun setFilterLanguage(language: Language?) {
+        _filterUiState.update {
+            it.copy(language = language)
+        }
+    }
+
+    fun setFilterIndexer(indexer: String?) {
+        _filterUiState.update {
+            it.copy(indexer = indexer)
+        }
+    }
+
+    fun setFilterQuality(qualityInfo: QualityInfo?) {
+        _filterUiState.update {
+            it.copy(quality = qualityInfo)
+        }
+    }
+
+    fun setFilterProtocol(protocol: ReleaseProtocol?) {
+        _filterUiState.update {
+            it.copy(protocol = protocol)
+        }
+    }
+
+    fun setFilterCustomFormat(customFormat: CustomFormat?) {
+        _filterUiState.update {
+            it.copy(customFormat = customFormat)
         }
     }
 
