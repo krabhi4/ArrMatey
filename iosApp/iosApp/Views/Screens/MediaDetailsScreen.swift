@@ -26,39 +26,11 @@ struct MediaDetailsScreen: View {
         self.viewModel = ArrMediaDetailsViewModelS(id: id, type: type)
     }
     
-    private var uiState: MediaDetailsUiState {
-        viewModel.uiState
-    }
-    
-    private var automaticSearchIds: Set<Int64> {
-        viewModel.automaticSearchIds
-    }
-    
-    private var lastSearchResult: Bool? {
-        viewModel.lastSearchResult
-    }
-    
-    private var isMonitored: Bool {
-        viewModel.isMonitored
-    }
-    
-    private var qualityProfiles: [QualityProfile] {
-        viewModel.qualityProfiles
-    }
-    
-    private var tags: [Tag] {
-        viewModel.tags
-    }
-    
-    private var deleteInProgress: Bool {
-        viewModel.deleteStatus is OperationStatusInProgress
-    }
-    
     var body: some View {
         contentForState()
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Image(systemName: isMonitored ? "bookmark.fill" : "bookmark")
+                    Image(systemName: viewModel.isMonitored ? "bookmark.fill" : "bookmark")
                         .imageScale(.medium)
                         .onTapGesture {
                             viewModel.toggleMonitor()
@@ -67,7 +39,7 @@ struct MediaDetailsScreen: View {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
                         Button("edit", systemImage: "pencil") {
-                            // todo
+                            showEditSheet = true
                         }
                         Button("delete", systemImage: "trash") {
                             showConfirmSheet = true
@@ -83,11 +55,25 @@ struct MediaDetailsScreen: View {
                 viewModel.refreshDetails()
             }
             .sheet(isPresented: $showConfirmSheet) {
-                DeleteMediaSheet(isLoading: deleteInProgress, onConfirm: { addExclusion, deleteFiles in
+                DeleteMediaSheet(isLoading: viewModel.deleteInProgress, onConfirm: { addExclusion, deleteFiles in
                     viewModel.delete(addExclusion, deleteFiles)
                 })
                 .presentationDetents([.fraction(0.33)])
                 .presentationBackground(.ultraThinMaterial)
+            }
+            .sheet(isPresented: $showEditSheet) {
+                switch viewModel.item {
+                case nil: EmptyView()
+                case let movie as ArrMovie: EditMovieSheet(item: movie, qualityProfiles: viewModel.qualityProfiles, rootFolders: viewModel.rootFolders, tags: viewModel.tags, editInProgress: viewModel.editInProgress, onEditItem: { newMovie, moveFiles in
+                    viewModel.editItem(newMovie, moveFiles: moveFiles)
+                })
+                        .presentationBackground(.ultraThinMaterial)
+                case let series as ArrSeries: EditSeriesSheet(item: series, qualityProfiles: viewModel.qualityProfiles, rootFolders: viewModel.rootFolders, tags: viewModel.tags, editInProgress: viewModel.editInProgress, onEditItem: { newSeries, moveFiles in
+                    viewModel.editItem(newSeries, moveFiles: moveFiles)
+                })
+                        .presentationBackground(.ultraThinMaterial)
+                default: EmptyView()
+                }
             }
             .onChange(of: viewModel.deleteSucceeded) { _, success in
                 if success {
@@ -97,6 +83,7 @@ struct MediaDetailsScreen: View {
             .onChange(of: viewModel.editItemSucceeded) { _, success in
                 if success {
                     showEditSheet = false
+                    viewModel.refreshDetails()
                 }
             }
             .alert(
@@ -121,7 +108,7 @@ struct MediaDetailsScreen: View {
     
     @ViewBuilder
     private func contentForState() -> some View {
-        switch uiState {
+        switch viewModel.uiState {
         case is MediaDetailsUiStateInitial:
             ZStack {
                 Text("initial state")
@@ -151,7 +138,7 @@ struct MediaDetailsScreen: View {
                         
                         filesArea(for: item, extraFiles, episodes)
                         
-                        MediaInfoArea(item: item, qualityProfiles: qualityProfiles, tags: tags)
+                        MediaInfoArea(item: item, qualityProfiles: viewModel.qualityProfiles, tags: viewModel.tags)
                         
                         Spacer()
                             .frame(height: 12)
@@ -200,8 +187,8 @@ struct MediaDetailsScreen: View {
             SeriesFilesView(
                 series: series,
                 episodes: episodes,
-                searchIds: automaticSearchIds,
-                searchResult: lastSearchResult,
+                searchIds: viewModel.automaticSearchIds,
+                searchResult: viewModel.lastSearchResult,
                 onToggleSeasonMonitor: { sn in
                     viewModel.toggleSeasonMonitor(seasonNumber: sn)
                 },
@@ -223,8 +210,8 @@ struct MediaDetailsScreen: View {
             MovieFilesView(
                 movie: movie,
                 movieExtraFiles: extraFiles,
-                searchIds: automaticSearchIds,
-                searchResult: lastSearchResult,
+                searchIds: viewModel.automaticSearchIds,
+                searchResult: viewModel.lastSearchResult,
                 onAutomaticSearch: {
                     viewModel.performMovieAutomaticLookup(movieId: movie.id as! Int64)
                 }

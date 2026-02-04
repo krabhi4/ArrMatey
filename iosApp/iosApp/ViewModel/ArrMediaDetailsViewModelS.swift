@@ -12,27 +12,18 @@ import SwiftUI
 class ArrMediaDetailsViewModelS: ObservableObject {
     private let viewModel: ArrMediaDetailsViewModel
     
-//    @Published private(set) var uiState: MediaDetailsUiState = MediaDetailsUiStateInitial()
-//    @Published private(set) var history: [HistoryItem] = []
-//    @Published private(set) var monitorStatus: OperationStatus = OperationStatusIdle()
-//    @Published private(set) var isMonitored: Bool = false
-//    @Published private(set) var automaticSearchIds: Set<Int64> = Set()
-//    @Published private(set) var lastSearchResult: Bool? = nil
-//    @Published private(set) var qualityProfiles: [QualityProfile] = []
-//    @Published private(set) var tags: [Tag] = []
-//    @Published private(set) var deleteStatus: OperationStatus = OperationStatusIdle()
-//    @Published private(set) var deleteSucceeded: Bool = false
-    
     @Published private(set) var uiState: MediaDetailsUiState = MediaDetailsUiStateInitial()
     @Published private(set) var history: [HistoryItem] = []
     @Published private(set) var monitorStatus: OperationStatus = OperationStatusIdle()
     @Published private(set) var editItemStatus: OperationStatus = OperationStatusIdle()
     @Published private(set) var editItemSucceeded: Bool = false
+    @Published private(set) var editInProgress: Bool = false
     @Published private(set) var isMonitored: Bool = false
     @Published private(set) var automaticSearchIds: Set<Int64> = Set()
     @Published private(set) var lastSearchResult: Bool? = nil
     @Published private(set) var deleteStatus: OperationStatus = OperationStatusIdle()
     @Published private(set) var deleteSucceeded: Bool = false
+    @Published private(set) var deleteInProgress: Bool = false
     @Published private(set) var deleteSeasonStatus: OperationStatus = OperationStatusIdle()
     @Published private(set) var deleteSeasonSucceeded: Bool = false
     
@@ -40,18 +31,26 @@ class ArrMediaDetailsViewModelS: ObservableObject {
     @Published private(set) var rootFolders: [RootFolder] = []
     @Published private(set) var tags: [Tag] = []
     
+    @Published private(set) var item: ArrMedia? = nil
+    
     init(id: Int64, type: InstanceType) {
         self.viewModel = KoinBridge.shared.getArrMediaDetailsViewModel(id: id, type: type)
         startObserving()
     }
     
     private func startObserving() {
-        viewModel.uiState.observeAsync { self.uiState = $0 }
+        viewModel.uiState.observeAsync {
+            self.uiState = $0
+            if let success = $0 as? MediaDetailsUiStateSuccess {
+                self.item = success.item
+            }
+        }
         viewModel.history.observeAsync { self.history = $0 }
         viewModel.monitorStatus.observeAsync { self.monitorStatus = $0 }
         viewModel.editItemStatus.observeAsync {
             self.editItemStatus = $0
             self.editItemSucceeded = $0 is OperationStatusSuccess
+            self.editInProgress = $0 is OperationStatusInProgress
         }
         viewModel.isMonitored.observeAsync { self.isMonitored = $0.boolValue }
         viewModel.automaticSearchIds.observeAsync { self.automaticSearchIds = Set($0.map { $0.int64Value }) }
@@ -59,6 +58,7 @@ class ArrMediaDetailsViewModelS: ObservableObject {
         viewModel.deleteStatus.observeAsync {
             self.deleteStatus = $0
             self.deleteSucceeded = $0 is OperationStatusSuccess
+            self.deleteInProgress = $0 is OperationStatusInProgress
         }
         viewModel.deleteSeasonStatus.observeAsync {
             self.deleteSeasonStatus = $0

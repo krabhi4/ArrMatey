@@ -1,6 +1,5 @@
 package com.dnfapps.arrmatey.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -289,7 +288,7 @@ fun MediaDetailsScreen(
                             if (success.item.rootFolderPath != it.rootFolderPath) {
                                 moveFilesItem = it
                             } else {
-                                mediaDetailsViewModel.updateItem(it)
+                                mediaDetailsViewModel.editItem(it)
                             }
                         },
                         onDismiss = { showEditSheet = false }
@@ -301,7 +300,7 @@ fun MediaDetailsScreen(
                 AlertDialog(
                     onDismissRequest = { moveFilesItem = null },
                     title = {
-                        Text("Movie files to ${item.rootFolderPath}?")
+                        Text("Move files to ${item.rootFolderPath}?")
                     },
                     confirmButton = {
                         TextButton(

@@ -279,13 +279,15 @@ class InstanceScopedRepository(
 
                 updateItemInLibraryCache(item)
                 _editItemStatus.value = OperationStatus.Success("Item edited successfully")
+//                _editItemStatus.value = OperationStatus.Idle
             }
             .onError { code, message, cause ->
                 _editItemStatus.value = OperationStatus.Error(code, message, cause)
+//                _editItemStatus.value = OperationStatus.Idle
             }
-            .also {
-                _editItemStatus.value = OperationStatus.Idle
-            }
+//            .also {
+//                _editItemStatus.value = OperationStatus.Idle
+//            }
     }
 
     suspend fun updateMediaItem(item: ArrMedia): NetworkResult<ArrMedia> {
