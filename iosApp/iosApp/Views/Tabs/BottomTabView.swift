@@ -16,6 +16,7 @@ struct BottomTabView: View {
             case .shows: SeriesTab()
             case .movies: MoviesTab()
             case .activity: ActivityTab()
+            case .calendar: CalendarTab()
             }
         }
     }

@@ -61,7 +61,16 @@ data class ArrMovie(
     val collection: MovieCollection? = null,
     val popularity: Double,
     val lastSearchTime: String? = null,
+
+    val instanceId: Long? = null
 ): ArrMedia {
+
+    val isWaiting: Boolean
+        get() = when(status) {
+            MediaStatus.Tba, MediaStatus.Announced -> true
+            MediaStatus.InCinemas -> minimumAvailability == MediaStatus.Released
+            else -> false
+        }
 
     override fun ratingScore(): Double {
         val imdb = ratings.imdb?.value

@@ -1,10 +1,13 @@
 package com.dnfapps.arrmatey.arr.api.client
 
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
+import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrRelease
+import com.dnfapps.arrmatey.arr.api.model.ArrSeries
 import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.CommandResponse
 import com.dnfapps.arrmatey.arr.api.model.DownloadReleasePayload
+import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.HistoryItem
 import com.dnfapps.arrmatey.arr.api.model.MonitoredResponse
 import com.dnfapps.arrmatey.arr.api.model.QualityProfile
@@ -13,6 +16,7 @@ import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
 import com.dnfapps.arrmatey.arr.api.model.RootFolder
 import com.dnfapps.arrmatey.arr.api.model.Tag
 import com.dnfapps.arrmatey.client.NetworkResult
+import kotlinx.datetime.LocalDate
 
 interface ArrClient {
     suspend fun getLibrary(): NetworkResult<List<ArrMedia>>
@@ -33,4 +37,6 @@ interface ArrClient {
     suspend fun deleteActivityTask(id: Int, removeFromClient: Boolean, blocklist: Boolean, skipRedownload: Boolean): NetworkResult<Unit>
     suspend fun getItemHistory(id: Long, page: Int, pageSize: Int): NetworkResult<List<HistoryItem>>
     suspend fun downloadRelease(payload: DownloadReleasePayload): NetworkResult<Any>
+    suspend fun getMovieCalendar(start: LocalDate, end: LocalDate): NetworkResult<List<ArrMovie>>
+    suspend fun getEpisodeCalendar(start: LocalDate, end: LocalDate): NetworkResult<List<Episode>>
 }

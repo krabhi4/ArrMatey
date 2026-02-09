@@ -20,9 +20,11 @@ import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.ui.tabs.ActivityTab
 import com.dnfapps.arrmatey.ui.tabs.ArrTab
+import com.dnfapps.arrmatey.ui.tabs.CalendarTab
 import com.dnfapps.arrmatey.ui.tabs.SettingsTabNavHost
 import com.dnfapps.arrmatey.utils.mokoString
 import org.koin.compose.koinInject
+import java.util.Calendar
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -39,6 +41,7 @@ fun HomeScreen(
                 TabItem.SHOWS -> ArrTab(InstanceType.Sonarr)
                 TabItem.MOVIES -> ArrTab(InstanceType.Radarr)
                 TabItem.ACTIVITY -> ActivityTab()
+                TabItem.CALENDAR -> CalendarTab()
                 TabItem.SETTINGS -> SettingsTabNavHost()
             }
         }

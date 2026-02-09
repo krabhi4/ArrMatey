@@ -1,6 +1,7 @@
 package com.dnfapps.arrmatey.arr.api.client
 
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
+import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
 import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.CommandResponse
@@ -15,6 +16,7 @@ import com.dnfapps.arrmatey.arr.api.model.SonarrHistoryResponse
 import com.dnfapps.arrmatey.client.NetworkResult
 import com.dnfapps.arrmatey.instances.model.Instance
 import io.ktor.client.HttpClient
+import kotlinx.datetime.LocalDate
 
 class SonarrClient(
     override val instance: Instance,
@@ -108,6 +110,22 @@ class SonarrClient(
 
     override suspend fun performAutomaticSearch(id: Long): NetworkResult<CommandResponse> =
         post("command", CommandPayload.Series(id))
+
+    override suspend fun getEpisodeCalendar(
+        start: LocalDate,
+        end: LocalDate
+    ): NetworkResult<List<Episode>> =
+        get<List<Episode>>("calendar", mapOf(
+            "start" to start.toString(),
+            "end" to end.toString(),
+            "unmonitored" to true,
+            "includeSeries" to true
+        )).map { it.map { ep -> ep.copy(instanceId = instance.id) } }
+
+    override suspend fun getMovieCalendar(
+        start: LocalDate,
+        end: LocalDate
+    ): NetworkResult<List<ArrMovie>> = NetworkResult.Success(emptyList())
 
     suspend fun updateEpisode(item: Episode): NetworkResult<Episode> =
         put("episode/${item.id}", item)

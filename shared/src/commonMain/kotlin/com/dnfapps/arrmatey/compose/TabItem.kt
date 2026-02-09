@@ -1,6 +1,7 @@
 package com.dnfapps.arrmatey.compose
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Settings
@@ -17,6 +18,7 @@ enum class TabItem(
     SHOWS("tv", Icons.Default.Tv, MR.strings.series),
     MOVIES("movieclapper", Icons.Default.Movie, MR.strings.movies),
     ACTIVITY("square.and.arrow.down", Icons.Default.Download, MR.strings.activity),
+    CALENDAR("calendar", Icons.Default.CalendarMonth, MR.strings.schedule),
     SETTINGS("gear", Icons.Default.Settings, MR.strings.settings);
 
     companion object {

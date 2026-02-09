@@ -42,6 +42,12 @@ class InstanceScopedRepository(
 ) {
     val client: ArrClient = createClient()
 
+    val sonarrClient: SonarrClient
+        get() = client as? SonarrClient ?: throw IllegalStateException("Client is not a SonarrClient instance")
+
+    val radarrClient: RadarrClient
+        get() = client as? RadarrClient ?: throw IllegalStateException("Client is not a RadarrClient instance")
+
     private fun createClient(): ArrClient = when (instance.type) {
             InstanceType.Sonarr -> SonarrClient(instance, httpClient)
             InstanceType.Radarr -> RadarrClient(instance, httpClient)

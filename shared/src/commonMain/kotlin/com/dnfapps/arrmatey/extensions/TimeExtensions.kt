@@ -2,8 +2,10 @@ package com.dnfapps.arrmatey.extensions
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 fun LocalDate.isToday(timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean {
     val today = Clock.System.todayIn(timeZone)
@@ -39,3 +41,8 @@ fun LocalDate.isBeforeToday(timeZone: TimeZone = TimeZone.currentSystemDefault()
 }
 
 fun LocalDate.isBeforeToday(): Boolean = isBeforeToday(TimeZone.currentSystemDefault())
+
+@OptIn(ExperimentalTime::class)
+fun Clock.Companion.localToday(): LocalDate {
+    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+}

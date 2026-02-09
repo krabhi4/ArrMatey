@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.dnfapps.arrmatey.arr.api.client.LoggerLevel
+import com.dnfapps.arrmatey.arr.state.CalendarViewMode
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ class PreferencesStore(
 
     private val sonarrInfoCardKey = booleanPreferencesKey("sonarrInfoCard")
     private val radarrInfoCardKey = booleanPreferencesKey("radarrInfoCard")
+    private val calendarViewTypeKey = stringPreferencesKey("calendarViewType")
     private val activityPollingKey = booleanPreferencesKey("enableActivityPolling")
     private val httpLogLevelKey = stringPreferencesKey("httpLogLevel")
     private val useDynamicThemeKey = booleanPreferencesKey("useDynamicTheme")
@@ -67,6 +69,13 @@ class PreferencesStore(
             preferences[useClearLogoKey] ?: true
         }
 
+    val calendarViewMode: Flow<CalendarViewMode> = dataStore.data
+        .map { preferences ->
+            preferences[calendarViewTypeKey]?.let { type ->
+                CalendarViewMode.valueOf(type)
+            } ?: CalendarViewMode.List
+        }
+
     fun dismissInfoCard(type: InstanceType) {
         setInfoCardVisibility(type, false)
     }
@@ -110,6 +119,20 @@ class PreferencesStore(
             dataStore.edit { preferences ->
                 val current = preferences[useClearLogoKey] ?: true
                 preferences[useClearLogoKey] = !current
+            }
+        }
+    }
+
+    fun toggleCalendarViewMode() {
+        scope.launch {
+            dataStore.edit { preferences ->
+                val current = preferences[calendarViewTypeKey]?.let { type ->
+                    CalendarViewMode.valueOf(type)
+                } ?: CalendarViewMode.List
+                preferences[calendarViewTypeKey] = when (current) {
+                    CalendarViewMode.Month -> CalendarViewMode.List.name
+                    CalendarViewMode.List -> CalendarViewMode.Month.name
+                }
             }
         }
     }

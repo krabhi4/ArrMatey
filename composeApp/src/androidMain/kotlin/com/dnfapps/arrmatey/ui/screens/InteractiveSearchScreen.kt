@@ -75,7 +75,6 @@ import com.dnfapps.arrmatey.entensions.Bullet
 import com.dnfapps.arrmatey.entensions.SafeSnackbar
 import com.dnfapps.arrmatey.entensions.bullet
 import com.dnfapps.arrmatey.entensions.copy
-import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.entensions.showErrorImmediately
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.extensions.formatAgeMinutes

@@ -1,6 +1,5 @@
 package com.dnfapps.arrmatey.ui.tabs
 
-import com.dnfapps.arrmatey.shared.MR
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +58,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.arr.api.model.QueueDownloadState
 import com.dnfapps.arrmatey.arr.api.model.QueueItem
+import com.dnfapps.arrmatey.arr.api.model.RadarrQueueItem
+import com.dnfapps.arrmatey.arr.api.model.SonarrQueueItem
 import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.client.OperationStatus
 import com.dnfapps.arrmatey.compose.utils.QueueSortBy
@@ -66,8 +67,8 @@ import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.entensions.bullet
 import com.dnfapps.arrmatey.entensions.copy
-import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.instances.model.Instance
+import com.dnfapps.arrmatey.shared.MR
 import com.dnfapps.arrmatey.ui.components.DropdownPicker
 import com.dnfapps.arrmatey.ui.components.LabelledSwitch
 import com.dnfapps.arrmatey.utils.format
@@ -184,12 +185,21 @@ fun ActivityItem(
     item: QueueItem,
     onClick: () -> Unit
 ) {
-    val colors = if (item.hasIssue) {
-        CardDefaults.cardColors(
+    val colors = when {
+        item.hasIssue -> CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.errorContainer,
             contentColor = MaterialTheme.colorScheme.onErrorContainer
         )
-    } else CardDefaults.cardColors()
+        item is SonarrQueueItem -> CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+        )
+        item is RadarrQueueItem -> CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        else -> CardDefaults.cardColors()
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),

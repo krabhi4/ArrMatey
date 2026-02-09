@@ -22,6 +22,11 @@ abstract class Navigation<T>(initialScreen: T) {
         backStack.add(screen)
         backStack.removeAt(backStack.size - 2)
     }
+
+    fun replaceBackStack(newStack: List<T>) {
+        backStack.removeRange(fromIndex = 1, toIndex = backStack.size)
+        backStack.addAll(newStack)
+    }
 }
 
 class SettingsNavigation: Navigation<SettingsScreen>(SettingsScreen.Landing)

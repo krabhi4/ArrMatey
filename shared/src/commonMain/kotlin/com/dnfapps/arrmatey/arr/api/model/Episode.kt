@@ -41,7 +41,10 @@ data class Episode(
     val unverifiedSceneNumbering: Boolean,
     val endTime: String? = null,
     val grabDate: String? = null,
-    val images: List<ArrImage> = emptyList()
+    val images: List<ArrImage> = emptyList(),
+
+    val series: ArrSeries? = null,
+    var instanceId: Long? = null
 ) {
     val displayTitle: String
         get() = title ?: "Unknown"
@@ -54,6 +57,9 @@ data class Episode(
 
     val fileQualityName: String?
         get() = episodeFile?.qualityName
+
+    val hasAired: Boolean
+        get() = airDate?.isBeforeToday() ?: false
 
     fun formatAirDateUtc(
         friendlyTodayFormat: Boolean = true,

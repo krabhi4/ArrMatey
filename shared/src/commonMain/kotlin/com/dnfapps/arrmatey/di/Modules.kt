@@ -40,15 +40,18 @@ import com.dnfapps.arrmatey.arr.viewmodel.MovieFilesViewModel
 import com.dnfapps.arrmatey.arr.service.ActivityQueueService
 import com.dnfapps.arrmatey.arr.api.client.HttpClientFactory
 import com.dnfapps.arrmatey.arr.api.model.Episode
+import com.dnfapps.arrmatey.arr.service.CalendarService
 import com.dnfapps.arrmatey.arr.usecase.DeleteEpisodeFileUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteMediaUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteQueueItemUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteSeasonFilesUseCase
+import com.dnfapps.arrmatey.arr.usecase.GetCalendarUseCase
 import com.dnfapps.arrmatey.arr.usecase.GetEpisodeHistoryUseCase
 import com.dnfapps.arrmatey.arr.usecase.PerformAutomaticSearchUseCase
 import com.dnfapps.arrmatey.arr.usecase.PerformRefreshUseCase
 import com.dnfapps.arrmatey.arr.usecase.ToggleMonitorUseCase
 import com.dnfapps.arrmatey.arr.usecase.UpdateMediaUseCase
+import com.dnfapps.arrmatey.arr.viewmodel.CalendarViewModel
 import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
 import com.dnfapps.arrmatey.database.ArrMateyDatabase
 import com.dnfapps.arrmatey.database.InstanceRepository
@@ -103,6 +106,7 @@ val repositoryModule = module {
 
 val serviceModule = module {
     single { ActivityQueueService(get(), get()) }
+    single { CalendarService(get()) }
 }
 
 val useCaseModule = module {
@@ -138,6 +142,7 @@ val useCaseModule = module {
     factory { DeleteEpisodeFileUseCase() }
     factory { DeleteQueueItemUseCase(get()) }
     factory { PerformRefreshUseCase() }
+    factory { GetCalendarUseCase(get()) }
 }
 
 val viewModelModule = module {
@@ -171,6 +176,7 @@ val viewModelModule = module {
     factory { (instanceId: Long) ->
         EditInstanceViewModel(instanceId, get(), get(), get(), get())
     }
+    factory { CalendarViewModel(get(), get()) }
 }
 
 val resourcesModule = module {

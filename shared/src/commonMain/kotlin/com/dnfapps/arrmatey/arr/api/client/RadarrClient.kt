@@ -4,6 +4,7 @@ import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.CommandResponse
+import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.ExtraFile
 import com.dnfapps.arrmatey.arr.api.model.MonitoredResponse
 import com.dnfapps.arrmatey.arr.api.model.MovieEditorBody
@@ -13,6 +14,7 @@ import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
 import com.dnfapps.arrmatey.client.NetworkResult
 import com.dnfapps.arrmatey.instances.model.Instance
 import io.ktor.client.HttpClient
+import kotlinx.datetime.LocalDate
 
 class RadarrClient(
     override val instance: Instance,
@@ -94,6 +96,21 @@ class RadarrClient(
 
     override suspend fun performAutomaticSearch(id: Long): NetworkResult<CommandResponse> =
         post("command", CommandPayload.Movie(listOf(id)))
+
+    override suspend fun getMovieCalendar(
+        start: LocalDate,
+        end: LocalDate
+    ): NetworkResult<List<ArrMovie>> =
+        get<List<ArrMovie>>("calendar", mapOf(
+            "start" to start.toString(),
+            "end" to end.toString(),
+            "unmonitored" to true
+        )).map { it.map { movie -> movie.copy(instanceId = instance.id) } }
+
+    override suspend fun getEpisodeCalendar(
+        start: LocalDate,
+        end: LocalDate
+    ): NetworkResult<List<Episode>> = NetworkResult.Success(emptyList())
 
     suspend fun getMovieExtraFile(id: Long): NetworkResult<List<ExtraFile>> =
         get("extrafile", mapOf("movieId" to id))

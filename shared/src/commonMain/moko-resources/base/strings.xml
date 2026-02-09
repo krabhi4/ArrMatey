@@ -149,6 +149,7 @@
     <string name="direction">Direction</string>
     <string name="custom_format">Custom Format</string>
     <string name="add">Add</string>
+    <string name="episodes">Episodes</string>
 
     <!-- History Event Type -->
     <string name="grabbed">Grabbed</string>
@@ -216,5 +217,26 @@
     <string name="no_query_results">No results for \"%1$d\" in your library</string>
     <string name="no_query_results_label">Check your spelling or</string>
     <string name="no_query_results_link">add a new %1%d</string>
+
+    <!-- Calendar -->
+    <string name="calendar">Calendar</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="premier">Premier</string>
+    <string name="premiers_only">Premiers</string>
+    <string name="finales_only">Finales</string>
+    <string name="additional_episodes_count">+%1$d more</string>
+    <string name="schedule">Schedule</string>
+    <string name="release_schedule">Release Schedule</string>
+
+    <!-- Day prefixes -->
+    <string name="sun">Sun</string>
+    <string name="mon">Mon</string>
+    <string name="tues">Tues</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
 
 </resources>

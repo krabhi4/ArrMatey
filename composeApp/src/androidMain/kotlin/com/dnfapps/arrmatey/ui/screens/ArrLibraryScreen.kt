@@ -82,7 +82,6 @@ import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.SafeSnackbar
 import com.dnfapps.arrmatey.entensions.copy
-import com.dnfapps.arrmatey.entensions.getString
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
