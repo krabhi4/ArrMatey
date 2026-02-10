@@ -78,11 +78,16 @@ struct ArrLibraryView: View {
                 
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(items, id: \.id) { item in
-                        PosterItemRepresentable(
-                            item: item,
-                            isActive: itemIsActive(item)
-                        )
-                        .frame(height: 180)
+                        PosterItem(item: item) {
+                            VStack {
+                                Spacer()
+                                if item.id != nil {
+                                    ProgressView(value: Double(item.statusProgress))
+                                        .tint(itemIsActive(item) ? Color.blue : Color(argb: item.statusColor))
+                                        .padding(8)
+                                }
+                            }
+                        }
                         .onTapGesture {
                             onItemClicked(item)
                         }
@@ -92,9 +97,7 @@ struct ArrLibraryView: View {
             } else {
                 LazyVStack(spacing: 12) {
                     ForEach(items, id: \.id) { item in
-                        MediaListItemRepresentable(item: item, isActive: itemIsActive(item))
-                            .frame(height: 110)
-                            .frame(maxWidth: .infinity)
+                        MediaItemView(item: item, isActive: itemIsActive(item))
                             .onTapGesture {
                                 onItemClicked(item)
                             }

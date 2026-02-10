@@ -17,14 +17,8 @@ struct MediaDetailsHeader: View {
         ZStack {
             MediaHeaderBanner(bannerUrl: item.getBanner()?.remoteUrl)
             HStack(alignment: .top, spacing: 12) {
-                PosterItemView(
-                    item: item,
-                    onItemClick: nil
-                )
-                .frame(width: 150, height: 220)
-                .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .background(.clear)
+                PosterItem(item: item)
+                    .frame(width: 150, height: 220)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     if let clearLogo = item.getClearLogo()?.remoteUrl {

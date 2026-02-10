@@ -19,6 +19,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Views/Components/Untitled.swift,
 			);
 			target = 0A53B60B2C93580475B7FFCA /* iosApp */;
 		};

@@ -77,12 +77,17 @@ struct MediaSearchScreen: View {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(state.items, id: \.guid) { item in
                     ZStack {
-                        PosterItemRepresentable(
-                            item: item,
-                            isActive: queueItems.contains(where: { $0.mediaId == item.id })
-                        )
+                        PosterItem(item: item) {
+                            VStack {
+                                Spacer()
+                                if item.id != nil {
+                                    ProgressView(value: Double(item.statusProgress))
+                                        .tint(queueItems.contains(where: { $0.mediaId == item.id }) ? Color.blue : Color(argb: item.statusColor))
+                                        .padding(8)
+                                }
+                            }
+                        }
                         .id(item.guid)
-                        .frame(height: 180)
                         .onTapGesture {
                             if let id = item.id?.int64Value {
                                 navigation.go(to: .details(id), of: type)

@@ -8,22 +8,67 @@
 import SwiftUI
 import Shared
 
-struct PosterItemView<T: ArrMedia>: UIViewControllerRepresentable {
-    let item: T
-    let onItemClick: ((ArrMedia) -> Void)?
-    var enabled: Bool = true
+struct PosterItem<Content: View>: View {
+    let item: ArrMedia
+    let elevation: CGFloat
+    let radius: CGFloat
+    let additionalContent: () -> Content
 
-    func makeUIViewController(context: Context) -> UIViewController {
-        let controller = PosterItemViewController(
-            item: self.item,
-            onItemClick: self.onItemClick,
-            enabled: self.enabled
-        )
-        controller.view.backgroundColor = .clear
-        return controller
+    @State private var imageLoaded = false
+    @State private var loadError = false
+
+    private let aspectRatio: CGFloat = 0.675
+
+    init(
+        item: ArrMedia,
+        elevation: CGFloat = 4,
+        radius: CGFloat = 12,
+        @ViewBuilder additionalContent: @escaping () -> Content = { EmptyView() }
+    ) {
+        self.item = item
+        self.elevation = elevation
+        self.radius = radius
+        self.additionalContent = additionalContent
     }
 
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-        // left empty
+    var body: some View {
+        ZStack {
+            Color(UIColor.secondarySystemBackground)
+
+            if let urlString = item.getPoster()?.remoteUrl, let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .onAppear { imageLoaded = true }
+                    case .failure:
+                        VStack {
+                            Image(systemName: "photo.badge.exclamationmark")
+                                .font(.largeTitle)
+                                .foregroundColor(.red)
+                            Text("Error Loading")
+                                .font(.caption2)
+                        }
+                        .onAppear { loadError = true }
+                    case .empty:
+                        ProgressView()
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+            } else {
+                Image(systemName: "photo")
+                    .foregroundColor(.gray)
+            }
+
+            if imageLoaded {
+                additionalContent()
+            }
+        }
+        .aspectRatio(aspectRatio, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: radius))
+        .shadow(radius: elevation)
     }
 }

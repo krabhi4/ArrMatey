@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Shared
 
 extension Color {
     init(hex: String) {
@@ -31,5 +32,14 @@ extension Color {
             blue: Double(b) / 255,
             opacity: Double(a) / 255
         )
+    }
+    
+    init(argb: UInt64) {
+        let a = Double((argb >> 56) & 0xFF) / 255.0
+        let r = Double((argb >> 48) & 0xFF) / 255.0
+        let g = Double((argb >> 40) & 0xFF) / 255.0
+        let b = Double((argb >> 32) & 0xFF) / 255.0
+        
+        self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
     }
 }
