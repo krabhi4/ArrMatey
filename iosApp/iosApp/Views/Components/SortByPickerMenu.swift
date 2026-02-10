@@ -38,30 +38,20 @@ struct SortByPickerMenu: View {
     
     var body: some View {
         Menu {
-            Picker(MR.strings().sort_by.localized(), selection: $sortedBy) {
-                ForEach(sortByOptions, id: \.self) { sortOption in
-                    Label {
+            ForEach(sortByOptions, id: \.self) { sortOption in
+                Button(action: {
+                    if sortedBy == sortOption {
+                        changeSortOrder((sortOrder == .asc) ? .desc : .asc)
+                    } else {
+                        changeSortBy(sortOption)
+                    }
+                }) {
+                    if sortedBy == sortOption {
+                        Label(sortOption.resource.localized(), systemImage: sortOrder == .asc ? "chevron.up" : "chevron.down")
+                    } else {
                         Text(sortOption.resource.localized())
-                    } icon: {
-                        Image(systemName: sortOption.iosIcon)
-                    }
-                    .tag(sortOption)
-                }
-            }
-            .pickerStyle(.inline)
-            
-            Section {
-                Picker(MR.strings().direction.localized(), selection: $sortOrder) {
-                    ForEach(Shared.SortOrder.allCases, id: \.self) { sortOrder in
-                        Label {
-                            Text(sortOrder.resource.localized())
-                        } icon: {
-                            Image(systemName: sortOrder.iosIcon)
-                        }
-                        .tag(sortOrder)
                     }
                 }
-                .pickerStyle(.inline)
             }
         } label: {
             Label(sortedBy.resource.localized(), systemImage: "arrow.up.arrow.down")

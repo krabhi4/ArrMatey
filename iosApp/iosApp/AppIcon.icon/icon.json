@@ -17,7 +17,9 @@
           ],
           "fill-specializations" : [
             {
-              "value" : "automatic"
+              "value" : {
+                "solid" : "display-p3:1.00000,1.00000,1.00000,1.00000"
+              }
             },
             {
               "appearance" : "dark",
