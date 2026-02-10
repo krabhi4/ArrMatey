@@ -12,9 +12,11 @@ import Shared
 struct MoviesTab: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
+    @StateObject private var movieViewModel = ArrMediaViewModelS(type: .radarr)
+    
     var body: some View {
         NavigationStack(path: $navigationManager.moviePath) {
-            ArrTab(type: .radarr)
+            ArrTab(type: .radarr, viewModel: movieViewModel)
                 .navigationDestination(for: MediaRoute.self) { value in
                     destination(for: value)
                 }

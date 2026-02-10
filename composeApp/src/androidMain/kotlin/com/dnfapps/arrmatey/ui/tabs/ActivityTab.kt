@@ -38,6 +38,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -86,6 +87,7 @@ fun ActivityTab(
     val instances by viewModel.instances.collectAsStateWithLifecycle()
     val uiState by viewModel.activityQueueUiState.collectAsStateWithLifecycle()
     val removeItemStatus by viewModel.removeItemState.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isPolling.collectAsStateWithLifecycle()
 
     var showConfirmRemove by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<QueueItem?>(null) }
@@ -121,11 +123,13 @@ fun ActivityTab(
             )
         }
     ) { paddingValues ->
-        Box(
+        PullToRefreshBox(
             modifier = Modifier
                 .padding(paddingValues.copy(bottom = 0.dp))
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
+            isRefreshing = isLoading,
+            onRefresh = { viewModel.refresh() }
         ) {
             if (queueItems.isEmpty()) {
                 EmptyActivityState()

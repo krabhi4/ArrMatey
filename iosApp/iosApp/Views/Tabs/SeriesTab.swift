@@ -9,9 +9,11 @@ import Shared
 struct SeriesTab: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
+    @StateObject private var seriesViewModel = ArrMediaViewModelS(type: .sonarr)
+    
     var body: some View {
         NavigationStack(path: $navigationManager.seriesPath) {
-            ArrTab(type: .sonarr)
+            ArrTab(type: .sonarr, viewModel: seriesViewModel)
                 .navigationDestination(for: MediaRoute.self) { value in
                     destination(for: value)
                 }

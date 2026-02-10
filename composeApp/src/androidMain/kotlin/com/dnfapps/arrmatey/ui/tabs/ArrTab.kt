@@ -5,7 +5,9 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
+import com.dnfapps.arrmatey.arr.viewmodel.ArrMediaViewModel
 import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
+import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
@@ -22,6 +24,7 @@ import org.koin.compose.koinInject
 @Composable
 fun ArrTab(
     type: InstanceType,
+    arrMediaViewModel: ArrMediaViewModel = koinInjectParams(type),
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.arr(type)
 ) {
@@ -30,7 +33,7 @@ fun ArrTab(
         onBack = { navigation.popBackStack() },
         entryProvider = entryProvider {
             entry<ArrScreen.Library> {
-                ArrLibraryScreen(type)
+                ArrLibraryScreen(type, arrMediaViewModel)
             }
             entry<ArrScreen.Details> { details ->
                 MediaDetailsScreen(details.id, type)

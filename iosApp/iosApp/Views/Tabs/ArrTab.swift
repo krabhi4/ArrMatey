@@ -38,9 +38,9 @@ struct ArrTab: View {
     }
     
     
-    init(type: InstanceType) {
+    init(type: InstanceType, viewModel: ArrMediaViewModelS) {
         self.type = type
-        self.arrMediaViewModel = ArrMediaViewModelS(type: type)
+        self.arrMediaViewModel = viewModel
         self.instancesViewModel = InstancesViewModelS(type: type)
     }
     
@@ -53,13 +53,13 @@ struct ArrTab: View {
             .refreshable {
                 arrMediaViewModel.refresh()
             }
-            .onReceive(instancesViewModel.$instancesState) { _ in
-                if instanceState.selectedInstance != nil {
+            .onReceive(instancesViewModel.$instancesState) { newState in
+                if newState.selectedInstance != nil && uiState is ArrLibraryInitial {
                     arrMediaViewModel.refresh()
                 }
             }
             .task {
-                if instanceState.selectedInstance != nil {
+                if instanceState.selectedInstance != nil && uiState is ArrLibraryInitial {
                     arrMediaViewModel.refresh()
                 }
             }
@@ -84,7 +84,7 @@ struct ArrTab: View {
             }
         } else if let success = uiState as? ArrLibrarySuccess {
             ArrLibraryView(type: type, state: success, searchQuery: $arrMediaViewModel.searchQuery, searchPresented: $searchPresented)
-        } else if uiState is ArrLibraryError {
+    } else if uiState is ArrLibraryError {
             ZStack {
                 errorView()
             }

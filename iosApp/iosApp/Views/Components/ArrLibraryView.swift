@@ -23,14 +23,21 @@ struct ArrLibraryView: View {
     }
     
     var body: some View {
-        if state.items.isEmpty && searchQuery.isEmpty {
-            VStack {
-                EmptyLibraryView()
+        Group {
+            if state.items.isEmpty && searchQuery.isEmpty {
+                VStack {
+                    EmptyLibraryView()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                contentView(items: state.items, prefs: state.preferences)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
-            contentView(items: state.items, prefs: state.preferences)
         }
+        .searchable(
+            text: $searchQuery,
+            isPresented: $searchPresented,
+            placement: .navigationBarDrawer(displayMode: .automatic)
+        )
     }
     
     private func contentView(
@@ -58,11 +65,6 @@ struct ArrLibraryView: View {
             }
         }
         .id(items.count)
-        .searchable(
-            text: $searchQuery,
-            isPresented: $searchPresented,
-            placement: .automatic
-        )
     }
     
     @ViewBuilder
