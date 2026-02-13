@@ -31,7 +31,7 @@ fun MovieFileView(
     movie: ArrMovie,
     movieExtraFiles: List<ExtraFile>,
     searchIds: Set<Long>,
-    onAutomaticSearch: (Long) -> Unit,
+    onAutomaticSearch: () -> Unit,
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.movies()
 ) {
@@ -43,11 +43,7 @@ fun MovieFileView(
                 val destination = ArrScreen.MovieReleases(movie.id!!)
                 navigation.navigateTo(destination)
             },
-            onAutomaticClicked = {
-                movie.id?.let { id ->
-                    onAutomaticSearch(id)
-                }
-            },
+            onAutomaticClicked = onAutomaticSearch,
             automaticSearchEnabled = movie.monitored,
             automaticSearchInProgress = searchIds.contains(movie.id),
             modifier = Modifier

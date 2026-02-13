@@ -23,6 +23,9 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.androidx.navigation3.ui)
+            implementation(libs.coil)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -40,8 +43,6 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
             implementation(libs.androidx.compose.material3.alpha)
-            implementation(libs.coil.compose)
-            implementation(libs.coil.network)
             implementation(libs.kotlinx.datetime)
             implementation(libs.cloudy)
 

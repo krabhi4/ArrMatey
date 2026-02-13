@@ -1,5 +1,7 @@
 package com.dnfapps.arrmatey.arr.api.client
 
+import com.dnfapps.arrmatey.arr.api.model.ApplyTags
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
@@ -14,6 +16,7 @@ import com.dnfapps.arrmatey.arr.api.model.SeriesRelease
 import com.dnfapps.arrmatey.arr.api.model.SonarrHistoryItem
 import com.dnfapps.arrmatey.arr.api.model.SonarrHistoryResponse
 import com.dnfapps.arrmatey.client.NetworkResult
+import com.dnfapps.arrmatey.client.onSuccess
 import com.dnfapps.arrmatey.instances.model.Instance
 import io.ktor.client.HttpClient
 import kotlinx.datetime.LocalDate
@@ -24,7 +27,20 @@ class SonarrClient(
 ) : BaseArrClient(httpClient) {
 
     override suspend fun getLibrary(): NetworkResult<List<ArrSeries>> =
-        get("series")
+        get<List<ArrSeries>>("series")
+            .onSuccess { shows ->
+                shows.map { series ->
+                    series.copy(
+                        images = series.images.map { image ->
+                            if (image.remoteUrl?.startsWith("/") == true) {
+                                image.copy(remoteUrl = "$baseUrl${image.remoteUrl}")
+                            } else {
+                                image
+                            }
+                        }
+                    )
+                }
+            }
 
     override suspend fun getDetail(id: Long): NetworkResult<ArrSeries> =
         get("series/$id")
@@ -46,7 +62,7 @@ class SonarrClient(
             qualityProfileId = series.qualityProfileId,
             rootFolderPath = series.rootFolderPath,
             tags = series.tags,
-            applyTags = "replace",
+            applyTags = ApplyTags.Replace,
             moveFiles = moveFiles,
         )
         return put("series/editor", body = body)
@@ -68,10 +84,8 @@ class SonarrClient(
     override suspend fun lookup(query: String): NetworkResult<List<ArrSeries>> =
         get("series/lookup", mapOf("term" to query))
 
-    override suspend fun addItemToLibrary(item: ArrMedia): NetworkResult<ArrSeries> {
-        val res = post<ArrMedia, ArrSeries>("series", item)
-        return res
-    }
+    override suspend fun addItemToLibrary(item: ArrMedia): NetworkResult<ArrSeries> =
+        post<ArrMedia, ArrSeries>("series", item)
 
     override suspend fun getReleases(params: ReleaseParams): NetworkResult<List<SeriesRelease>> {
         if (params !is ReleaseParams.Series) {
@@ -126,6 +140,11 @@ class SonarrClient(
         start: LocalDate,
         end: LocalDate
     ): NetworkResult<List<ArrMovie>> = NetworkResult.Success(emptyList())
+
+    override suspend fun getAlbumCalendar(
+        start: LocalDate,
+        end: LocalDate
+    ): NetworkResult<List<ArrAlbum>> = NetworkResult.Success(emptyList())
 
     suspend fun updateEpisode(item: Episode): NetworkResult<Episode> =
         put("episode/${item.id}", item)

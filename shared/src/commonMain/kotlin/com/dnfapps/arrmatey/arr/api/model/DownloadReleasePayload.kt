@@ -22,4 +22,11 @@ sealed interface DownloadReleasePayload {
         val seasonNumber: Int? = null,
         val episodeId: Long? = null
     ) : DownloadReleasePayload
+
+    @Serializable
+    data class Album(
+        override val guid: String,
+        override val indexerId: Int,
+        val albumId: Long? = null,
+    ): DownloadReleasePayload
 }

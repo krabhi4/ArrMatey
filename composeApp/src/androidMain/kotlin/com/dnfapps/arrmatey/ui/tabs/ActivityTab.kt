@@ -11,19 +11,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -31,7 +32,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -57,21 +57,18 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dnfapps.arrmatey.arr.api.model.LidarrQueueItem
 import com.dnfapps.arrmatey.arr.api.model.QueueDownloadState
 import com.dnfapps.arrmatey.arr.api.model.QueueItem
 import com.dnfapps.arrmatey.arr.api.model.RadarrQueueItem
 import com.dnfapps.arrmatey.arr.api.model.SonarrQueueItem
 import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.client.OperationStatus
-import com.dnfapps.arrmatey.compose.utils.QueueSortBy
-import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.entensions.bullet
 import com.dnfapps.arrmatey.entensions.copy
-import com.dnfapps.arrmatey.instances.model.Instance
 import com.dnfapps.arrmatey.isDebug
 import com.dnfapps.arrmatey.shared.MR
-import com.dnfapps.arrmatey.ui.components.DropdownPicker
 import com.dnfapps.arrmatey.ui.components.LabelledSwitch
 import com.dnfapps.arrmatey.ui.menu.ActivityFilterMenu
 import com.dnfapps.arrmatey.utils.format
@@ -129,7 +126,7 @@ fun ActivityTab(
                 .padding(paddingValues.copy(bottom = 0.dp))
                 .fillMaxSize(),
             contentAlignment = Alignment.Center,
-            isRefreshing = isLoading,
+            isRefreshing = false,
             onRefresh = { viewModel.refresh() }
         ) {
             if (queueItems.isEmpty()) {
@@ -190,6 +187,10 @@ fun ActivityItem(
         item is RadarrQueueItem -> CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        item is LidarrQueueItem -> CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         )
         else -> CardDefaults.cardColors()
     }
@@ -261,6 +262,7 @@ fun QueueItemInfoSheet(
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 24.dp)
         ) {
@@ -386,7 +388,8 @@ fun QueueItemInfoSheet(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally),
-                modifier = Modifier.wrapContentWidth()
+                modifier = Modifier.heightIn(max = 1000.dp),
+                userScrollEnabled = false
             ) {
                 infoItems.forEach { (key, value) ->
                     value?.let {

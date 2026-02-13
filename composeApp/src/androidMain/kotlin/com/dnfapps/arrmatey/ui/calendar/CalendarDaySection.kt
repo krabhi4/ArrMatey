@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.EpisodeGroup
 import com.dnfapps.arrmatey.shared.MR
@@ -32,7 +33,8 @@ import kotlin.time.ExperimentalTime
 fun CalendarDaySection(
     date: LocalDate,
     movies: List<ArrMovie>,
-    episodeGroups: List<EpisodeGroup>
+    episodeGroups: List<EpisodeGroup>,
+    albums: List<ArrAlbum>
 ) {
     val today = remember {
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
@@ -69,7 +71,7 @@ fun CalendarDaySection(
             }
 
             val totalEpisodes = episodeGroups.sumOf { it.totalCount }
-            val totalItems = movies.size + totalEpisodes
+            val totalItems = movies.size + albums.size + totalEpisodes
             if (totalItems > 0) {
                 Surface(
                     shape = CircleShape,
@@ -91,6 +93,10 @@ fun CalendarDaySection(
 
         episodeGroups.forEach { episode ->
             EpisodeCalendarItem(episode)
+        }
+
+        albums.forEach { album ->
+            AlbumCalendarItem(album)
         }
     }
 }

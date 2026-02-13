@@ -68,46 +68,24 @@ fun SeasonHeader(
         text = infoString,
         fontSize = 16.sp
     )
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.fillMaxWidth().padding(top = 6.dp)
-    ) {
-        IconButton (
-            onClick = onDeleteSeason,
-            shape = RoundedCornerShape(10.dp),
-            colors = IconButtonDefaults.iconButtonColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer
-            ),
-            enabled = !deleteInProgress
-        ) {
-            if (deleteInProgress) {
-                CircularProgressIndicator(Modifier.size(24.dp))
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = mokoString(MR.strings.delete)
-                )
-            }
-        }
 
-        ReleaseDownloadButtons(
-            onInteractiveClicked = {
-                seriesId?.let { seriesId ->
-                    val destination = ArrScreen.SeriesRelease(
-                        seriesId = seriesId,
-                        seasonNumber = season.seasonNumber
-                    )
-                    navigation.navigateTo(destination)
-                }
-            },
-            onAutomaticClicked = {
-                onPerformAutomaticSearch(season.seasonNumber)
-            },
-            automaticSearchInProgress = searchInProgress(season.seasonNumber),
-            modifier = Modifier.weight(1f),
-            smallSpacing = true,
-            automaticSearchEnabled = episodes.any { it.monitored }
-        )
-    }
+    ReleaseDownloadButtons(
+        onInteractiveClicked = {
+            seriesId?.let { seriesId ->
+                val destination = ArrScreen.SeriesRelease(
+                    seriesId = seriesId,
+                    seasonNumber = season.seasonNumber
+                )
+                navigation.navigateTo(destination)
+            }
+        },
+        onAutomaticClicked = {
+            onPerformAutomaticSearch(season.seasonNumber)
+        },
+        automaticSearchInProgress = searchInProgress(season.seasonNumber),
+        modifier = Modifier.fillMaxWidth(),
+        automaticSearchEnabled = episodes.any { it.monitored },
+        deleteInProgress = deleteInProgress,
+        onDelete = onDeleteSeason,
+    )
 }

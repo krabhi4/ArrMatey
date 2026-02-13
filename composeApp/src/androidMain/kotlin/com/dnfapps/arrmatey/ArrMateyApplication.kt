@@ -1,11 +1,17 @@
 package com.dnfapps.arrmatey
 
 import android.app.Application
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
 import com.dnfapps.arrmatey.di.appModules
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
-class ArrMateyApplication : Application() {
+class ArrMateyApplication : Application(), SingletonImageLoader.Factory {
+
+    private val imageLoader: ImageLoader by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -15,4 +21,8 @@ class ArrMateyApplication : Application() {
             modules(appModules() + listOf(androidModule))
         }
     }
+
+    override fun newImageLoader(
+        context: PlatformContext
+    ): ImageLoader = imageLoader
 }

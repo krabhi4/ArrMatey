@@ -48,7 +48,7 @@ struct MediaPreviewScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                MediaDetailsHeader(item: media)
+                MediaDetailsHeader(item: media, type: type)
 
                 VStack(alignment: .leading, spacing: 12) {
                     if let airingString = makeAiringString(for: media) {

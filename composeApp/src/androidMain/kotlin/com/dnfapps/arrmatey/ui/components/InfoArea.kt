@@ -23,9 +23,12 @@ import androidx.compose.ui.unit.sp
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
+import com.dnfapps.arrmatey.arr.api.model.ArtistMonitorType
 import com.dnfapps.arrmatey.arr.api.model.QualityProfile
-import com.dnfapps.arrmatey.arr.api.model.SeriesMonitorNewItems
+import com.dnfapps.arrmatey.arr.api.model.MonitorNewItems
 import com.dnfapps.arrmatey.arr.api.model.Tag
+import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
 import com.dnfapps.arrmatey.entensions.forEachIndexed
 import com.dnfapps.arrmatey.utils.format
 import com.dnfapps.arrmatey.utils.mokoString
@@ -55,6 +58,7 @@ fun InfoArea(
                 val infoItems = when (item) {
                     is ArrSeries -> seriesInfo(item, qualityProfiles, tags)
                     is ArrMovie -> movieInfo(item, qualityProfiles, tags)
+                    is Arrtist -> artistInfo(item, qualityProfiles, tags)
                 }
                 infoItems.forEachIndexed { index, (key, value) ->
                     Row(
@@ -92,7 +96,7 @@ private fun seriesInfo(
     val tagsLabel = series.formatTags(tags) ?: mokoString(MR.strings.none)
 
     val unknown = mokoString(MR.strings.unknown)
-    val monitorLabel = if (series.monitorNewItems == SeriesMonitorNewItems.All) {
+    val monitorLabel = if (series.monitorNewItems == MonitorNewItems.All) {
         mokoString(MR.strings.monitored)
     } else { mokoString(MR.strings.unmonitored) }
 
@@ -100,8 +104,11 @@ private fun seriesInfo(
         mokoString(MR.strings.yes)
     } else { mokoString(MR.strings.no) }
 
+    val diskSize = series.fileSize.bytesAsFileSizeString()
+
     return mapOf(
         mokoString(MR.strings.series_type) to series.seriesType.name,
+        mokoString(MR.strings.size_on_disk) to diskSize,
         mokoString(MR.strings.root_folder) to (series.rootFolderPath ?: unknown),
         mokoString(MR.strings.path) to (series.path ?: unknown),
         mokoString(MR.strings.new_seasons) to monitorLabel,
@@ -143,4 +150,33 @@ private fun movieInfo(
         put(mokoString(MR.strings.tags), tagsLabel)
     }
 
+}
+
+@Composable
+private fun artistInfo(
+    artist: Arrtist,
+    qualityProfiles: List<QualityProfile>,
+    tags: List<Tag>
+): Map<String, String> {
+    val qualityProfile = qualityProfiles.firstOrNull { it.id == artist.qualityProfileId }
+    val tagsLabel = artist.formatTags(tags) ?: mokoString(MR.strings.none)
+
+    val unknown = mokoString(MR.strings.unknown)
+    val monitorLabel = if (artist.monitorNewItems == ArtistMonitorType.All) {
+        mokoString(MR.strings.monitored)
+    } else { mokoString(MR.strings.unmonitored) }
+
+    val rootFolderPathValue = artist.rootFolderPath?.takeUnless { it.isBlank() }
+        ?: mokoString(MR.strings.unknown)
+
+    val diskSize = artist.fileSize.bytesAsFileSizeString()
+
+    return buildMap {
+        put(mokoString(MR.strings.size_on_disk), diskSize)
+        put(mokoString(MR.strings.root_folder), rootFolderPathValue)
+        put(mokoString(MR.strings.path), (artist.path ?: unknown))
+        put(mokoString(MR.strings.new_albums), monitorLabel)
+        put(mokoString(MR.strings.quality_profile), (qualityProfile?.name ?: unknown))
+        put(mokoString(MR.strings.tags), tagsLabel)
+    }
 }

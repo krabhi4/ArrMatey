@@ -20,7 +20,7 @@ fun ContainerCard(
         shape = RoundedCornerShape(10.dp)
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 12.dp, horizontal = 18.dp),
+            modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
             content = content
         )
     }

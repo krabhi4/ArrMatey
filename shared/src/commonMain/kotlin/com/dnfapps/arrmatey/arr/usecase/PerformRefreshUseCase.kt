@@ -14,6 +14,7 @@ class PerformRefreshUseCase {
         val payload = when (type) {
             InstanceType.Sonarr -> CommandPayload.RefreshSeries(mediaId)
             InstanceType.Radarr -> CommandPayload.RefreshMovie(listOf(mediaId))
+            InstanceType.Lidarr -> CommandPayload.RefreshAlbum(mediaId)
         }
         return repository.executeCommand(payload)
     }

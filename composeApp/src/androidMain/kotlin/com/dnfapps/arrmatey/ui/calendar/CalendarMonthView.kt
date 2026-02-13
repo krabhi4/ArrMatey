@@ -57,6 +57,7 @@ fun CalendarMonthView(
 
     val dayMovies = state.movies[selectedDate] ?: emptyList()
     val dayEpisodeGroups = state.groupedEpisodes[selectedDate] ?: emptyList()
+    val dayAlbums = state.albums[selectedDate] ?: emptyList()
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -94,19 +95,19 @@ fun CalendarMonthView(
             onDateSelected = { selectedDate = it },
             state = state
         )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
+        HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
 
         if (selectedDate.month == currentMonth.month && selectedDate.year == currentMonth.year) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                contentPadding = PaddingValues(16.dp)
             ) {
                 item {
                     CalendarDaySection(
                         date = selectedDate,
                         movies = dayMovies,
-                        episodeGroups = dayEpisodeGroups
+                        episodeGroups = dayEpisodeGroups,
+                        albums = dayAlbums
                     )
                 }
             }

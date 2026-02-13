@@ -26,8 +26,6 @@ data class SeriesRelease(
     override val approved: Boolean,
     override val temporarilyRejected: Boolean,
     override val rejected: Boolean,
-    override val tmdbId: Int? = null,
-    override val imdbId: String? = null,
     override val rejections: List<String>,
     @Contextual override val publishDate: Instant,
     override val commentUrl: String,
@@ -45,6 +43,8 @@ data class SeriesRelease(
     override val languages: List<Language> = emptyList(),
     override val magnetUrl: String? = null,
 
+    val tmdbId: Int? = null,
+    val imdbId: String? = null,
     val indexerFlags: Int,
     val fullSeason: Boolean,
     val seasonNumber: Int,

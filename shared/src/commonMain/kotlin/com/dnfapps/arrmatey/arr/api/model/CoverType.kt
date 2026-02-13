@@ -2,21 +2,27 @@ package com.dnfapps.arrmatey.arr.api.model
 
 import kotlinx.serialization.SerialName
 
-enum class CoverType {
+enum class CoverType(val defaultFileName: String) {
     @SerialName("clearlogo")
-    ClearLogo,
+    ClearLogo("clearlogo.jpg"),
 
     @SerialName("banner")
-    Banner,
+    Banner("banner.jpg"),
 
     @SerialName("poster")
-    Poster,
+    Poster("poster.jpg"),
 
     @SerialName("fanart")
-    FanArt,
+    FanArt("fanart.jpg"),
 
     @SerialName("screenshot")
-    Screenshot,
+    Screenshot("screenshot.jpg"),
 
-    Undefined
+    @SerialName("cover")
+    Cover("cover.jpg"),
+
+    @SerialName("disc")
+    Disc("disc.jpg"),
+
+    Undefined("")
 }

@@ -18,6 +18,8 @@ struct MediaInfoArea: View {
             seriesInfo(series)
         } else if let movie = item as? ArrMovie {
             movieInfo(movie)
+        } else if let artist = item as? Arrtist {
+            artistInfo(artist)
         } else { [] }
     }
     
@@ -68,8 +70,11 @@ struct MediaInfoArea: View {
             MR.strings().no.localized()
         }
         
+        let diskSize = series.fileSize.bytesAsFileSizeString()
+        
         return [
             InfoItem(label: MR.strings().series_type.localized(), value: series.seriesType.name),
+            InfoItem(label: MR.strings().size_on_disk.localized(), value: diskSize),
             InfoItem(label: MR.strings().root_folder.localized(), value: series.rootFolderPath ?? unknown),
             InfoItem(label: MR.strings().path.localized(), value: series.path ?? unknown),
             InfoItem(label: MR.strings().new_seasons.localized(), value: monitorLabel),
@@ -78,7 +83,7 @@ struct MediaInfoArea: View {
             InfoItem(label: MR.strings().tags.localized(), value: tagsLabel)
         ]
     }
-    
+
     private func movieInfo(_ movie: ArrMovie) -> [InfoItem] {
         let unknown = MR.strings().unknown.localized()
         
@@ -86,9 +91,7 @@ struct MediaInfoArea: View {
         let qualityLabel = qualityProfile?.name ?? unknown
         let tagsLabel = movie.formatTags(availableTags: tags) ?? MR.strings().none.localized()
         
-        let rootFolderValue = if movie.rootFolderPath.isEmpty { unknown } else {
-            movie.rootFolderPath
-        }
+        let rootFolderValue = movie.rootFolderPath.isEmpty ? unknown : movie.rootFolderPath
         
         var info: [InfoItem] = [
             InfoItem(label: MR.strings().minimum_availability.localized(), value: movie.minimumAvailability.name),
@@ -104,7 +107,7 @@ struct MediaInfoArea: View {
             info.append(InfoItem(label: MR.strings().physical_release.localized(), value: physicalRelease))
         }
         
-        if let digitalRelease = movie.digitalRelease?.format(pattern: "MMM d, yyy") {
+        if let digitalRelease = movie.digitalRelease?.format(pattern: "MMM d, yyyy") {
             info.append(InfoItem(label: MR.strings().digital_release.localized(), value: digitalRelease))
         }
         
@@ -112,5 +115,36 @@ struct MediaInfoArea: View {
         info.append(InfoItem(label: MR.strings().tags.localized(), value: tagsLabel))
         
         return info
+    }
+
+    private func artistInfo(_ artist: Arrtist) -> [InfoItem] {
+        let unknown = MR.strings().unknown.localized()
+        
+        let qualityProfile = qualityProfiles.first(where: { $0.id == artist.qualityProfileId })
+        let qualityLabel = qualityProfile?.name ?? unknown
+        let tagsLabel = artist.formatTags(availableTags: tags) ?? MR.strings().none.localized()
+        
+        let monitorLabel = if artist.monitorNewItems == .all {
+            MR.strings().monitored.localized()
+        } else {
+            MR.strings().unmonitored.localized()
+        }
+        
+        let rootFolderValue = if let path = artist.rootFolderPath, !path.isEmpty {
+            path
+        } else {
+            unknown
+        }
+        
+        let diskSize = artist.fileSize.bytesAsFileSizeString()
+        
+        return [
+            InfoItem(label: MR.strings().size_on_disk.localized(), value: diskSize),
+            InfoItem(label: MR.strings().root_folder.localized(), value: rootFolderValue),
+            InfoItem(label: MR.strings().path.localized(), value: artist.path ?? unknown),
+            InfoItem(label: MR.strings().new_albums.localized(), value: monitorLabel),
+            InfoItem(label: MR.strings().quality_profile.localized(), value: qualityLabel),
+            InfoItem(label: MR.strings().tags.localized(), value: tagsLabel)
+        ]
     }
 }

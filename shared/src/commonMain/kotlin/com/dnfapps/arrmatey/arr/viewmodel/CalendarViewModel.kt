@@ -2,6 +2,7 @@ package com.dnfapps.arrmatey.arr.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.EpisodeGroup
@@ -36,6 +37,7 @@ class CalendarViewModel(
             movies = filterMovies(calendar.movies, filter),
             episodes = filterEpisodes(calendar.episodes, filter),
             groupedEpisodes = filterEpisodeGroups(calendar.groupedEpisodes, filter),
+            albums = filterAlbums(calendar.albums, filter),
             dates = calendar.dates,
             isLoading = calendar.isLoading,
             isLoadingFuture = calendar.isLoadingFuture,
@@ -160,6 +162,20 @@ class CalendarViewModel(
             }
         }
 
+    private fun filterAlbums(
+        albumsMap: Map<LocalDate, List<ArrAlbum>>,
+        filter: CalendarFilterState
+    ): Map<LocalDate, List<ArrAlbum>> =
+        if (filter.contentFilter != ContentFilter.All && filter.contentFilter != ContentFilter.AlbumsOnly) {
+            emptyMap()
+        } else {
+            albumsMap.mapValues { (_, albums) ->
+                albums.filter { album ->
+                    filterAlbum(album, filter)
+                }
+            }
+        }
+
     private fun filterMovie(movie: ArrMovie, filter: CalendarFilterState): Boolean {
         return (!filter.showMonitoredOnly || movie.monitored) &&
                 (filter.instanceId == null || movie.instanceId == filter.instanceId)
@@ -170,5 +186,10 @@ class CalendarViewModel(
                 (!filter.showPremiersOnly || (episode.seasonNumber == 1 && episode.episodeNumber == 1)) &&
                 (!filter.showFinalesOnly || episode.finaleType != null) &&
                 (filter.instanceId == null || episode.instanceId == filter.instanceId)
+    }
+
+    private fun filterAlbum(album: ArrAlbum, filter: CalendarFilterState): Boolean {
+        return (!filter.showMonitoredOnly || album.monitored) &&
+                (filter.instanceId == null || album.instanceId == filter.instanceId)
     }
 }

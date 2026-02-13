@@ -2,6 +2,7 @@ package com.dnfapps.arrmatey.arr.api.model
 
 import androidx.compose.ui.graphics.Color
 import com.dnfapps.arrmatey.extensions.formatAsRuntime
+import com.dnfapps.arrmatey.instances.model.Instance
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
@@ -37,18 +38,16 @@ sealed interface ArrMedia {
      */
     val id: Long?
     val title: String
-    val originalLanguage: Language
-    val year: Int
+    val originalLanguage: Language?
+    val year: Int?
     val qualityProfileId: Int
     val monitored: Boolean
-    val runtime: Int
-    val tmdbId: Long?
+    val runtime: Int?
     val images: List<ArrImage>
     val sortTitle: String?
     val overview: String?
     val path: String?
     val cleanTitle: String?
-    val imdbId: String?
     val titleSlug: String?
     val rootFolderPath: String?
     val folder: String?
@@ -73,7 +72,7 @@ sealed interface ArrMedia {
     val fileSize: Long
         get() = statistics?.sizeOnDisk ?: 0L
     val runtimeString: String
-        get() = runtime.formatAsRuntime()
+        get() = runtime?.formatAsRuntime() ?: ""
 
     fun getPoster(): ArrImage?  {
         return images.firstOrNull { it.coverType == CoverType.Poster }
@@ -116,6 +115,7 @@ fun ArrMedia.toJson(): String {
     val element: JsonElement = when (this) {
         is ArrSeries -> ArrMedia.json.encodeToJsonElement(ArrSeriesSerializer, this)
         is ArrMovie  -> ArrMedia.json.encodeToJsonElement(ArrMovieSerializer, this)
+        is Arrtist -> ArrMedia.json.encodeToJsonElement(ArrtistSerializer, this)
     }
 
     return ArrMedia.json.encodeToString(element)
@@ -143,6 +143,17 @@ object ArrMovieSerializer :
     }
 }
 
+object ArrtistSerializer:
+    JsonTransformingSerializer<Arrtist>(Arrtist.serializer()) {
+    override fun transformSerialize(element: JsonElement): JsonElement {
+        val obj = element.jsonObject
+        return buildJsonObject {
+            obj.forEach { (k, v) -> put(k, v) }
+            put("mediaType", InstanceType.Lidarr.name)
+        }
+    }
+}
+
 
 object AnyArrMediaSerializer: KSerializer<ArrMedia> {
     override val descriptor: SerialDescriptor
@@ -158,6 +169,7 @@ object AnyArrMediaSerializer: KSerializer<ArrMedia> {
         return when (mediaType) {
             InstanceType.Sonarr.name -> decoder.json.decodeFromJsonElement(ArrSeries.serializer(), element)
             InstanceType.Radarr.name -> decoder.json.decodeFromJsonElement(ArrMovie.serializer(), element)
+            InstanceType.Lidarr.name -> decoder.json.decodeFromJsonElement(Arrtist.serializer(), element)
             else -> error("Unknown mediaType: $mediaType")
         }
     }
@@ -168,6 +180,7 @@ object AnyArrMediaSerializer: KSerializer<ArrMedia> {
         val element: JsonElement = when (value) {
             is ArrSeries -> json.encodeToJsonElement(ArrSeriesSerializer, value)
             is ArrMovie  -> json.encodeToJsonElement(ArrMovieSerializer, value)
+            is Arrtist -> json.encodeToJsonElement(ArrtistSerializer, value)
         }
         encoder.encodeJsonElement(element)
     }

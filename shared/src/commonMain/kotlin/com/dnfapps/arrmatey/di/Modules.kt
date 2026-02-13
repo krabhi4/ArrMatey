@@ -41,6 +41,7 @@ import com.dnfapps.arrmatey.arr.service.ActivityQueueService
 import com.dnfapps.arrmatey.arr.api.client.HttpClientFactory
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.service.CalendarService
+import com.dnfapps.arrmatey.arr.usecase.DeleteAlbumFilesUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteEpisodeFileUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteMediaUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteQueueItemUseCase
@@ -143,6 +144,7 @@ val useCaseModule = module {
     factory { DeleteQueueItemUseCase(get()) }
     factory { PerformRefreshUseCase() }
     factory { GetCalendarUseCase(get()) }
+    factory { DeleteAlbumFilesUseCase() }
 }
 
 val viewModelModule = module {
@@ -151,7 +153,7 @@ val viewModelModule = module {
         ArrMediaViewModel(type, get(), get(), get())
     }
     factory { (id: Long, type: InstanceType) ->
-        ArrMediaDetailsViewModel(id, type, get(), get(), get(), get(), get(), get(), get(), get())
+        ArrMediaDetailsViewModel(id, type, get(), get(), get(), get(), get(), get(), get(), get(), get())
     }
     factory { (type: InstanceType) ->
         InstancesViewModel(type, get(), get(), get())

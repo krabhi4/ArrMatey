@@ -35,6 +35,7 @@ object HistoryItemSerializer : JsonContentPolymorphicSerializer<HistoryItem>(His
         return when {
             "movieId" in jsonObject -> RadarrHistoryItem.serializer()
             "seriesId" in jsonObject -> SonarrHistoryItem.serializer()
+            "artistId" in jsonObject || "albumId" in jsonObject || "trackId" in jsonObject -> LidarrHistoryItem.serializer()
             else -> throw SerializationException("Unknown MediaItem type")
         }
     }

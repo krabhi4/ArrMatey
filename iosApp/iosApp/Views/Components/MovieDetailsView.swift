@@ -22,9 +22,10 @@ struct MovieDetailsView: View {
     }
     
     private var runtimeString: String? {
-        guard item.runtime > 0 else { return nil }
-        let hours = item.runtime / 60
-        let minutes = item.runtime % 60
+        let runtime = item.runtime.intValue
+        guard runtime > 0 else { return nil }
+        let hours = runtime / 60
+        let minutes = runtime % 60
         
         if hours > 0 {
             return "\(hours)h \(minutes)m"

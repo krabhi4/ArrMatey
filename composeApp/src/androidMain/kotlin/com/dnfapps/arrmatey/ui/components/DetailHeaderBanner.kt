@@ -14,7 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.dnfapps.arrmatey.compose.utils.rememberRemoteUrlData
+import com.dnfapps.arrmatey.ui.helpers.rememberRemoteImageData
 
 @Composable
 fun DetailHeaderBanner(
@@ -29,7 +29,7 @@ fun DetailHeaderBanner(
             .clipToBounds()
     ) {
         AsyncImage(
-            model = rememberRemoteUrlData(bannerUrl),
+            model = rememberRemoteImageData(bannerUrl),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.matchParentSize()

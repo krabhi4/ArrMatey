@@ -1,7 +1,6 @@
 package com.dnfapps.arrmatey.ui.screens
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import com.dnfapps.arrmatey.shared.MR
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,13 +24,11 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -58,6 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
 import com.dnfapps.arrmatey.arr.api.model.QualityProfile
 import com.dnfapps.arrmatey.arr.api.model.RootFolder
 import com.dnfapps.arrmatey.arr.api.model.Tag
@@ -74,6 +72,8 @@ import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
 import com.dnfapps.arrmatey.navigation.NavigationManager
+import com.dnfapps.arrmatey.shared.MR
+import com.dnfapps.arrmatey.ui.components.AlbumsArea
 import com.dnfapps.arrmatey.ui.components.DetailsHeader
 import com.dnfapps.arrmatey.ui.components.InfoArea
 import com.dnfapps.arrmatey.ui.components.ItemDescriptionCard
@@ -82,6 +82,7 @@ import com.dnfapps.arrmatey.ui.components.MovieFileView
 import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
 import com.dnfapps.arrmatey.ui.components.SeasonsArea
 import com.dnfapps.arrmatey.ui.components.UpcomingDateView
+import com.dnfapps.arrmatey.ui.sheets.EditArtistSheet
 import com.dnfapps.arrmatey.ui.sheets.EditMovieSheet
 import com.dnfapps.arrmatey.ui.sheets.EditSeriesSheet
 import com.dnfapps.arrmatey.utils.mokoString
@@ -108,6 +109,7 @@ fun MediaDetailsScreen(
 
     val monitorStatus by mediaDetailsViewModel.monitorStatus.collectAsStateWithLifecycle()
     val seasonDeleteStatus by mediaDetailsViewModel.deleteSeasonStatus.collectAsStateWithLifecycle()
+    val albumDeleteStatus by mediaDetailsViewModel.deleteAlbumStatus.collectAsStateWithLifecycle()
     val editStatus by mediaDetailsViewModel.editItemStatus.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -187,7 +189,7 @@ fun MediaDetailsScreen(
                             modifier = Modifier.verticalScroll(scrollState),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            DetailsHeader(item)
+                            DetailsHeader(item, type)
 
                             Column(
                                 modifier = Modifier.padding(horizontal = 24.dp),
@@ -226,8 +228,25 @@ fun MediaDetailsScreen(
                                         movieExtraFiles = state.extraFiles,
                                         searchIds = automaticSearchIds,
                                         onAutomaticSearch = {
-                                            mediaDetailsViewModel.performMovieAutomaticLookup(it)
+                                            mediaDetailsViewModel.performAutomaticLookup()
                                         }
+                                    )
+                                    is Arrtist -> AlbumsArea(
+                                        artist = item,
+                                        albums = state.albums,
+                                        tracks = state.tracks,
+                                        trackFiles = state.trackFiles,
+                                        searchIds = automaticSearchIds,
+                                        onToggleAlbumMonitor = {
+                                            mediaDetailsViewModel.toggleAlbumMonitored(it)
+                                        },
+                                        onAlbumAutomaticSearch = {
+                                            mediaDetailsViewModel.performAlbumAutomaticLookup(it)
+                                        },
+                                        deleteAlbumFiles = {
+                                            mediaDetailsViewModel.deleteAlbumFiles(it)
+                                        },
+                                        albumDeleteInProgress = albumDeleteStatus is OperationStatus.InProgress,
                                     )
                                 }
 
@@ -272,10 +291,10 @@ fun MediaDetailsScreen(
                         onRefresh = {
                             mediaDetailsViewModel.performRefresh()
                         },
-                        showSearch = type == InstanceType.Sonarr,
+                        showSearch = type.includeTopLevelAutomaticSearchOption,
                         enableSearch = isMonitored,
                         onSearchMonitored = {
-                            mediaDetailsViewModel.performSeriesAutomaticLookup()
+                            mediaDetailsViewModel.performAutomaticLookup()
                         }
                     )
                 }
@@ -418,6 +437,15 @@ private fun EditMediaSheet(
             onDismiss = onDismiss,
         )
         is ArrSeries -> EditSeriesSheet(
+            item = item,
+            qualityProfiles = qualityProfiles,
+            rootFolders = rootFolders,
+            tags = tags,
+            editInProgress = editInProgress,
+            onEditItem = onEditItem,
+            onDismiss = onDismiss
+        )
+        is Arrtist -> EditArtistSheet(
             item = item,
             qualityProfiles = qualityProfiles,
             rootFolders = rootFolders,

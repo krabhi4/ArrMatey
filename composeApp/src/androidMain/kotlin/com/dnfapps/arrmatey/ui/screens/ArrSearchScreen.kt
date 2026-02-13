@@ -43,7 +43,7 @@ import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
 import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.shared.MR
-import com.dnfapps.arrmatey.ui.components.PosterGrid
+import com.dnfapps.arrmatey.ui.components.MediaList
 import com.dnfapps.arrmatey.ui.menu.SearchSortMenu
 import com.dnfapps.arrmatey.utils.mokoString
 import kotlinx.coroutines.FlowPreview
@@ -157,7 +157,7 @@ fun ArrSearchScreen(
                                     modifier = Modifier.align(Alignment.Center)
                                 )
                             } else {
-                                PosterGrid(
+                                MediaList(
                                     items = state.items,
                                     onItemClick = { item ->
                                         val destination = if (item.id == null) {
@@ -167,7 +167,7 @@ fun ArrSearchScreen(
                                         }
                                         navigation.navigateTo(destination)
                                     },
-                                    itemIsActive = { item -> queueItems.any { it.mediaId == item.id } }
+                                    itemIsActive = { item -> queueItems.any { it.mediaId == item.id } },
                                 )
                             }
                         }

@@ -12,6 +12,7 @@ class NavigationManager: ObservableObject {
     @Published var settingsPath = NavigationPath()
     @Published var seriesPath = NavigationPath()
     @Published var moviePath = NavigationPath()
+    @Published var musicPath = NavigationPath()
     
     @Published var selectedTab: TabItem = .shows
     
@@ -21,6 +22,8 @@ class NavigationManager: ObservableObject {
             seriesPath.append(route)
         case .radarr:
             moviePath.append(route)
+        case .lidarr:
+            musicPath.append(route)
         }
     }
     
@@ -32,6 +35,9 @@ class NavigationManager: ObservableObject {
         case .radarr:
             moviePath.removeLast()
             moviePath.append(route)
+        case .lidarr:
+            musicPath.removeLast()
+            musicPath.append(route)
         }
     }
     
@@ -50,6 +56,10 @@ enum MediaRoute: Hashable {
         seriesId: Int64? = nil,
         seasonNumber: Int32? = nil,
         episodeId: Int64? = nil
+    )
+    case albumReleases(
+        albumId: Int64,
+        artistId: Int64? = nil
     )
     case episodeDetails(String, String)
 }

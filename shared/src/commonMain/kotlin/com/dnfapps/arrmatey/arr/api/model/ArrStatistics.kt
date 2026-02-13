@@ -21,6 +21,7 @@ object ArrStatisticsSerializer : JsonContentPolymorphicSerializer<ArrStatistics>
         return when {
             "episodeFileCount" in jsonObject -> SeriesStatistics.serializer()
             "movieFileCount" in jsonObject -> MovieStatistics.serializer()
+            "albumCount" in jsonObject -> LidarrStatistics.serializer()
             else -> throw SerializationException("Unknown MediaItem type")
         }
     }

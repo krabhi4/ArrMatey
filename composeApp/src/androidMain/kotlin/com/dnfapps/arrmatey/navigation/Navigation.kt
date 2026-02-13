@@ -32,3 +32,4 @@ abstract class Navigation<T>(initialScreen: T) {
 class SettingsNavigation: Navigation<SettingsScreen>(SettingsScreen.Landing)
 class SeriesTabNavigation : Navigation<ArrScreen>(ArrScreen.Library)
 class MoviesTabNavigation: Navigation<ArrScreen>(ArrScreen.Library)
+class MusicTabNavigation: Navigation<ArrScreen>(ArrScreen.Library)

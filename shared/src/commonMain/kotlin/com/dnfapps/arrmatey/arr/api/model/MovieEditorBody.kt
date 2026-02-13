@@ -10,6 +10,6 @@ data class MovieEditorBody(
     val minimumAvailability: MediaStatus,
     val rootFolderPath: String,
     val tags: List<Int>,
-    val applyTags: String,
+    val applyTags: ApplyTags,
     val moveFiles: Boolean
 )

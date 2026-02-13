@@ -3,18 +3,19 @@ package com.dnfapps.arrmatey.arr.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dnfapps.arrmatey.arr.api.model.Episode
+import com.dnfapps.arrmatey.arr.api.model.LidarrQueueItem
 import com.dnfapps.arrmatey.arr.api.model.QueueItem
 import com.dnfapps.arrmatey.arr.api.model.RadarrQueueItem
 import com.dnfapps.arrmatey.arr.api.model.SonarrQueueItem
-import com.dnfapps.arrmatey.arr.usecase.GetActivityTasksUseCase
 import com.dnfapps.arrmatey.arr.service.ActivityQueueService
 import com.dnfapps.arrmatey.arr.state.ActivityQueueUiState
 import com.dnfapps.arrmatey.arr.usecase.DeleteQueueItemUseCase
+import com.dnfapps.arrmatey.arr.usecase.GetActivityTasksUseCase
 import com.dnfapps.arrmatey.client.OperationStatus
 import com.dnfapps.arrmatey.compose.utils.QueueSortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
-import com.dnfapps.arrmatey.compose.utils.applySorting
 import com.dnfapps.arrmatey.database.InstanceRepository
+import com.dnfapps.arrmatey.extensions.orderedSortedBy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -68,10 +69,9 @@ class ActivityQueueViewModel(
         activityTasks,
         _activityQueueUiState
     ) { tasks, (instanceId, sortBy, sortOrder) ->
-        tasks
-            .groupByTask()
-            .filterByInstance(instanceId)
-            .applySorting(sortBy, sortOrder)
+        val grouped = groupByTask(tasks)
+        val filtered = filterByInstance(grouped, instanceId)
+        applySorting(filtered, sortBy, sortOrder)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -142,19 +142,25 @@ class ActivityQueueViewModel(
         super.onCleared()
         activityQueueService.stopPolling()
     }
+
+    private fun groupByTask(items: List<QueueItem>): List<QueueItem> =
+        items.groupBy { it.taskGroup }
+            .map { (_, groupItems) ->
+                val first = groupItems.first()
+                groupItems.size.takeIf { it > 0 }?.let { size ->
+                    when (first) {
+                        is SonarrQueueItem -> first.copy(taskGroupCount = size)
+                        is RadarrQueueItem -> first.copy(taskGroupCount = size)
+                        is LidarrQueueItem -> first.copy(taskGroupCount = size)
+                    }
+                } ?: first
+            }
+
+    private fun filterByInstance(items: List<QueueItem>, instanceId: Long?): List<QueueItem> =
+        instanceId?.let { items.filter { it.instanceId == instanceId } } ?: items
+
+    private fun applySorting(items: List<QueueItem>, sortBy: QueueSortBy, sortOrder: SortOrder) = when(sortBy) {
+        QueueSortBy.Title -> items.orderedSortedBy(sortOrder) { it.titleLabel }
+        QueueSortBy.Added -> items.orderedSortedBy(sortOrder) { it.added }
+    }
 }
-
-private fun List<QueueItem>.groupByTask(): List<QueueItem> =
-    groupBy { it.taskGroup }
-        .map { (_, groupItems) ->
-            val first = groupItems.first()
-            groupItems.size.takeIf { it > 0 }?.let { size ->
-                when (first) {
-                    is SonarrQueueItem -> first.copy(taskGroupCount = size)
-                    is RadarrQueueItem -> first.copy(taskGroupCount = size)
-                }
-            } ?: first
-        }
-
-private fun List<QueueItem>.filterByInstance(instanceId: Long?): List<QueueItem> =
-    instanceId?.let { filter { it.instanceId == instanceId } } ?: this

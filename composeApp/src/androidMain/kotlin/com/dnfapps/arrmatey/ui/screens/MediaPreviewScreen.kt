@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
 import com.dnfapps.arrmatey.arr.api.model.QualityProfile
 import com.dnfapps.arrmatey.arr.api.model.RootFolder
 import com.dnfapps.arrmatey.arr.api.model.Tag
@@ -49,6 +50,7 @@ import com.dnfapps.arrmatey.ui.components.DetailsHeader
 import com.dnfapps.arrmatey.ui.components.ItemDescriptionCard
 import com.dnfapps.arrmatey.ui.components.OverlayTopAppBar
 import com.dnfapps.arrmatey.ui.components.UpcomingDateView
+import com.dnfapps.arrmatey.ui.sheets.AddArtistSheet
 import com.dnfapps.arrmatey.ui.sheets.AddMovieSheet
 import com.dnfapps.arrmatey.ui.sheets.AddSeriesSheet
 import com.dnfapps.arrmatey.utils.mokoString
@@ -112,7 +114,7 @@ fun MediaPreviewScreen(
                 modifier = Modifier.verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                DetailsHeader(item)
+                DetailsHeader(item, type)
 
                 Column(
                     modifier = Modifier.padding(horizontal = 24.dp),
@@ -192,6 +194,15 @@ private fun AddMediaSheet(
             onDismiss
         )
         is ArrMovie -> AddMovieSheet(
+            item,
+            qualityProfiles,
+            rootFolders,
+            tags,
+            addInProgress,
+            onAddItem,
+            onDismiss
+        )
+        is Arrtist -> AddArtistSheet(
             item,
             qualityProfiles,
             rootFolders,

@@ -12,7 +12,7 @@ data class QualityInfo(
             val name = quality.name
             val resolution = quality.resolution
 
-            if (name.contains(resolution.toString())) {
+            if (name.contains(resolution.toString()) || resolution == null) {
                 return name
             }
 

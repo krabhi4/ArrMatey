@@ -52,6 +52,7 @@ struct ArrLibraryView: View {
             } else {
                 mediaView(
                     viewType: prefs.viewType,
+                    aspectRatio: type.aspectRatio,
                     items: items,
                     onItemClicked: { media in
                         if let id = media.id as? Int64 {
@@ -70,6 +71,7 @@ struct ArrLibraryView: View {
     @ViewBuilder
     private func mediaView(
         viewType: ViewType,
+        aspectRatio: AspectRatio,
         items: [ArrMedia],
         onItemClicked: @escaping (ArrMedia) -> Void,
         itemIsActive: @escaping (ArrMedia) -> Bool
@@ -80,7 +82,7 @@ struct ArrLibraryView: View {
                 
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(items, id: \.id) { item in
-                        PosterItem(item: item) {
+                        PosterItem(item: item, aspectRatio: aspectRatio) {
                             VStack {
                                 Spacer()
                                 if item.id != nil {

@@ -1,5 +1,10 @@
 package com.dnfapps.arrmatey.client
 
+import com.dnfapps.arrmatey.arr.api.client.HasArrImages
+import com.dnfapps.arrmatey.client.NetworkResult.Error
+import com.dnfapps.arrmatey.client.NetworkResult.Loading
+import com.dnfapps.arrmatey.client.NetworkResult.Success
+
 sealed interface NetworkResult<out T> {
     object Loading : NetworkResult<Nothing>
     data class Success<T>(val data: T): NetworkResult<T>
@@ -15,6 +20,14 @@ sealed interface NetworkResult<out T> {
             is Error -> Error(code, message, cause)
             is Success -> Success(transform(data))
         }
+    }
+}
+
+fun <T, R> NetworkResult<List<T>>.mapValues(transform: (T) -> R): NetworkResult<List<R>> {
+    return when (this) {
+        is Loading -> Loading
+        is Error -> Error(code, message, cause)
+        is Success -> Success(data = data.map(transform))
     }
 }
 

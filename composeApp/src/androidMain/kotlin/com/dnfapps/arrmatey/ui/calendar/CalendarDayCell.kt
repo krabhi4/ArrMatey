@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +37,7 @@ fun CalendarDayCell(
     isSelected: Boolean,
     movieCount: Int,
     episodeCount: Int,
+    albumCount: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -72,38 +75,37 @@ fun CalendarDayCell(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (movieCount > 0 || episodeCount > 0) {
-                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            if (movieCount > 0 || episodeCount > 0 || albumCount > 0) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
                     if (movieCount > 0) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.secondary,
-                            shape = CircleShape,
-                            modifier = Modifier.size(16.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(
-                                    text = if (movieCount > 9) "9+" else movieCount.toString(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontSize = 8.sp,
-                                    color = MaterialTheme.colorScheme.onSecondary
-                                )
-                            }
+                        item {
+                            GridBadge(
+                                movieCount,
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            )
                         }
                     }
                     if (episodeCount > 0) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.tertiary,
-                            shape = CircleShape,
-                            modifier = Modifier.size(16.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(
-                                    text = if (episodeCount > 9) "9+" else episodeCount.toString(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontSize = 8.sp,
-                                    color = MaterialTheme.colorScheme.onTertiary
-                                )
-                            }
+                        item {
+                            GridBadge(
+                                episodeCount,
+                                MaterialTheme.colorScheme.tertiaryContainer,
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
+                    }
+                    if (albumCount > 0) {
+                        item {
+                            GridBadge(
+                                albumCount,
+                                MaterialTheme.colorScheme.secondaryContainer,
+                                MaterialTheme.colorScheme.onSecondaryContainer
+                            )
                         }
                     }
                 }

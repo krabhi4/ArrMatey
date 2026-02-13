@@ -2,11 +2,13 @@ package com.dnfapps.arrmatey.arr.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.arr.usecase.GetLookupResultsUseCase
 import com.dnfapps.arrmatey.arr.usecase.PerformLookupUseCase
 import com.dnfapps.arrmatey.compose.utils.SortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
+import com.dnfapps.arrmatey.extensions.orderedSortedWith
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -44,13 +46,15 @@ class ArrSearchViewModel(
             ) { state, sortBy, sortOrder ->
                 when (state) {
                     is ArrLibrary.Success -> {
-                        val sorted = when (sortBy) {
-                            SortBy.Relevance -> state.items
-                            SortBy.Year -> state.items.sortedBy { it.year }
-                            SortBy.Rating -> state.items.sortedBy { it.ratingScore() }
-                            else -> state.items
+                        val comparator: Comparator<ArrMedia>? = when (sortBy) {
+                            SortBy.Year -> compareBy { it.year }
+                            SortBy.Rating -> compareBy { it.ratingScore() }
+                            else -> null
                         }
-                        val finalList = if (sortOrder == SortOrder.Desc) sorted.reversed() else sorted
+                        val finalList = comparator?.let { comparator ->
+                            state.items.orderedSortedWith(sortOrder, comparator)
+                        } ?: state.items
+
                         ArrLibrary.Success(items = finalList, preferences = state.preferences)
                     }
                     else -> state

@@ -12,15 +12,15 @@ struct PosterItem<Content: View>: View {
     let item: ArrMedia
     let elevation: CGFloat
     let radius: CGFloat
+    let aspectRatio: AspectRatio
     let additionalContent: () -> Content
 
     @State private var imageLoaded = false
     @State private var loadError = false
 
-    private let aspectRatio: CGFloat = 0.675
-
     init(
         item: ArrMedia,
+        aspectRatio: AspectRatio = .poster,
         elevation: CGFloat = 4,
         radius: CGFloat = 12,
         @ViewBuilder additionalContent: @escaping () -> Content = { EmptyView() }
@@ -28,6 +28,7 @@ struct PosterItem<Content: View>: View {
         self.item = item
         self.elevation = elevation
         self.radius = radius
+        self.aspectRatio = aspectRatio
         self.additionalContent = additionalContent
     }
 
@@ -67,7 +68,7 @@ struct PosterItem<Content: View>: View {
                 additionalContent()
             }
         }
-        .aspectRatio(aspectRatio, contentMode: .fit)
+        .aspectRatio(CGFloat(aspectRatio.ratio), contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: radius))
         .shadow(radius: elevation)
     }

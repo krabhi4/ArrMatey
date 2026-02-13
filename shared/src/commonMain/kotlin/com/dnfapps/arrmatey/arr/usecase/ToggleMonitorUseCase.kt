@@ -1,8 +1,10 @@
 package com.dnfapps.arrmatey.arr.usecase
 
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.client.NetworkResult
 import com.dnfapps.arrmatey.instances.repository.InstanceScopedRepository
@@ -15,6 +17,7 @@ class ToggleMonitorUseCase {
         val updatedItem = when (item) {
             is ArrSeries -> item.copy(monitored = !item.monitored)
             is ArrMovie -> item.copy(monitored = !item.monitored)
+            is Arrtist -> item.copy(monitored = !item.monitored)
         }
         return repository.updateMediaItem(updatedItem)
     }
@@ -32,5 +35,12 @@ class ToggleMonitorUseCase {
         repository: InstanceScopedRepository
     ): NetworkResult<Episode> {
         return repository.toggleEpisodeMonitor(episode)
+    }
+
+    suspend fun toggleAlbum(
+        album: ArrAlbum,
+        repository: InstanceScopedRepository
+    ): NetworkResult<ArrAlbum> {
+        return repository.toggleAlbumMonitor(album)
     }
 }

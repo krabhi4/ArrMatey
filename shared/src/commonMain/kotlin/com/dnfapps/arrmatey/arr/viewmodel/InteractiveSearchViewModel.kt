@@ -3,8 +3,10 @@ package com.dnfapps.arrmatey.arr.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dnfapps.arrmatey.arr.api.model.ArrRelease
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
 import com.dnfapps.arrmatey.arr.api.model.CustomFormat
 import com.dnfapps.arrmatey.arr.api.model.Language
+import com.dnfapps.arrmatey.arr.api.model.LidarrRelease
 import com.dnfapps.arrmatey.arr.api.model.MovieRelease
 import com.dnfapps.arrmatey.arr.api.model.QualityInfo
 import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
@@ -18,6 +20,7 @@ import com.dnfapps.arrmatey.arr.usecase.GetReleasesUseCase
 import com.dnfapps.arrmatey.compose.utils.ReleaseFilterBy
 import com.dnfapps.arrmatey.compose.utils.ReleaseSortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
+import com.dnfapps.arrmatey.extensions.orderedSortedWith
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.instances.usecase.GetInstanceRepositoryUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -90,11 +93,7 @@ class InteractiveSearchViewModel(
             ReleaseSortBy.FileSize -> compareBy { it.size }
             ReleaseSortBy.CustomScore -> compareBy { it.customFormatScore }
         }
-        return if (filter.sortOrder == SortOrder.Asc) {
-            items.sortedWith(comparator)
-        } else {
-            items.sortedWith(comparator.reversed())
-        }
+        return items.orderedSortedWith(filter.sortOrder, comparator)
     }
 
     private inline fun <reified T :ArrRelease> applyFiltering(
@@ -112,12 +111,13 @@ class InteractiveSearchViewModel(
             (filter.customFormat == null || item.customFormats.any { it.id == filter.customFormat.id }) &&
             (query.isEmpty() || item.title.contains(query, ignoreCase = true))
         }
-        return when (filtered.first()) {
+        return when (filtered.firstOrNull()) {
+            null -> filtered
             is SeriesRelease -> {
                 @Suppress("UNCHECKED_CAST")
                 seriesFiltering(filtered as List<SeriesRelease>, filter) as List<T>
             }
-            is MovieRelease -> filtered
+            else -> filtered
         }
     }
 

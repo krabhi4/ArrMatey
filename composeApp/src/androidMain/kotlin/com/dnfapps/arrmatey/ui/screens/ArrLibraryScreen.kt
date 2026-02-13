@@ -117,11 +117,12 @@ fun ArrLibraryScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigation.navigateTo(ArrScreen.Search()) },
-                modifier = Modifier.offset(y = 25.dp, x = 5.dp)
-            ) {
-                Icon(Icons.Default.Add, null)
+            instancesState.selectedInstance?.let {
+                FloatingActionButton(
+                    onClick = { navigation.navigateTo(ArrScreen.Search()) }
+                ) {
+                    Icon(Icons.Default.Add, null)
+                }
             }
         },
         topBar = {
@@ -152,6 +153,8 @@ fun ArrLibraryScreen(
                             onSortByChanged = { arrMediaViewModel.updateSortBy(it) },
                             sortOrder = preferences.sortOrder,
                             onSortOrderChanged = { arrMediaViewModel.updateSortOrder(it) },
+                            viewType = preferences.viewType,
+                            onViewTypeChanged = { arrMediaViewModel.updateViewType(it) }
                         )
                     }
                 }
@@ -228,6 +231,7 @@ fun ArrLibraryScreen(
 
                                     if (items.isNotEmpty()) {
                                         MediaView(
+                                            type = type,
                                             items = items,
                                             onItemClick = {
                                                 it.id?.let { id ->
@@ -264,8 +268,9 @@ private fun EmptySearchResultsView(
     onShouldSearch: () -> Unit
 ) {
     val mediaType = when (type) {
-        InstanceType.Sonarr -> "series"
-        InstanceType.Radarr -> "movie"
+        InstanceType.Sonarr -> mokoString(MR.strings.series_type)
+        InstanceType.Radarr -> mokoString(MR.strings.movie_type)
+        InstanceType.Lidarr -> mokoString(MR.strings.artist_type)
     }
     Column(
         verticalArrangement = Arrangement.Center,
@@ -275,13 +280,13 @@ private fun EmptySearchResultsView(
             .fillMaxSize()
     ) {
         Text(
-            "No results for \"$query\" in your library",
+            text = mokoString(MR.strings.no_query_results, query),
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium
         )
         Text(
             text = buildAnnotatedString {
-                append("Check your spelling or ")
+                append(mokoString(MR.strings.no_query_results_label))
                 withLink(
                     link = LinkAnnotation.Clickable(tag = "new_entry") {
                         onShouldSearch()
@@ -291,7 +296,7 @@ private fun EmptySearchResultsView(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )) {
-                        append("add a new $mediaType")
+                        append(mokoString(MR.strings.no_query_results_link, mediaType))
                     }
                 }
             }
@@ -404,6 +409,7 @@ private fun InstanceErrorView(
 
 @Composable
 fun MediaView(
+    type: InstanceType,
     items: List<ArrMedia>,
     onItemClick: (ArrMedia) -> Unit,
     itemIsActive: (ArrMedia) -> Boolean,
@@ -419,6 +425,7 @@ fun MediaView(
                 .fillMaxSize()
         )
         ViewType.Grid -> PosterGrid(
+            aspectRatio = type.aspectRatio,
             items = items,
             onItemClick = onItemClick,
             itemIsActive = itemIsActive,

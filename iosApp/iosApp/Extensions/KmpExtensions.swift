@@ -26,6 +26,20 @@ extension Bool {
     }
 }
 
+struct IdentifiableInt: Identifiable {
+    let id: Int32
+    var value: Int32 { id }
+}
+
+extension Binding where Value == Int32? {
+    func mapToIdentifiable() -> Binding<IdentifiableInt?> {
+        Binding<IdentifiableInt?>(
+            get: { self.wrappedValue.map { IdentifiableInt(id: $0) } },
+            set: { self.wrappedValue = $0?.id }
+        )
+    }
+}
+
 typealias LocalDate = Kotlinx_datetimeLocalDate
 
 extension Kotlinx_datetimeLocalDate {

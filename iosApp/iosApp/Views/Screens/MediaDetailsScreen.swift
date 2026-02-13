@@ -13,12 +13,13 @@ struct MediaDetailsScreen: View {
     private let type: InstanceType
     
     @Environment(\.dismiss) private var dismiss
-
+    
     @ObservedObject private var viewModel: ArrMediaDetailsViewModelS
     
     @State private var showConfirmSheet: Bool = false
     @State private var showEditSheet: Bool = false
     @State private var confirmDeleteSeason: Int32? = nil
+    @State private var confirmDeleteAlbum: ArrAlbum? = nil
     
     init(id: Int64, type: InstanceType) {
         self.id = id
@@ -28,45 +29,8 @@ struct MediaDetailsScreen: View {
     
     var body: some View {
         contentForState()
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Image(systemName: viewModel.isMonitored ? "bookmark.fill" : "bookmark")
-                        .imageScale(.medium)
-                        .onTapGesture {
-                            viewModel.toggleMonitor()
-                        }
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    Menu {
-                        Section {
-                            Button(MR.strings().refresh.localized(), systemImage: "arrow.clockwise") {
-                                viewModel.performRefresh()
-                            }
-                            if type == .sonarr {
-                                Button(MR.strings().search_monitored.localized(), systemImage: "magnifyingglass") {
-                                    viewModel.performSeriesAutomaticLookup()
-                                }
-                                .disabled(!viewModel.isMonitored)
-                            }
-                        }
-                        Section {
-                            Button(MR.strings().edit.localized(), systemImage: "pencil") {
-                                showEditSheet = true
-                            }
-                            Button(MR.strings().delete.localized(), systemImage: "trash") {
-                                showConfirmSheet = true
-                            }
-                            .tint(.red)
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .imageScale(.medium)
-                    }
-                }
-            }
-            .task {
-                viewModel.refreshDetails()
-            }
+            .toolbar { toolbarContent }
+            .task { viewModel.refreshDetails() }
             .sheet(isPresented: $showConfirmSheet) {
                 DeleteMediaSheet(isLoading: viewModel.deleteInProgress, onConfirm: { addExclusion, deleteFiles in
                     viewModel.delete(addExclusion, deleteFiles)
@@ -75,47 +39,28 @@ struct MediaDetailsScreen: View {
                 .presentationBackground(.ultraThinMaterial)
             }
             .sheet(isPresented: $showEditSheet) {
-                switch viewModel.item {
-                case nil: EmptyView()
-                case let movie as ArrMovie: EditMovieSheet(item: movie, qualityProfiles: viewModel.qualityProfiles, rootFolders: viewModel.rootFolders, tags: viewModel.tags, editInProgress: viewModel.editInProgress, onEditItem: { newMovie, moveFiles in
-                    viewModel.editItem(newMovie, moveFiles: moveFiles)
-                })
-                        .presentationBackground(.ultraThinMaterial)
-                case let series as ArrSeries: EditSeriesSheet(item: series, qualityProfiles: viewModel.qualityProfiles, rootFolders: viewModel.rootFolders, tags: viewModel.tags, editInProgress: viewModel.editInProgress, onEditItem: { newSeries, moveFiles in
-                    viewModel.editItem(newSeries, moveFiles: moveFiles)
-                })
-                        .presentationBackground(.ultraThinMaterial)
-                default: EmptyView()
-                }
+                sheetContent
             }
-            .onChange(of: viewModel.deleteSucceeded) { _, success in
-                if success {
-                    dismiss()
-                }
-            }
+            .onChange(of: viewModel.deleteSucceeded) { _, success in if success { dismiss() } }
             .onChange(of: viewModel.editItemSucceeded) { _, success in
                 if success {
                     showEditSheet = false
                     viewModel.refreshDetails()
                 }
             }
-            .alert(
-                MR.strings().delete_season.formatted(args: [confirmDeleteSeason ?? 0]),
-                isPresented: Binding(
-                    get: { confirmDeleteSeason != nil },
-                    set: { if !$0 { confirmDeleteSeason = nil } }
-                ),
-                presenting: confirmDeleteSeason
-            ) { season in
-                Button(MR.strings().delete.localized(), role: .destructive) {
-                    viewModel.deleteSeasonFiles(season)
-                    confirmDeleteSeason = nil
-                }
-                Button(MR.strings().cancel.localized(), role: .cancel) {
-                    confirmDeleteSeason = nil
-                }
-            } message: { season in
-                Text(MR.strings().delete_season_confirm.formatted(args: [season]))
+            .confirmationAlert(item: $confirmDeleteSeason) { season in
+                AlertConfig(
+                    title: MR.strings().delete_season.formatted(args: [season]),
+                    message: MR.strings().delete_season_confirm.formatted(args: [season]),
+                    action: { viewModel.deleteSeasonFiles(season) }
+                )
+            }
+            .confirmationAlert(item: $confirmDeleteAlbum) { album in
+                AlertConfig(
+                    title: MR.strings().delete_album.localized(),
+                    message: MR.strings().delete_album_confirm.formatted(args: [album.title]),
+                    action: { viewModel.deleteAlbumFiles(album.id) }
+                )
             }
     }
     
@@ -133,12 +78,10 @@ struct MediaDetailsScreen: View {
             }
         case let state as MediaDetailsUiStateSuccess:
             let item = state.item
-            let episodes = state.episodes
-            let extraFiles = state.extraFiles
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 0){
-                    MediaDetailsHeader(item: item)
+                    MediaDetailsHeader(item: item, type: type)
                         .frame(height: 400)
                     
                     VStack(alignment: .leading, spacing: 12) {
@@ -150,7 +93,7 @@ struct MediaDetailsScreen: View {
                         
                         ItemDescriptionCard(overview: item.overview)
                         
-                        filesArea(for: item, extraFiles, episodes)
+                        filesArea(for: item, state.extraFiles, state.episodes, state.albums, state.tracks, state.trackFiles)
                         
                         MediaInfoArea(item: item, qualityProfiles: viewModel.qualityProfiles, tags: viewModel.tags)
                         
@@ -195,7 +138,10 @@ struct MediaDetailsScreen: View {
     private func filesArea(
         for item: ArrMedia,
         _ extraFiles: [ExtraFile],
-        _ episodes: [Episode]
+        _ episodes: [Episode],
+        _ albums: [ArrAlbum],
+        _ tracks: [KotlinLong: [LidarrTrack]],
+        _ trackFiles: [KotlinLong: [LidarrTrackFile]]
     ) -> some View {
         if let series = item as? ArrSeries {
             SeriesFilesView(
@@ -218,7 +164,7 @@ struct MediaDetailsScreen: View {
                 onDeleteSeasonFiles: { seasonNumber in
                     confirmDeleteSeason = seasonNumber
                 },
-                seasonDeleteInProgress: false
+                seasonDeleteInProgress: viewModel.deleteSeasonInProgress
             )
         } else if let movie = item as? ArrMovie {
             MovieFilesView(
@@ -227,11 +173,83 @@ struct MediaDetailsScreen: View {
                 searchIds: viewModel.automaticSearchIds,
                 searchResult: viewModel.lastSearchResult,
                 onAutomaticSearch: {
-                    viewModel.performMovieAutomaticLookup(movieId: movie.id as! Int64)
+                    viewModel.performAutomaticLookup()
                 }
+            )
+        } else if let artist = item as? Arrtist {
+            ArtistFilesView(
+                artist: artist,
+                albums: albums,
+                tracks: tracks,
+                trackFiles: trackFiles,
+                searchIds: viewModel.automaticSearchIds,
+                onToggleAlbumMonitor: {
+                    viewModel.toggleAlbumMonitored(album: $0)
+                },
+                onAlbumAutomaticSearch: {
+                    viewModel.performAlbumAutomaticLookup(albumId: $0)
+                },
+                deleteAlbumFiles: {
+                    confirmDeleteAlbum = $0
+                },
+                albumDeleteInProgress: viewModel.deleteAlbumInProgress
             )
         } else {
             EmptyView()
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Image(systemName: viewModel.isMonitored ? "bookmark.fill" : "bookmark")
+                .imageScale(.medium)
+                .onTapGesture {
+                    viewModel.toggleMonitor()
+                }
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Menu {
+                Section {
+                    Button(MR.strings().refresh.localized(), systemImage: "arrow.clockwise") {
+                        viewModel.performRefresh()
+                    }
+                    if type.includeTopLevelAutomaticSearchOption {
+                        Button(MR.strings().search_monitored.localized(), systemImage: "magnifyingglass") {
+                            viewModel.performAutomaticLookup()
+                        }
+                        .disabled(!viewModel.isMonitored)
+                    }
+                }
+                Section {
+                    Button(MR.strings().edit.localized(), systemImage: "pencil") {
+                        showEditSheet = true
+                    }
+                    Button(MR.strings().delete.localized(), systemImage: "trash") {
+                        showConfirmSheet = true
+                    }
+                    .tint(.red)
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .imageScale(.medium)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var sheetContent: some View {
+        switch viewModel.item {
+        case nil: EmptyView()
+        case let movie as ArrMovie: EditMovieSheet(item: movie, qualityProfiles: viewModel.qualityProfiles, rootFolders: viewModel.rootFolders, tags: viewModel.tags, editInProgress: viewModel.editInProgress, onEditItem: { newMovie, moveFiles in
+            viewModel.editItem(newMovie, moveFiles: moveFiles)
+        })
+        .presentationBackground(.ultraThinMaterial)
+        case let series as ArrSeries: EditSeriesSheet(item: series, qualityProfiles: viewModel.qualityProfiles, rootFolders: viewModel.rootFolders, tags: viewModel.tags, editInProgress: viewModel.editInProgress, onEditItem: { newSeries, moveFiles in
+            viewModel.editItem(newSeries, moveFiles: moveFiles)
+        })
+        .presentationBackground(.ultraThinMaterial)
+        default: EmptyView()
         }
     }
     

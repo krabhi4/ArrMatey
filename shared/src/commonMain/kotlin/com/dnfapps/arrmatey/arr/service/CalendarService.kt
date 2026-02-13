@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.arr.service
 
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.EpisodeGroup
@@ -39,6 +40,9 @@ class CalendarService(
 
     private val _episodeGroups = MutableStateFlow<Map<LocalDate, List<EpisodeGroup>>>(emptyMap())
     val episodeGroups: StateFlow<Map<LocalDate, List<EpisodeGroup>>> = _episodeGroups.asStateFlow()
+
+    private val _albums = MutableStateFlow<Map<LocalDate, List<ArrAlbum>>>(emptyMap())
+    val albums: StateFlow<Map<LocalDate, List<ArrAlbum>>> = _albums.asStateFlow()
 
     private val _dates = MutableStateFlow<List<LocalDate>>(emptyList())
     val dates: StateFlow<List<LocalDate>> = _dates.asStateFlow()
@@ -93,6 +97,7 @@ class CalendarService(
                     when (repository.instance.type) {
                         InstanceType.Radarr -> fetchMovies(repository, start, end)
                         InstanceType.Sonarr -> fetchEpisodes(repository, start, end)
+                        InstanceType.Lidarr -> fetchAlbums(repository, start, end)
                     }
                 }
             }
@@ -216,6 +221,46 @@ class CalendarService(
         _episodeGroups.value = grouped
     }
 
+    private suspend fun fetchAlbums(
+        repository: InstanceScopedRepository,
+        start: LocalDate,
+        end: LocalDate
+    ) {
+        repository.client.getAlbumCalendar(start, end)
+            .onSuccess { albums ->
+                val currentAlbums = _albums.value.toMutableMap()
+
+                albums.forEach { album ->
+                    album.releaseDate?.let { instant ->
+                        val date = instant.toLocalDate()
+                        upsertAlbum(currentAlbums, album, date)
+                    }
+                }
+
+                _albums.value = currentAlbums
+            }
+            .onError { _, message, cause ->
+                _error.value = message
+            }
+    }
+
+    private fun upsertAlbum(
+        map: MutableMap<LocalDate, List<ArrAlbum>>,
+        album: ArrAlbum,
+        date: LocalDate
+    ) {
+        val currentList = map[date]?.toMutableList() ?: mutableListOf()
+
+        val existingIndex = currentList.indexOfFirst { it.id == album.id }
+        if (existingIndex >= 0) {
+            currentList[existingIndex] = album
+        } else {
+            currentList.add(album)
+        }
+
+        map[date] = currentList
+    }
+
     private fun insertDates(start: LocalDate, end: LocalDate) {
         val currentDates = _dates.value.toMutableList()
         var current = start
@@ -237,6 +282,7 @@ class CalendarService(
     fun reset() {
         _movies.value = emptyMap()
         _episodes.value = emptyMap()
+        _albums.value = emptyMap()
         _dates.value = emptyList()
         _error.value = null
     }

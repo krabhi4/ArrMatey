@@ -12,6 +12,9 @@ enum class QueueDownloadState {
     @SerialName("importBlocked")
     ImportBlocked,
 
+    @SerialName("importFailed")
+    ImportFailed,
+
     @SerialName("importing")
     Importing,
 

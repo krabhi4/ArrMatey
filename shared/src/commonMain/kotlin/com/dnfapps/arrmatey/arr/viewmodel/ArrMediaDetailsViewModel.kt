@@ -2,13 +2,16 @@ package com.dnfapps.arrmatey.arr.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.HistoryItem
 import com.dnfapps.arrmatey.arr.api.model.QualityProfile
 import com.dnfapps.arrmatey.arr.api.model.RootFolder
 import com.dnfapps.arrmatey.arr.api.model.Tag
 import com.dnfapps.arrmatey.arr.state.MediaDetailsUiState
+import com.dnfapps.arrmatey.arr.usecase.DeleteAlbumFilesUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteMediaUseCase
 import com.dnfapps.arrmatey.arr.usecase.DeleteSeasonFilesUseCase
 import com.dnfapps.arrmatey.arr.usecase.GetMediaDetailsUseCase
@@ -40,6 +43,7 @@ class ArrMediaDetailsViewModel(
     private val updateMediaUseCase: UpdateMediaUseCase,
     private val deleteMediaUseCase: DeleteMediaUseCase,
     private val deleteSeasonFilesUseCase: DeleteSeasonFilesUseCase,
+    private val deleteAlbumFilesUseCase: DeleteAlbumFilesUseCase,
     private val performRefreshUseCase: PerformRefreshUseCase
 ): ViewModel() {
 
@@ -69,6 +73,9 @@ class ArrMediaDetailsViewModel(
 
     private val _deleteSeasonStatus = MutableStateFlow<OperationStatus>(OperationStatus.Idle)
     val deleteSeasonStatus: StateFlow<OperationStatus> = _deleteStatus.asStateFlow()
+
+    private val _deleteAlbumStatus = MutableStateFlow<OperationStatus>(OperationStatus.Idle)
+    val deleteAlbumStatus: StateFlow<OperationStatus> = _deleteAlbumStatus.asStateFlow()
 
 
     private val _qualityProfiles = MutableStateFlow<List<QualityProfile>>(emptyList())
@@ -137,6 +144,20 @@ class ArrMediaDetailsViewModel(
                 _editItemStatus.value = status
             }
         }
+
+        viewModelScope.launch {
+            repository.artistAlbums.collect { albumMap ->
+                val artistAlbums = albumMap[mediaId] ?: return@collect
+
+                _uiState.update { currentState ->
+                    if (currentState is MediaDetailsUiState.Success) {
+                        currentState.copy(albums = artistAlbums)
+                    } else {
+                        currentState
+                    }
+                }
+            }
+        }
     }
 
     fun refreshDetails() {
@@ -181,6 +202,13 @@ class ArrMediaDetailsViewModel(
         }
     }
 
+    fun toggleAlbumMonitored(album: ArrAlbum) {
+        viewModelScope.launch {
+            val repository = currentRepository ?: return@launch
+            toggleMonitorUseCase.toggleAlbum(album, repository)
+        }
+    }
+
     fun deleteMedia(deleteFiles: Boolean, addImportExclusion: Boolean) {
         viewModelScope.launch {
             val repository = currentRepository ?: return@launch
@@ -201,6 +229,16 @@ class ArrMediaDetailsViewModel(
         }
     }
 
+    fun deleteAlbumFiles(albumId: Long) {
+        viewModelScope.launch {
+            val repository = currentRepository ?: return@launch
+            deleteAlbumFilesUseCase(mediaId, albumId, repository)
+                .collect { status ->
+                    _deleteAlbumStatus.value = status
+                }
+        }
+    }
+
     fun performRefresh() {
         viewModelScope.launch {
             val repository = currentRepository ?: return@launch
@@ -208,7 +246,7 @@ class ArrMediaDetailsViewModel(
         }
     }
 
-    fun performSeriesAutomaticLookup() {
+    fun performAutomaticLookup() {
         runSearch(mediaId)
     }
 
@@ -220,20 +258,21 @@ class ArrMediaDetailsViewModel(
         runSearch(mediaId, seasonNumber = seasonNumber)
     }
 
-    fun performMovieAutomaticLookup(movieId: Long) {
-        runSearch(movieId)
+    fun performAlbumAutomaticLookup(albumId: Long) {
+        runSearch(albumId, albumId)
     }
 
     private fun runSearch(
         trackingId: Long,
         episodeId: Long? = null,
-        seasonNumber: Int? = null
+        seasonNumber: Int? = null,
+        albumId: Long? = null
     ) {
         viewModelScope.launch {
             val repository = currentRepository ?: return@launch
             updateSearchIds(trackingId, add = true)
 
-            performAutomaticSearchUseCase(mediaId, instanceType, repository, episodeId, seasonNumber)
+            performAutomaticSearchUseCase(mediaId, instanceType, repository, episodeId, seasonNumber, albumId)
                 .onSuccess { _lastSearchResult.value = true }
                 .onError { _, _, _ -> _lastSearchResult.value = false }
 

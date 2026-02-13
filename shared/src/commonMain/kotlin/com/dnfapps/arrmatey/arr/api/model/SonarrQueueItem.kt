@@ -50,9 +50,6 @@ data class SonarrQueueItem(
 
     override val titleLabel: String
         get() {
-//            val title = series?.title ?: return "Unknown"
-//            if ((taskGroupCount > 1))
-
             series?.title?.let { seriesTitle ->
                 taskGroupCount?.let { count ->
                     if (count > 1 && seasonNumber != null) {

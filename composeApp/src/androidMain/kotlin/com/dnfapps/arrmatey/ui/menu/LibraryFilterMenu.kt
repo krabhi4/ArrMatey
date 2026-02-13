@@ -27,6 +27,7 @@ import com.dnfapps.arrmatey.compose.utils.FilterBy
 import com.dnfapps.arrmatey.compose.utils.SortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.instances.model.InstanceType
+import com.dnfapps.arrmatey.ui.theme.ViewType
 import com.dnfapps.arrmatey.utils.mokoString
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -38,7 +39,9 @@ fun LibraryFilterMenu(
     sortBy: SortBy,
     onSortByChanged: (SortBy) -> Unit,
     sortOrder: SortOrder,
-    onSortOrderChanged: (SortOrder) -> Unit
+    onSortOrderChanged: (SortOrder) -> Unit,
+    viewType: ViewType,
+    onViewTypeChanged: (ViewType) -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val groupInteractionSource = remember { MutableInteractionSource() }
@@ -52,7 +55,26 @@ fun LibraryFilterMenu(
             onDismissRequest = { showMenu = false }
         ) {
             DropdownMenuGroup(
-                shapes = MenuDefaults.groupShape(0, 2),
+                shapes = MenuDefaults.groupShape(0, 3),
+                interactionSource = groupInteractionSource
+            ) {
+                ViewType.entries.forEachIndexed { index, type ->
+                    DropdownMenuItem(
+                        text = { Text(mokoString(type.resource)) },
+                        selected = type == viewType,
+                        onClick = { onViewTypeChanged(type) },
+                        shapes = MenuDefaults.itemShape(index, ViewType.entries.size),
+                        checkedLeadingIcon = {
+                            Icon(Icons.Default.Check, null)
+                        },
+                        leadingIcon = { Icon(type.imageVector, null) }
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(MenuDefaults.GroupSpacing))
+
+            DropdownMenuGroup(
+                shapes = MenuDefaults.groupShape(1, 3),
                 interactionSource = groupInteractionSource
             ) {
                 val filterOptions = FilterBy.typeEntries(type)
@@ -68,11 +90,10 @@ fun LibraryFilterMenu(
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(MenuDefaults.GroupSpacing))
 
             DropdownMenuGroup(
-                shapes = MenuDefaults.groupShape(1, 2),
+                shapes = MenuDefaults.groupShape(2, 3),
                 interactionSource = groupInteractionSource
             ) {
                 val sortOptions = SortBy.typeEntries(type)

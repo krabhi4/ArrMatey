@@ -62,6 +62,13 @@ fun ArrTab(
                     } else ReleaseFilterBy.SeasonPack
                 )
             }
+            entry<ArrScreen.AlbumRelease> { params ->
+                val releaseParams = ReleaseParams.Album(
+                    artistId = params.artistId,
+                    albumId = params.albumId
+                )
+                InteractiveSearchScreen(type, releaseParams)
+            }
             entry<ArrScreen.MovieFiles> { params ->
                 MovieFilesScreen(movie = params.movie)
             }

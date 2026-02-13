@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.FileDownloadDone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,6 +29,7 @@ import com.dnfapps.arrmatey.compose.TabItem
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.shared.MR
+import com.dnfapps.arrmatey.ui.components.PosterItem
 import com.dnfapps.arrmatey.utils.format
 import com.dnfapps.arrmatey.utils.mokoString
 import org.koin.compose.koinInject
@@ -64,10 +65,13 @@ fun EpisodeCalendarItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(vertical = 12.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            episode.series?.let { series ->
+                PosterItem(item = series, Modifier.width(50.dp))
+            }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = episode.series?.title ?: mokoString(MR.strings.unknown),

@@ -19,3 +19,29 @@ fun Int.formatAsRuntime(): String {
         if (hours == 0 && minutes == 0) append("0m")
     }
 }
+
+fun Int.formatAsDuration(): String {
+    val totalSeconds = this / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+
+    fun pad(value: Int): String = if (value < 10) "0$value" else value.toString()
+
+    return "${pad(hours)}:${pad(minutes)}:${pad(seconds)}"
+}
+
+fun Int.padStart(length: Int, char: Char): String = toString().padStart(length, char)
+
+fun Double.toOneDecimal(): String {
+    val rounded = (this * 10.0).let { kotlin.math.round(it) / 10.0 }
+    val string = rounded.toString()
+
+    return if (string.contains(".")) {
+        val parts = string.split(".")
+        val decimal = parts[1]
+        if (decimal.length == 1) string else "${parts[0]}.${decimal.take(1)}"
+    } else {
+        "$string.0"
+    }
+}

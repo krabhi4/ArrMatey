@@ -46,10 +46,16 @@ enum class SortBy(
         private val radarrOps by lazy {
             listOf(Title, Year, Added, Rating, FileSize, Grabbed, DigitalRelease)
         }
+
+        private val lidarrOps by lazy {
+            listOf(Title, Year, Added, Rating, FileSize)
+        }
+
         fun typeEntries(type: InstanceType) =
             when (type) {
                 InstanceType.Sonarr -> sonarrOps
                 InstanceType.Radarr -> radarrOps
+                InstanceType.Lidarr -> lidarrOps
             }
 
         fun lookupEntries() = listOf(Relevance, Year, Rating)

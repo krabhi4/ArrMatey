@@ -12,6 +12,7 @@ class PerformAutomaticSearchUseCase {
         repository: InstanceScopedRepository,
         episodeId: Long? = null,
         seasonNumber: Int? = null,
+        albumId: Long? = null
     ): NetworkResult<Any> {
         val payload = when (type) {
             InstanceType.Sonarr -> {
@@ -22,6 +23,12 @@ class PerformAutomaticSearchUseCase {
                 }
             }
             InstanceType.Radarr -> CommandPayload.Movie(listOf(mediaId))
+            InstanceType.Lidarr -> {
+                when {
+                    albumId != null -> CommandPayload.Album(listOf(albumId))
+                    else -> CommandPayload.Artist(mediaId)
+                }
+            }
         }
         return repository.executeCommand(payload)
     }

@@ -10,6 +10,6 @@ data class QualityProfile(
     val cutoff: Int,
     val minFormatScore: Int,
     val cutoffFormatScore: Int,
-    val minUpgradeFormatScore: Int,
+    val minUpgradeFormatScore: Int? = null,
     val formatItems: List<FormatItem>
 )

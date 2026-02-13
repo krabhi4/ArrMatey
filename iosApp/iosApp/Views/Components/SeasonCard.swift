@@ -81,7 +81,7 @@ struct SeasonCard: View {
         if season.seasonNumber == 0 {
             MR.strings().specials.localized()
         } else {
-            MR.strings().season_singular.localized() + " \(season.seasonNumber)"
+            MR.strings().season_label.formatted(args: [season.seasonNumber])
         }
     }
     

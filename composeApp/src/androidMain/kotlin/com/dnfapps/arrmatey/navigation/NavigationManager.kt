@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 class NavigationManager(
     private val settingsNavigation: SettingsNavigation,
     private val seriesNavigation: SeriesTabNavigation,
-    private val movieNavigation: MoviesTabNavigation
+    private val movieNavigation: MoviesTabNavigation,
+    private val musicNavigation: MusicTabNavigation
 ) {
 
     fun settings() = settingsNavigation
@@ -17,11 +18,14 @@ class NavigationManager(
     fun arr(type: InstanceType) = when (type) {
         InstanceType.Sonarr -> seriesNavigation
         InstanceType.Radarr -> movieNavigation
+        InstanceType.Lidarr -> musicNavigation
     }
 
     fun series() = seriesNavigation
 
     fun movies() = movieNavigation
+
+    fun music() = musicNavigation
 
     private val _selectedTab = MutableStateFlow(TabItem.SHOWS)
     val selectedTab: StateFlow<TabItem> = _selectedTab.asStateFlow()

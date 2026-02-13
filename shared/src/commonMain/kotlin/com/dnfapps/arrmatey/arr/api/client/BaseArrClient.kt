@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.arr.api.client
 
+import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.CommandResponse
 import com.dnfapps.arrmatey.arr.api.model.DownloadReleasePayload
@@ -25,7 +26,7 @@ abstract class BaseArrClient(
     protected abstract val instance: Instance
 
     protected val baseUrl: String
-        get() = "${instance.url}/api/v3"
+        get() = "${instance.url}/${instance.type.apiBase}"
 
     override suspend fun getQualityProfiles(): NetworkResult<List<QualityProfile>> =
         get("qualityprofile")
@@ -48,7 +49,9 @@ abstract class BaseArrClient(
             "pageSize" to pageSize,
             "includeMovie" to true,
             "includeSeries" to true,
-            "includeEpisode" to true
+            "includeEpisode" to true,
+            "includeAlbum" to true,
+            "includeArtist" to true
         )).map { it.setInstance(instance.id, instance.label) }
 
     override suspend fun downloadRelease(
@@ -76,31 +79,31 @@ abstract class BaseArrClient(
         endpoint: String,
         params: Map<String, Any> = emptyMap()
     ): NetworkResult<T> =
-        httpClient.safeGet("$baseUrl/$endpoint") {
+        httpClient.safeGet<T>("$baseUrl/$endpoint") {
             url {
                 params.forEach { (key, value) ->
                     parameters.append(key, value.toString())
                 }
             }
-        }
+        }.rebuild()
 
     protected suspend inline fun <reified T, reified R> post(
         endpoint: String,
         body: T
     ): NetworkResult<R> =
-        httpClient.safePost("$baseUrl/$endpoint") {
+        httpClient.safePost<R>("$baseUrl/$endpoint") {
             contentType(ContentType.Application.Json)
             setBody(body)
-        }
+        }.rebuild()
 
     protected suspend inline fun <reified T, reified R> put(
         endpoint: String,
         body: T
     ): NetworkResult<R> =
-        httpClient.safePut("$baseUrl/$endpoint") {
+        httpClient.safePut<R>("$baseUrl/$endpoint") {
             contentType(ContentType.Application.Json)
             setBody(body)
-        }
+        }.rebuild()
 
     protected suspend inline fun <reified T, reified R> delete(
         endpoint: String,
@@ -108,6 +111,7 @@ abstract class BaseArrClient(
         params: Map<String, Any> = emptyMap(),
     ): NetworkResult<R> =
         httpClient.safeDelete("$baseUrl/$endpoint") {
+            contentType(ContentType.Application.Json)
             url {
                 params.forEach { (key, value) ->
                     parameters.append(key, value.toString())
@@ -127,4 +131,17 @@ abstract class BaseArrClient(
                 }
             }
         }
+
+    @Suppress("UNCHECKED_CAST")
+    protected fun <T> NetworkResult<T>.rebuild(): NetworkResult<T> {
+        return this.map { data ->
+            when (data) {
+                is HasArrImages<*> -> data.withLocalImages(instance.url) as T
+                is List<*> -> data.map { item ->
+                    if (item is HasArrImages<*>) item.withLocalImages(instance.url) else item
+                } as T
+                else -> data
+            }
+        }
+    }
 }

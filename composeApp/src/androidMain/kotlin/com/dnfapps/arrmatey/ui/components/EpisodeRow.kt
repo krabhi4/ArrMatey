@@ -66,7 +66,7 @@ fun EpisodeRow(
         ) {
             val titleString = buildAnnotatedString {
                 withStyle(SpanStyle(fontSize = 16.sp)) {
-                    withStyle((SpanStyle(color = MaterialTheme.colorScheme.primary))) {
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                         append("${episode.episodeNumber}. ")
                     }
                     withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {

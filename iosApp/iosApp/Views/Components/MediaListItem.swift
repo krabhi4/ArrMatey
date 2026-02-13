@@ -17,6 +17,16 @@ struct MediaItemView<T: ArrMedia>: View {
         self.isActive = isActive
     }
     
+    private var itemTitle: String {
+        var result = item.title
+        if let year = item.year {
+            if !item.title.contains(String(describing: year)) {
+                result += " (\(year))"
+            }
+        }
+        return result
+    }
+    
     var body: some View {
         ZStack {
             BannerView(item: item)
@@ -38,7 +48,7 @@ struct MediaItemView<T: ArrMedia>: View {
                 .cornerRadius(12)
                 
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(item.title + " (\(Int(item.year)))")
+                    Text(itemTitle)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
                         .lineLimit(1)

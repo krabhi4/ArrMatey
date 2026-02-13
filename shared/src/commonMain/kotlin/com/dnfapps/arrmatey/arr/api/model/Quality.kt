@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class Quality(
     val id: Int,
     val name: String,
-    val source: String,
-    val resolution: Int,
+    val source: String? = null,
+    val resolution: Int? = null,
     val modifier: String? = null
 )

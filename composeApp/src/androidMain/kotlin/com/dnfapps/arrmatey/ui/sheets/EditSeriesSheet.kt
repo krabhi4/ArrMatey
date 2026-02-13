@@ -26,7 +26,7 @@ import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
 import com.dnfapps.arrmatey.arr.api.model.QualityProfile
 import com.dnfapps.arrmatey.arr.api.model.RootFolder
-import com.dnfapps.arrmatey.arr.api.model.SeriesMonitorNewItems
+import com.dnfapps.arrmatey.arr.api.model.MonitorNewItems
 import com.dnfapps.arrmatey.arr.api.model.SeriesType
 import com.dnfapps.arrmatey.arr.api.model.Tag
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
@@ -47,7 +47,7 @@ fun EditSeriesSheet(
     onDismiss: () -> Unit
 ) {
     var monitor by remember { mutableStateOf(item.monitored) }
-    var monitorNewSeasons by remember { mutableStateOf(item.monitorNewItems == SeriesMonitorNewItems.All) }
+    var monitorNewSeasons by remember { mutableStateOf(item.monitorNewItems == MonitorNewItems.All) }
     var qualityProfileId by remember { mutableIntStateOf(item.qualityProfileId) }
     var seriesType by remember { mutableStateOf(item.seriesType) }
     var seasonFolders by remember { mutableStateOf(item.seasonFolder) }
@@ -126,9 +126,9 @@ fun EditSeriesSheet(
                     val newItem = item.copyForEdit(
                         monitored = monitor,
                         monitorNewSeasons = if (monitorNewSeasons) {
-                            SeriesMonitorNewItems.All
+                            MonitorNewItems.All
                         } else {
-                            SeriesMonitorNewItems.None
+                            MonitorNewItems.None
                         },
                         qualityProfileId = qualityProfileId,
                         seriesType = seriesType,

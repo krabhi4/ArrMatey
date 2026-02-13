@@ -23,6 +23,7 @@ class PreferencesStore(
 
     private val sonarrInfoCardKey = booleanPreferencesKey("sonarrInfoCard")
     private val radarrInfoCardKey = booleanPreferencesKey("radarrInfoCard")
+    private val lidarrInfoCardKey = booleanPreferencesKey("lidarrInfoCard")
     private val calendarViewTypeKey = stringPreferencesKey("calendarViewType")
     private val activityPollingKey = booleanPreferencesKey("enableActivityPolling")
     private val httpLogLevelKey = stringPreferencesKey("httpLogLevel")
@@ -32,6 +33,7 @@ class PreferencesStore(
     private fun infoCardKey(type: InstanceType): Preferences.Key<Boolean> = when (type) {
         InstanceType.Sonarr -> sonarrInfoCardKey
         InstanceType.Radarr -> radarrInfoCardKey
+        InstanceType.Lidarr -> lidarrInfoCardKey
     }
 
     private val scope = CoroutineScope(Dispatchers.IO)

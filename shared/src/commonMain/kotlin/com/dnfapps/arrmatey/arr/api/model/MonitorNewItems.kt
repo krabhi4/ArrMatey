@@ -2,7 +2,7 @@ package com.dnfapps.arrmatey.arr.api.model
 
 import kotlinx.serialization.SerialName
 
-enum class SeriesMonitorNewItems {
+enum class MonitorNewItems {
     @SerialName("all")
     All,
 

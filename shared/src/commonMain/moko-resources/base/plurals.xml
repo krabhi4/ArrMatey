@@ -1,0 +1,10 @@
+<resources>
+    <plurals name="seasons">
+        <item quantity="one">%d Season</item>
+        <item quantity="other">%d Seasons</item>
+    </plurals>
+    <plurals name="albums">
+        <item quantity="one">%d Album</item>
+        <item quantity="other">%d Albums</item>
+    </plurals>
+</resources>

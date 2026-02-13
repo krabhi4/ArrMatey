@@ -41,6 +41,7 @@ import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
 import com.dnfapps.arrmatey.navigation.NavigationManager
+import com.dnfapps.arrmatey.utils.mokoPlural
 import com.dnfapps.arrmatey.utils.mokoString
 import org.koin.compose.koinInject
 
@@ -66,7 +67,7 @@ fun SeasonsArea(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
-            text = mokoString(MR.strings.seasons),
+            text = mokoString(MR.strings.seasons_header),
             fontWeight = FontWeight.Medium,
             fontSize = 26.sp
         )
@@ -91,7 +92,7 @@ fun SeasonsArea(
                             text = if (season.seasonNumber == 0) {
                                 mokoString(MR.strings.specials)
                             } else {
-                                "${mokoString(MR.strings.season_singular)} ${season.seasonNumber}"
+                                mokoString(MR.strings.season_label, season.seasonNumber)
                             },
                             fontWeight = FontWeight.Medium,
                             fontSize = 22.sp

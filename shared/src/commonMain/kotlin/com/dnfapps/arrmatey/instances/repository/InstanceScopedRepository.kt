@@ -1,17 +1,22 @@
 package com.dnfapps.arrmatey.instances.repository
 
 import com.dnfapps.arrmatey.arr.api.client.ArrClient
+import com.dnfapps.arrmatey.arr.api.client.LidarrClient
 import com.dnfapps.arrmatey.arr.api.client.RadarrClient
 import com.dnfapps.arrmatey.arr.api.client.SonarrClient
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrRelease
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
 import com.dnfapps.arrmatey.arr.api.model.CommandPayload
 import com.dnfapps.arrmatey.arr.api.model.DownloadReleasePayload
 import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.ExtraFile
 import com.dnfapps.arrmatey.arr.api.model.HistoryItem
+import com.dnfapps.arrmatey.arr.api.model.LidarrTrack
+import com.dnfapps.arrmatey.arr.api.model.LidarrTrackFile
 import com.dnfapps.arrmatey.arr.api.model.MonitoredResponse
 import com.dnfapps.arrmatey.arr.api.model.QualityProfile
 import com.dnfapps.arrmatey.arr.api.model.QueueItem
@@ -34,6 +39,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class InstanceScopedRepository(
@@ -48,9 +54,13 @@ class InstanceScopedRepository(
     val radarrClient: RadarrClient
         get() = client as? RadarrClient ?: throw IllegalStateException("Client is not a RadarrClient instance")
 
+    val lidarrClient: LidarrClient
+        get() = client as? LidarrClient ?: throw IllegalStateException("Client is not a LidarrClient instance")
+
     private fun createClient(): ArrClient = when (instance.type) {
             InstanceType.Sonarr -> SonarrClient(instance, httpClient)
             InstanceType.Radarr -> RadarrClient(instance, httpClient)
+            InstanceType.Lidarr -> LidarrClient(instance, httpClient)
         }
 
     private val _library = MutableStateFlow<NetworkResult<List<ArrMedia>>?>(null)
@@ -110,9 +120,18 @@ class InstanceScopedRepository(
     private val _movieExtraFiles = MutableStateFlow<Map<Long, List<ExtraFile>>>(emptyMap())
     val movieExtraFiles: StateFlow<Map<Long, List<ExtraFile>>> = _movieExtraFiles.asStateFlow()
 
+    // Lidarr-specific
+    private val _artistAlbums = MutableStateFlow<Map<Long, List<ArrAlbum>>>(emptyMap())
+    val artistAlbums: StateFlow<Map<Long, List<ArrAlbum>>> = _artistAlbums.asStateFlow()
+
+    private val _artistTracks = MutableStateFlow<Map<Long, Map<Long, List<LidarrTrack>>>>(emptyMap())
+    val artistTracks: StateFlow<Map<Long, Map<Long, List<LidarrTrack>>>> = _artistTracks.asStateFlow()
+
+    private val _artistTrackFiles = MutableStateFlow<Map<Long, Map<Long, List<LidarrTrackFile>>>>(emptyMap())
+    val artistTrackFiles: StateFlow<Map<Long, Map<Long, List<LidarrTrackFile>>>> = _artistTrackFiles.asStateFlow()
+
     suspend fun refreshLibrary() {
         _library.value = NetworkResult.Loading
-        delay(5_000)
         _library.value = client.getLibrary()
     }
 
@@ -447,6 +466,43 @@ class InstanceScopedRepository(
         _episodes.value = currentEpisodes
     }
 
+    suspend fun toggleAlbumMonitor(album: ArrAlbum): NetworkResult<ArrAlbum> {
+        _monitorStatus.value = OperationStatus.InProgress
+
+        if (instance.type != InstanceType.Lidarr) {
+            _monitorStatus.value = OperationStatus.Error(message = "Not a Lidarr instance")
+            return NetworkResult.Error(message = "Not a Lidarr instance")
+        }
+
+        return (client as LidarrClient).toggleMonitored(album)
+            .onSuccess { resultAlbum ->
+                _monitorStatus.value = OperationStatus.Success(
+                    if (resultAlbum.monitored) "Album monitored" else "Album unmonitored"
+                )
+                updateAlbumInCache(resultAlbum.copy(images = album.images))
+                _monitorStatus.value = OperationStatus.Idle
+            }
+            .onError { code, message, cause ->
+                _monitorStatus.value = OperationStatus.Error(code, message, cause)
+                _monitorStatus.value = OperationStatus.Idle
+            }
+    }
+
+    private fun updateAlbumInCache(album: ArrAlbum) {
+        _artistAlbums.update { currentMap ->
+            val updatedMap = currentMap.toMutableMap()
+            updatedMap.forEach { (artistId, albumList) ->
+                val index = albumList.indexOfFirst { it.id == album.id }
+                if (index != -1) {
+                    val updatedList = albumList.toMutableList()
+                    updatedList[index] = album
+                    updatedMap[artistId] = updatedList
+                }
+            }
+            updatedMap
+        }
+    }
+
     private fun updateMonitoredInCache(id: Long, status: Boolean) {
         val libraryState = _library.value
         if (libraryState is NetworkResult.Success) {
@@ -455,6 +511,7 @@ class InstanceScopedRepository(
                     when (item) {
                         is ArrSeries -> item.copy(monitored = status)
                         is ArrMovie -> item.copy(monitored = status)
+                        is Arrtist -> item.copy(monitored = status)
                     }
                 } else {
                     item
@@ -470,6 +527,7 @@ class InstanceScopedRepository(
             val updatedMedia = when (item) {
                 is ArrSeries -> item.copy(monitored = status)
                 is ArrMovie -> item.copy(monitored = status)
+                is Arrtist -> item.copy(monitored = status)
             }
             val updatedCache = currentDetailsCache.toMutableMap()
             updatedCache[id] = updatedMedia
@@ -539,6 +597,9 @@ class InstanceScopedRepository(
         safePerformSonarr { client ->
             val episodes = _episodes.value[seriesId]?.filter { it.seasonNumber == seasonNumber } ?: emptyList()
             deleteEpisodes(seriesId, episodes)
+                .onSuccess {
+                    getMediaDetails(seriesId)
+                }
         }
 
     suspend fun deleteEpisodes(
@@ -546,7 +607,9 @@ class InstanceScopedRepository(
         episodes: List<Episode>
     ): NetworkResult<Unit> =
         safePerformSonarr { client ->
-            val fileIds = episodes.mapNotNull { it.episodeFileId }
+            val fileIds = episodes
+                .filter { it.episodeFile != null }
+                .mapNotNull { it.episodeFileId }
             client.deleteEpisodes(fileIds)
                 .onSuccess {
                     val currentMap = _episodes.value.toMutableMap()
@@ -578,6 +641,68 @@ class InstanceScopedRepository(
                 }
         }
 
+    // Lidarr-specific
+    suspend fun getArtistAlbums(artistId: Long): NetworkResult<List<ArrAlbum>> =
+        safePerformLidarr { client ->
+            client.getAlbums(artistId)
+                .onSuccess { albums ->
+                    val currentMap = _artistAlbums.value.toMutableMap()
+                    currentMap[artistId] = albums.sortedByDescending { it.releaseDate }
+                    _artistAlbums.value = currentMap
+                }
+        }
+
+    suspend fun getArtistTracks(artistId: Long): NetworkResult<List<LidarrTrack>> =
+        safePerformLidarr { client ->
+            client.getTracks(artistId = artistId)
+                .onSuccess { tracks ->
+                    val currentMap = _artistTracks.value.toMutableMap()
+                    currentMap[artistId] = tracks.groupBy { it.albumId }
+                    _artistTracks.value = currentMap
+                }
+        }
+
+    suspend fun getArtistTrackFiles(artistId: Long): NetworkResult<List<LidarrTrackFile>> =
+        safePerformLidarr { client ->
+            client.getTrackFiles(artistId = artistId)
+                .onSuccess { trackFiles ->
+                    val currentMap = _artistTrackFiles.value.toMutableMap()
+                    currentMap[artistId] = trackFiles.groupBy { it.albumId }
+                    _artistTrackFiles.value = currentMap
+                }
+        }
+
+    suspend fun deleteAlbumFiles(
+        artistId: Long,
+        albumId: Long
+    ): NetworkResult<Unit> =
+        safePerformLidarr { client ->
+            val files = (_artistTrackFiles.value[artistId] ?: emptyMap())[albumId] ?: emptyList()
+            deleteTrackFiles(files)
+                .onSuccess {
+                    getArtistAlbums(artistId)
+                }
+        }
+
+    suspend fun deleteTrackFiles(
+        tracks: List<LidarrTrackFile>
+    ): NetworkResult<Unit> =
+        safePerformLidarr { client ->
+            val fileIds = tracks.map { it.id }
+            client.deleteTracks(fileIds)
+                .onSuccess {
+                    _artistTrackFiles.update { currentMap ->
+                        currentMap.mapValues { (_, albumMap) ->
+                            albumMap.mapValues { (_, tracks) ->
+                                tracks.filterNot { trackFile ->
+                                    fileIds.contains(trackFile.id)
+                                }
+                            }.filterValues { it.isNotEmpty() }
+                        }.filterValues { it.isNotEmpty() }
+                    }
+                }
+        }
+
     // Helpers
     private suspend inline fun <reified T> safePerformSonarr(
         operation: suspend (SonarrClient) -> NetworkResult<T>
@@ -595,6 +720,15 @@ class InstanceScopedRepository(
             return NetworkResult.Error(message = "Not a Radarr instance")
         }
         return operation(client as RadarrClient)
+    }
+
+    private suspend inline fun <reified T> safePerformLidarr(
+        operation: suspend (LidarrClient) -> NetworkResult<T>
+    ): NetworkResult<T> {
+        if (instance.type != InstanceType.Lidarr) {
+            return NetworkResult.Error(message = "Not a Lidarr instance")
+        }
+        return operation(client as LidarrClient)
     }
 
 }

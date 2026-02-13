@@ -2,6 +2,7 @@ package com.dnfapps.arrmatey.arr.state
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,5 +30,6 @@ enum class ContentFilter(
 ) {
     All(MR.strings.all, Icons.Default.VideoLibrary, "play.square.stack"),
     MoviesOnly(MR.strings.movies, Icons.Default.Movie, "movieclapper"),
-    EpisodesOnly(MR.strings.episodes, Icons.Default.Tv, "tv")
+    EpisodesOnly(MR.strings.episodes, Icons.Default.Tv, "tv"),
+    AlbumsOnly(MR.strings.albums_header, Icons.Default.MusicNote, "music.note")
 }

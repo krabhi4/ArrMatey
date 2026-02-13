@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.dnfapps.arrmatey.shared.MR
+import com.dnfapps.arrmatey.utils.AspectRatio
 import dev.icerock.moko.resources.StringResource
 
 @Entity(
@@ -31,7 +32,10 @@ enum class InstanceType(
     val github: String,
     val website: String,
     val defaultPort: Int,
-    val supportsActivityQueue: Boolean
+    val supportsActivityQueue: Boolean,
+    val apiBase: String,
+    val includeTopLevelAutomaticSearchOption: Boolean,
+    val aspectRatio: AspectRatio
 ) {
     Sonarr(
         resource = MR.strings.sonarr_description,
@@ -39,7 +43,10 @@ enum class InstanceType(
         website = "https://sonarr.tv/",
         iconKey = "sonarr",
         defaultPort = 8989,
-        supportsActivityQueue = true
+        supportsActivityQueue = true,
+        apiBase = "api/v3",
+        includeTopLevelAutomaticSearchOption = true,
+        aspectRatio = AspectRatio.Poster
     ),
     Radarr(
         resource = MR.strings.radarr_description,
@@ -47,6 +54,20 @@ enum class InstanceType(
         website = "https://radarr.video/",
         iconKey = "radarr",
         defaultPort = 7878,
-        supportsActivityQueue = true
+        supportsActivityQueue = true,
+        apiBase = "api/v3",
+        includeTopLevelAutomaticSearchOption = false,
+        aspectRatio = AspectRatio.Poster
+    ),
+    Lidarr(
+        resource = MR.strings.lidarr_description,
+        github = "https://github.com/Lidarr/Lidarr",
+        website = "https://lidarr.audio/",
+        iconKey = "lidarr",
+        defaultPort = 8686,
+        supportsActivityQueue = true,
+        apiBase = "api/v1",
+        includeTopLevelAutomaticSearchOption = true,
+        aspectRatio = AspectRatio.Cover
     )
 }

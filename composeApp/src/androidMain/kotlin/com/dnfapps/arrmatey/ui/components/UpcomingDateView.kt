@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.sp
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
 import com.dnfapps.arrmatey.arr.api.model.MediaStatus
 import com.dnfapps.arrmatey.utils.format
 import com.dnfapps.arrmatey.utils.mokoString
@@ -24,6 +25,9 @@ fun UpcomingDateView(item: ArrMedia) {
         is ArrMovie -> item.inCinemas?.format()?.takeUnless {
             item.digitalRelease != null || item.physicalRelease != null
         }?.let { "${mokoString(MR.strings.in_cinemas)} $it" }
+        is Arrtist -> if (item.status == MediaStatus.Continuing) item.nextAlbum?.releaseDate?.format()?.let {
+            "${mokoString(MR.strings.next_album)} $it"
+        } ?: mokoString(MR.strings.continuing_unknown) else null
     }?.let { airingString ->
         Text(
             text = airingString,

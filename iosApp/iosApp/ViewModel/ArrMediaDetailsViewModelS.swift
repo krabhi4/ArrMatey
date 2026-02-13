@@ -21,11 +21,18 @@ class ArrMediaDetailsViewModelS: ObservableObject {
     @Published private(set) var isMonitored: Bool = false
     @Published private(set) var automaticSearchIds: Set<Int64> = Set()
     @Published private(set) var lastSearchResult: Bool? = nil
+    
     @Published private(set) var deleteStatus: OperationStatus = OperationStatusIdle()
     @Published private(set) var deleteSucceeded: Bool = false
     @Published private(set) var deleteInProgress: Bool = false
+    
     @Published private(set) var deleteSeasonStatus: OperationStatus = OperationStatusIdle()
     @Published private(set) var deleteSeasonSucceeded: Bool = false
+    @Published private(set) var deleteSeasonInProgress: Bool = false
+    
+    @Published private(set) var deleteAlbumStatus: OperationStatus = OperationStatusIdle()
+    @Published private(set) var deleteAlbumSucceeded: Bool = false
+    @Published private(set) var deleteAlbumInProgress: Bool = false
     
     @Published private(set) var qualityProfiles: [QualityProfile] = []
     @Published private(set) var rootFolders: [RootFolder] = []
@@ -63,6 +70,12 @@ class ArrMediaDetailsViewModelS: ObservableObject {
         viewModel.deleteSeasonStatus.observeAsync {
             self.deleteSeasonStatus = $0
             self.deleteSeasonSucceeded = $0 is OperationStatusSuccess
+            self.deleteSeasonInProgress = $0 is OperationStatusInProgress
+        }
+        viewModel.deleteAlbumStatus.observeAsync {
+            self.deleteAlbumStatus = $0
+            self.deleteAlbumSucceeded = $0 is OperationStatusSuccess
+            self.deleteAlbumInProgress = $0 is OperationStatusInProgress
         }
         
         viewModel.qualityProfiles.observeAsync { self.qualityProfiles = $0 }
@@ -94,6 +107,10 @@ class ArrMediaDetailsViewModelS: ObservableObject {
         viewModel.toggleEpisodeMonitored(episode: episode)
     }
     
+    func toggleAlbumMonitored(album: ArrAlbum) {
+        viewModel.toggleAlbumMonitored(album: album)
+    }
+    
     func deleteMedia(deleteFiles: Bool, addImportExclusion: Bool) {
         viewModel.deleteMedia(deleteFiles: deleteFiles, addImportExclusion: addImportExclusion)
     }
@@ -102,12 +119,16 @@ class ArrMediaDetailsViewModelS: ObservableObject {
         viewModel.deleteSeasonFiles(seasonNumber: seasonNumber)
     }
     
+    func deleteAlbumFiles(_ albumId: Int64) {
+        viewModel.deleteAlbumFiles(albumId: albumId)
+    }
+    
     func performRefresh() {
         viewModel.performRefresh()
     }
     
-    func performSeriesAutomaticLookup() {
-        viewModel.performSeriesAutomaticLookup()
+    func performAutomaticLookup() {
+        viewModel.performAutomaticLookup()
     }
     
     func performEpisodeAutomaticLookup(episodeId: Int64) {
@@ -118,8 +139,8 @@ class ArrMediaDetailsViewModelS: ObservableObject {
         viewModel.performSeasonAutomaticLookup(seasonNumber: seasonNumber)
     }
     
-    func performMovieAutomaticLookup(movieId: Int64) {
-        viewModel.performMovieAutomaticLookup(movieId: movieId)
+    func performAlbumAutomaticLookup(albumId: Int64) {
+        viewModel.performAlbumAutomaticLookup(albumId: albumId)
     }
     
     func delete(_ addExclusion: Bool, _ deleteFiles: Bool) {

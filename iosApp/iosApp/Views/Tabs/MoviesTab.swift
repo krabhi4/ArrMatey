@@ -43,6 +43,8 @@ struct MoviesTab: View {
             EmptyView()
         case .episodeDetails(_, _):
             EmptyView()
+        case .albumReleases(_, _):
+            EmptyView()
         }
     }
 }

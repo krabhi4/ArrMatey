@@ -52,6 +52,7 @@ fun HomeScreen(
             when (TabItem.entries[page]) {
                 TabItem.SHOWS -> ArrTab(InstanceType.Sonarr)
                 TabItem.MOVIES -> ArrTab(InstanceType.Radarr)
+                TabItem.MUSIC -> ArrTab(InstanceType.Lidarr)
                 TabItem.ACTIVITY -> ActivityTab()
                 TabItem.CALENDAR -> CalendarTab()
                 TabItem.SETTINGS -> SettingsTabNavHost()

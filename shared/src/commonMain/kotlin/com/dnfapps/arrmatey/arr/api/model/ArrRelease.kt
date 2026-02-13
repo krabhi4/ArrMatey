@@ -28,8 +28,6 @@ sealed interface ArrRelease {
     val approved: Boolean
     val temporarilyRejected: Boolean
     val rejected: Boolean
-    val imdbId: String?
-    val tmdbId: Int?
     val rejections: List<String>
     val publishDate: Instant
     val commentUrl: String
@@ -97,5 +95,9 @@ sealed interface ReleaseParams {
         val seriesId: Long? = null,
         val seasonNumber: Int? = null,
         val episodeId: Long? = null
+    ): ReleaseParams
+    data class Album(
+        val albumId: Long,
+        val artistId: Long? = null,
     ): ReleaseParams
 }

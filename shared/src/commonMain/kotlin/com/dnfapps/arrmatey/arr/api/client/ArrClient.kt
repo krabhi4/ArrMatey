@@ -1,5 +1,6 @@
 package com.dnfapps.arrmatey.arr.api.client
 
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrRelease
@@ -39,4 +40,5 @@ interface ArrClient {
     suspend fun downloadRelease(payload: DownloadReleasePayload): NetworkResult<Any>
     suspend fun getMovieCalendar(start: LocalDate, end: LocalDate): NetworkResult<List<ArrMovie>>
     suspend fun getEpisodeCalendar(start: LocalDate, end: LocalDate): NetworkResult<List<Episode>>
+    suspend fun getAlbumCalendar(start: LocalDate, end: LocalDate): NetworkResult<List<ArrAlbum>>
 }

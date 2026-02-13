@@ -18,8 +18,7 @@ struct SeriesDetailsView: View {
     }
     
     private var seasonString: String {
-        let seasonText = item.seasonCount > 1 ? MR.strings().seasons.localized() : MR.strings().season_singular.localized()
-        return "\(item.seasonCount) \(seasonText)"
+        return MR.plurals().seasons.localized(item.seasonCount)
     }
     
     private var fileSizeString: String {

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.Bookmark
@@ -23,9 +24,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.compose.TabItem
+import com.dnfapps.arrmatey.entensions.Bullet
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.shared.MR
+import com.dnfapps.arrmatey.ui.components.PosterItem
 import com.dnfapps.arrmatey.utils.mokoString
 import org.koin.compose.koinInject
 import kotlin.time.ExperimentalTime
@@ -55,10 +58,11 @@ fun MovieCalendarItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(vertical = 12.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            PosterItem(movie, Modifier.width(50.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = movie.title,
@@ -67,7 +71,7 @@ fun MovieCalendarItem(
                 )
 
                 Row(
-                    modifier = Modifier.padding(top = 2.dp),
+                    modifier = Modifier.padding(vertical = 2.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -84,6 +88,13 @@ fun MovieCalendarItem(
                         )
                     }
                 }
+
+                Text(
+                    text = listOfNotNull(movie.certification, movie.studio)
+                        .joinToString(Bullet),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
 
             val statusIcon = when {

@@ -1,5 +1,7 @@
 package com.dnfapps.arrmatey.arr.api.client
 
+import com.dnfapps.arrmatey.arr.api.model.ApplyTags
+import com.dnfapps.arrmatey.arr.api.model.ArrAlbum
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.CommandPayload
@@ -12,6 +14,7 @@ import com.dnfapps.arrmatey.arr.api.model.MovieRelease
 import com.dnfapps.arrmatey.arr.api.model.RadarrHistoryItem
 import com.dnfapps.arrmatey.arr.api.model.ReleaseParams
 import com.dnfapps.arrmatey.client.NetworkResult
+import com.dnfapps.arrmatey.client.onSuccess
 import com.dnfapps.arrmatey.instances.model.Instance
 import io.ktor.client.HttpClient
 import kotlinx.datetime.LocalDate
@@ -22,7 +25,20 @@ class RadarrClient(
 ): BaseArrClient(httpClient) {
 
     override suspend fun getLibrary(): NetworkResult<List<ArrMovie>> =
-        get("movie")
+        get<List<ArrMovie>>("movie")
+            .onSuccess { movies ->
+                movies.map { movie ->
+                    movie.copy(
+                        images = movie.images.map { image ->
+                            if (image.remoteUrl?.startsWith("/") == true) {
+                                image.copy(remoteUrl = "$baseUrl${image.remoteUrl}")
+                            } else {
+                                image
+                            }
+                        }
+                    )
+                }
+            }
 
     override suspend fun getDetail(id: Long): NetworkResult<ArrMovie> =
         get("movie/$id")
@@ -42,7 +58,7 @@ class RadarrClient(
             minimumAvailability = movie.minimumAvailability,
             rootFolderPath = movie.rootFolderPath,
             tags = movie.tags,
-            applyTags = "replace",
+            applyTags = ApplyTags.Replace,
             moveFiles = moveFiles,
         )
         return put("movie/editor", body = body)
@@ -111,6 +127,11 @@ class RadarrClient(
         start: LocalDate,
         end: LocalDate
     ): NetworkResult<List<Episode>> = NetworkResult.Success(emptyList())
+
+    override suspend fun getAlbumCalendar(
+        start: LocalDate,
+        end: LocalDate
+    ): NetworkResult<List<ArrAlbum>> = NetworkResult.Success(emptyList())
 
     suspend fun getMovieExtraFile(id: Long): NetworkResult<List<ExtraFile>> =
         get("extrafile", mapOf("movieId" to id))

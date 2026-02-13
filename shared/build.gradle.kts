@@ -83,8 +83,6 @@ kotlin {
             implementation(libs.koin.compose.viewmodel.navigation)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
-            implementation(libs.coil.compose)
-            implementation(libs.coil.network)
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.cloudy)

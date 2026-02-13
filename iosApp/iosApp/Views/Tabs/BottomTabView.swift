@@ -12,11 +12,12 @@ struct BottomTabView: View {
     var body: some View {
         NavigationStack {
             switch tabItem {
-            case .settings: SettingsTab()
             case .shows: SeriesTab()
             case .movies: MoviesTab()
+            case .music: MusicTab()
             case .activity: ActivityTab()
             case .calendar: CalendarTab()
+            case .settings: SettingsTab()
             }
         }
     }

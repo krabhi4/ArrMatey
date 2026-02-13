@@ -120,6 +120,7 @@ object QueueItemSerializer : JsonContentPolymorphicSerializer<QueueItem>(QueueIt
         return when {
             "movie" in jsonObject -> RadarrQueueItem.serializer()
             "series" in jsonObject -> SonarrQueueItem.serializer()
+            "album" in jsonObject -> LidarrQueueItem.serializer()
             else -> throw SerializationException("Unknown MediaItem type")
         }
     }

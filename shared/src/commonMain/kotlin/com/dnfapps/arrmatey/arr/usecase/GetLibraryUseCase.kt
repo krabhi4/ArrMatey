@@ -9,6 +9,7 @@ import com.dnfapps.arrmatey.compose.utils.SortBy
 import com.dnfapps.arrmatey.compose.utils.SortOrder
 import com.dnfapps.arrmatey.datastore.InstancePreferenceStoreRepository
 import com.dnfapps.arrmatey.datastore.InstancePreferences
+import com.dnfapps.arrmatey.extensions.orderedSortedWith
 import com.dnfapps.arrmatey.instances.repository.InstanceManager
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -62,11 +63,7 @@ class GetLibraryUseCase(
             else -> compareBy { it.sortTitle }
         }
 
-        return if (preferences.sortOrder == SortOrder.Asc) {
-            items.sortedWith(comparator)
-        } else {
-            items.sortedWith(comparator.reversed())
-        }
+        return items.orderedSortedWith(preferences.sortOrder, comparator)
     }
 
     private fun applyFiltering(

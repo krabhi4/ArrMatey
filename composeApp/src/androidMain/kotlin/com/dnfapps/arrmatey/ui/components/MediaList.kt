@@ -35,13 +35,16 @@ import coil3.compose.AsyncImage
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.api.model.ArrMovie
 import com.dnfapps.arrmatey.arr.api.model.ArrSeries
+import com.dnfapps.arrmatey.arr.api.model.Arrtist
 import com.dnfapps.arrmatey.arr.api.model.MediaStatus
 import com.dnfapps.arrmatey.compose.utils.bytesAsFileSizeString
-import com.dnfapps.arrmatey.compose.utils.rememberRemoteUrlData
+import com.dnfapps.arrmatey.entensions.Bullet
 import com.dnfapps.arrmatey.shared.MR
+import com.dnfapps.arrmatey.ui.helpers.rememberRemoteImageData
 import com.dnfapps.arrmatey.ui.theme.SonarrDownloading
 import com.dnfapps.arrmatey.ui.theme.TranslucentBlack
 import com.dnfapps.arrmatey.utils.format
+import com.dnfapps.arrmatey.utils.mokoPlural
 import com.dnfapps.arrmatey.utils.mokoString
 import com.skydoves.cloudy.cloudy
 import kotlin.time.ExperimentalTime
@@ -64,6 +67,9 @@ fun <T: ArrMedia> MediaList(
         items(items) { item ->
             val isActive = itemIsActive(item)
             MediaItem(item, onItemClick, isActive)
+        }
+        item {
+            Spacer(modifier = Modifier.height(0.dp))
         }
     }
 }
@@ -98,7 +104,7 @@ fun <T: ArrMedia> MediaItem(
             ) {
                 val posterUrl = item.getPoster()?.remoteUrl
                 AsyncImage(
-                    model = rememberRemoteUrlData(posterUrl),
+                    model = rememberRemoteImageData(posterUrl),
                     contentDescription = null,
                     modifier = Modifier
                         .height(defaultHeight)
@@ -111,7 +117,14 @@ fun <T: ArrMedia> MediaItem(
                     modifier = Modifier.defaultMinSize(minHeight = defaultHeight)
                 ) {
                     Text(
-                        text = "${item.title} (${item.year})",
+                        text = buildString {
+                            append(item.title)
+                            item.year?.let { year ->
+                                if (!item.title.contains("$year")) {
+                                    append(" ($year)")
+                                }
+                            }
+                        },
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -130,6 +143,7 @@ private fun ColumnScope.MediaDetails(item: ArrMedia, isActive: Boolean) {
     when (item) {
         is ArrSeries -> SeriesDetails(item, isActive)
         is ArrMovie -> MovieDetails(item)
+        is Arrtist -> ArtistDetails(item, isActive)
     }
 }
 
@@ -139,37 +153,39 @@ private fun ColumnScope.SeriesDetails(
     item: ArrSeries,
     isActive: Boolean
 ) {
-    val seasonText = if (item.seasonCount > 1) MR.strings.seasons else MR.strings.season_singular
-    val seasonLabel = "${item.seasonCount} ${mokoString(seasonText)}"
-    val seasonCountStr = "${item.seasonCount} $seasonLabel"
+    val seasonLabel = mokoPlural(MR.plurals.seasons, item.seasonCount)
     val fileSizeString = item.fileSize.bytesAsFileSizeString()
     val network = item.network
 
-    val firstLine = listOfNotNull(network, seasonCountStr, fileSizeString).joinToString(" • ")
+    val firstLine = listOfNotNull(network, seasonLabel, fileSizeString)
+        .joinToString(Bullet)
     Text(firstLine, color = Color.White, fontSize = 14.sp, lineHeight = 18.sp)
 
     val statusStr = when (item.status) {
-        MediaStatus.Continuing -> item.nextAiring?.format() ?: "${item.status.name} - ${mokoString(MR.strings.unknown)}"
-        else -> item.status.name
+        MediaStatus.Continuing -> item.nextAiring?.format()
+            ?: "${mokoString(item.status.resource)} - ${mokoString(MR.strings.unknown)}"
+        else -> mokoString(item.status.resource)
     }
     Text(statusStr, color = Color.White, fontSize = 14.sp, lineHeight = 18.sp)
 
-    Spacer(modifier = Modifier.weight(1f))
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth().padding(bottom = 1.dp)
-    ) {
-        Text(text = item.episodeFileCount.toString(), fontSize = 12.sp, color = Color.White)
-        Text(text = "/${item.episodeCount}", fontSize = 12.sp, color = Color.White)
+    if (item.id != null) {
+        Spacer(modifier = Modifier.weight(1f))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 1.dp)
+        ) {
+            Text(text = item.episodeFileCount.toString(), fontSize = 12.sp, color = Color.White)
+            Text(text = "/${item.episodeCount}", fontSize = 12.sp, color = Color.White)
+        }
+        LinearProgressIndicator(
+            progress = { item.statusProgress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp),
+            color = if (isActive) SonarrDownloading else item.statusColor
+        )
     }
-    LinearProgressIndicator(
-        progress = { item.statusProgress },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(6.dp),
-        color = if (isActive) SonarrDownloading else item.statusColor
-    )
 }
 
 @OptIn(ExperimentalTime::class)
@@ -186,14 +202,56 @@ private fun ColumnScope.MovieDetails(item: ArrMovie) {
     val secondLine = listOfNotNull(statusLabel, item.fileSize.bytesAsFileSizeString(), item.movieFile?.quality?.quality?.name).joinToString(" • ")
     Text(secondLine, color = Color.White, fontSize = 14.sp, lineHeight = 18.sp)
 
-    Spacer(modifier = Modifier.weight(1f))
-    LinearProgressIndicator(
-        progress = { item.statusProgress },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(6.dp),
-        color = item.statusColor
-    )
+    if (item.id != null) {
+        Spacer(modifier = Modifier.weight(1f))
+        LinearProgressIndicator(
+            progress = { item.statusProgress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp),
+            color = item.statusColor
+        )
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+@Composable
+private fun ColumnScope.ArtistDetails(
+    item: Arrtist,
+    isActive: Boolean
+) {
+    val albumCountString = mokoPlural(MR.plurals.albums, item.albumCount)
+    val fileSizeString = item.fileSize.bytesAsFileSizeString()
+
+    val firstLine = listOfNotNull(albumCountString, fileSizeString)
+        .joinToString(Bullet)
+    Text(firstLine, color = Color.White, fontSize = 14.sp, lineHeight = 18.sp)
+
+    val statusStr = when (item.status) {
+        MediaStatus.Continuing -> item.nextAlbum?.releaseDate?.format()
+            ?: "${mokoString(item.status.resource)} - ${mokoString(MR.strings.unknown)}"
+        else -> mokoString(item.status.resource)
+    }
+    Text(statusStr, color = Color.White, fontSize = 14.sp, lineHeight = 18.sp)
+
+//    Spacer(modifier = Modifier.weight(1f))
+    if (item.id != null) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 1.dp)
+        ) {
+            Text(text = item.trackFileCount.toString(), fontSize = 12.sp, color = Color.White)
+            Text(text = "/${item.trackCount}", fontSize = 12.sp, color = Color.White)
+        }
+        LinearProgressIndicator(
+            progress = { item.statusProgress },
+            color = if (isActive) SonarrDownloading else item.statusColor,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+        )
+    }
 }
 
 @Composable
@@ -204,7 +262,7 @@ fun BannerView(
     val banner = item.getBanner()?.remoteUrl
     banner?.let { bannerUrl ->
         AsyncImage(
-            model = rememberRemoteUrlData(bannerUrl),
+            model = rememberRemoteImageData(bannerUrl),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = modifier.cloudy()

@@ -62,6 +62,7 @@ androidx-foundation-layout = { group = "androidx.compose.foundation", name = "fo
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 androidx-compose-material3-alpha = { module = "androidx.compose.material3:material3", version.ref = "m3Alpha" }
+coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }

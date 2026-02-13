@@ -10,8 +10,22 @@ import SwiftUI
 
 struct MediaDetailsHeader: View {
     let item: ArrMedia
+    let type: InstanceType
     
     @Environment(\.colorScheme) var colorScheme
+    
+    private var infoString: String {
+        guard !(item is Arrtist) else { return "" }
+        var result = ""
+        if let year = item.year {
+            result += "\(year)"
+        }
+        result += " • \(item.runtimeString)"
+        if let certifcation = item.certification {
+            result += " • \(certifcation)"
+        }
+        return result
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -20,44 +34,20 @@ struct MediaDetailsHeader: View {
                     .frame(width: geometry.size.width)
                 
                 HStack(alignment: .top, spacing: 12) {
-                    PosterItem(item: item)
-                        .frame(width: 150, height: 220)
+                    PosterItem(item: item, aspectRatio: type.aspectRatio)
+                        .frame(height: 220)
                     
                     VStack(alignment: .leading, spacing: 4) {
-                        if let clearLogo = item.getClearLogo()?.remoteUrl {
-                            AsyncImage(url: URL(string: clearLogo)) { phase in
-                                if let image = phase.image {
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(minHeight: 64)
-                                        .background {
-                                            if colorScheme == .light {
-                                                RoundedRectangle(cornerRadius: 16)
-                                                    .fill(Color.black.opacity(0.4))
-                                                    .blur(radius: 5)
-                                                    .padding(-4)
-                                            }
-                                        }
-                                } else {
-                                    Color.clear.frame(height: 64)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        } else {
-                            Text(item.title)
-                                .font(.system(size: 36, weight: .bold))
-                                .lineLimit(3)
-                                .truncationMode(.tail)
-                                .multilineTextAlignment(.center)
-                                .frame(maxWidth: .infinity, alignment: .center)
+                        ClearLogoView(item: item)
+                            .padding(.bottom, 12)
+                        
+                        if !(item is Arrtist) {
+                            Text(infoString)
+                                .font(.system(size: 16))
+                            
+                            Text([item.releasedBy ?? "", item.statusString].joined(separator: " • "))
+                                .font(.system(size: 14))
                         }
-                        
-                        Text([String(item.year), item.runtimeString, item.certification ?? "NA"].joined(separator: " • "))
-                            .font(.system(size: 16))
-                        
-                        Text([item.releasedBy ?? "", item.statusString].joined(separator: " • "))
-                            .font(.system(size: 14))
                         
                         Text(item.genres.joined(separator: " • "))
                             .font(.system(size: 14))

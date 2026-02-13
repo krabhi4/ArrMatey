@@ -4,19 +4,21 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MediaInfo(
-    val audioBitrate: Int,
-    val audioChannels: Double,
-    val audioCodec: String,
-    val audioLanguages: String,
-    val audioStreamCount: Int,
-    val videoBitDepth: Int,
-    val videoBitrate: Int,
-    val videoCodec: String,
-    val videoFps: Double,
-    val videoDynamicRange: String,
-    val videoDynamicRangeType: String,
-    val resolution: String,
-    val runTime: String,
-    val scanType: String,
-    val subtitles: String
+    val audioBitrate: String? = null,
+    val audioBits: String? = null,
+    val audioChannels: Double? = null,
+    val audioCodec: String? = null,
+    val audioLanguages: String? = null,
+    val audioStreamCount: Int? = null,
+    val audioSampleRate: String? = null,
+    val videoBitDepth: Int? = null,
+    val videoBitrate: Int? = null,
+    val videoCodec: String? = null,
+    val videoFps: Double? = null,
+    val videoDynamicRange: String? = null,
+    val videoDynamicRangeType: String? = null,
+    val resolution: String? = null,
+    val runTime: String? = null,
+    val scanType: String? = null,
+    val subtitles: String? = null
 )

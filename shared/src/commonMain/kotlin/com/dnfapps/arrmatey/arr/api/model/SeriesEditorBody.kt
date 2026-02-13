@@ -6,12 +6,12 @@ import kotlinx.serialization.Serializable
 data class SeriesEditorBody(
     val seriesIds: List<Long>,
     val monitored: Boolean,
-    val monitorNewItems: SeriesMonitorNewItems,
+    val monitorNewItems: MonitorNewItems,
     val seriesType: SeriesType,
     val seasonFolder: Boolean,
     val qualityProfileId: Int,
     val rootFolderPath: String?,
     val tags: List<Int>,
-    val applyTags: String,
+    val applyTags: ApplyTags,
     val moveFiles: Boolean
 )
