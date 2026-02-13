@@ -38,8 +38,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 @Composable
 fun EpisodeCalendarItem(
-    episodeGroup: EpisodeGroup,
-    navigationManager: NavigationManager = koinInject()
+    episodeGroup: EpisodeGroup
 ) {
     val episode = episodeGroup.first
     Card(
@@ -48,19 +47,7 @@ fun EpisodeCalendarItem(
             .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer
-        ),
-        onClick = {
-            episode.series?.let { series ->
-                series.id?.let { seriesId ->
-                    val newStack = mutableListOf<ArrScreen>(ArrScreen.Details(seriesId))
-                    if (episodeGroup.additional.isEmpty()) {
-                        newStack.add(ArrScreen.EpisodeDetails(series, episode))
-                    }
-                    navigationManager.setSelectedTab(TabItem.SHOWS)
-                    navigationManager.series().replaceBackStack(newStack)
-                }
-            }
-        }
+        )
     ) {
         Row(
             modifier = Modifier

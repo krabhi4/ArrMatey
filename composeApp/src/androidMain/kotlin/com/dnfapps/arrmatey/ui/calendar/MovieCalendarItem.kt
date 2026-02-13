@@ -36,8 +36,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 @Composable
 fun MovieCalendarItem(
-    movie: ArrMovie,
-    navigationManager: NavigationManager = koinInject()
+    movie: ArrMovie
 ) {
     Card(
         modifier = Modifier
@@ -45,15 +44,7 @@ fun MovieCalendarItem(
             .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        onClick = {
-            movie.id?.let { id ->
-                navigationManager.setSelectedTab(TabItem.MOVIES)
-                navigationManager.movies().navigateTo(
-                    ArrScreen.Details(id)
-                )
-            }
-        }
+        )
     ) {
         Row(
             modifier = Modifier

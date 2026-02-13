@@ -13,6 +13,7 @@ struct CalendarDayCell: View {
     let isSelected: Bool
     let movieCount: Int
     let episodeCount: Int
+    let albumCount: Int
     let onClick: () -> Void
     
     private var isToday: Bool {
@@ -32,19 +33,16 @@ struct CalendarDayCell: View {
                 
                 Spacer()
                 
-                if movieCount > 0 || episodeCount > 0 {
-                    HStack(spacing: 2) {
+                if movieCount > 0 || episodeCount > 0 || albumCount > 0 {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 2) {
                         if movieCount > 0 {
-                            CountBadge(
-                                count: movieCount,
-                                color: .orange
-                            )
+                            CountBadge(count: movieCount, color: .blue)
                         }
                         if episodeCount > 0 {
-                            CountBadge(
-                                count: episodeCount,
-                                color: .purple
-                            )
+                            CountBadge(count: episodeCount, color: .teal)
+                        }
+                        if albumCount > 0 {
+                            CountBadge(count: albumCount, color: .purple)
                         }
                     }
                 } else {

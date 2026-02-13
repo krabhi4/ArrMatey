@@ -34,8 +34,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 @Composable
 fun AlbumCalendarItem(
-    album: ArrAlbum,
-    navigationManager: NavigationManager = koinInject()
+    album: ArrAlbum
 ) {
     Card(
         modifier = Modifier
@@ -43,16 +42,7 @@ fun AlbumCalendarItem(
             .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
-        ),
-        onClick = {
-            album.artist?.let { artist ->
-                artist.id?.let { artistId ->
-                    val newStack = mutableListOf<ArrScreen>(ArrScreen.Details(artistId))
-                    navigationManager.setSelectedTab(TabItem.MUSIC)
-                    navigationManager.music().replaceBackStack(newStack)
-                }
-            }
-        }
+        )
     ) {
         Row(
             modifier = Modifier

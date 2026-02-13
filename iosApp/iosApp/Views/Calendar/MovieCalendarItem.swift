@@ -11,8 +11,6 @@ import Shared
 struct MovieCalendarItem: View {
     let movie: ArrMovie
     
-    @EnvironmentObject private var navigation: NavigationManager
-    
     private var statusIcon: String? {
         if movie.isDownloaded {
             return "checkmark.circle.fill"
@@ -36,44 +34,34 @@ struct MovieCalendarItem: View {
     }
     
     var body: some View {
-        Button(action: {
-            if let id = movie.id?.int64Value {
-                navigation.selectedTab = .movies
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    navigation.go(to: .details(id), of: .radarr)
-                }
-            }
-        }) {
-            HStack(spacing: 12) {
-                PosterItem(item: movie)
-                    .frame(width: 50)
+        HStack(spacing: 12) {
+            PosterItem(item: movie)
+                .frame(width: 50)
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text(movie.title)
+                    .font(.headline)
+                    .foregroundColor(.primary)
                 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(movie.title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    if let releaseType = releaseTypeText {
-                        HStack(spacing: 8) {
-                            Text(releaseType)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                if let releaseType = releaseTypeText {
+                    HStack(spacing: 8) {
+                        Text(releaseType)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
-                
-                Spacer()
-                
-                if let icon = statusIcon {
-                    Image(systemName: icon)
-                        .font(.system(size: 20))
-                        .foregroundColor(.primary)
-                }
             }
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .cornerRadius(12)
+            
+            Spacer()
+            
+            if let icon = statusIcon {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(.primary)
+            }
         }
-        .buttonStyle(.plain)
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
     }
 }

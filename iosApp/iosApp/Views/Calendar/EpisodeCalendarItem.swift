@@ -11,8 +11,6 @@ import Shared
 struct EpisodeCalendarItem: View {
     let episodeGroup: EpisodeGroup
     
-    @EnvironmentObject private var navigation: NavigationManager
-    
     private var episode: Episode {
         episodeGroup.first
     }
@@ -50,64 +48,54 @@ struct EpisodeCalendarItem: View {
     }
     
     var body: some View {
-        Button(action: {
-            if let id = episode.series?.id?.int64Value {
-                navigation.selectedTab = .shows
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    navigation.go(to: .details(id), of: .sonarr)
-                }
+        HStack(spacing: 12) {
+            if let series = episode.series {
+                PosterItem(item: series)
+                    .frame(width: 50)
             }
-        }) {
-            HStack(spacing: 12) {
-                if let series = episode.series {
-                    PosterItem(item: series)
-                        .frame(width: 50)
-                }
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text(episode.series?.title ?? MR.strings().unknown.localized())
+                    .font(.headline)
+                    .foregroundColor(.primary)
                 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(episode.series?.title ?? MR.strings().unknown.localized())
-                        .font(.headline)
-                        .foregroundColor(.primary)
+                Text("S\(episode.seasonNumber)E\(episode.episodeNumber) • \(episode.title ?? "")")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                HStack(spacing: 8) {
+                    if let airTime = airTime {
+                        Text(airTime)
+                            .font(.caption)
+                            .foregroundColor(.primary)
+                    }
                     
-                    Text("S\(episode.seasonNumber)E\(episode.episodeNumber) • \(episode.title ?? "")")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    if isPremier {
+                        BadgeView(text: MR.strings().premier.localized(), color: .blue)
+                    }
                     
-                    HStack(spacing: 8) {
-                        if let airTime = airTime {
-                            Text(airTime)
-                                .font(.caption)
-                                .foregroundColor(.primary)
-                        }
-                        
-                        if isPremier {
-                            BadgeView(text: MR.strings().premier.localized(), color: .blue)
-                        }
-                        
-                        if let finaleType = episode.finaleType {
-                            BadgeView(text: finaleType.name, color: .red)
-                        }
-                        
-                        if !episodeGroup.additional.isEmpty {
-                            Text(MR.strings().additional_episodes_count.formatted(args: [episodeGroup.additional.count]))
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                    if let finaleType = episode.finaleType {
+                        BadgeView(text: finaleType.name, color: .red)
+                    }
+                    
+                    if !episodeGroup.additional.isEmpty {
+                        Text(MR.strings().additional_episodes_count.formatted(args: [episodeGroup.additional.count]))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
-                
-                Spacer()
-                
-                if let icon = statusIcon {
-                    Image(systemName: icon)
-                        .font(.system(size: 18))
-                        .foregroundColor(.primary)
-                }
             }
-            .padding()
-            .background(Color(.systemGroupedBackground))
-            .cornerRadius(12)
+            
+            Spacer()
+            
+            if let icon = statusIcon {
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundColor(.primary)
+            }
         }
-        .buttonStyle(.plain)
+        .padding()
+        .background(Color(.systemGroupedBackground))
+        .cornerRadius(12)
     }
 }

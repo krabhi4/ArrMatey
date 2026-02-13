@@ -42,6 +42,7 @@ struct CalendarMonthGrid: View {
                             isSelected: date.isEqual(to: selectedDate),
                             movieCount: movieCount(for: date),
                             episodeCount: episodeCount(for: date),
+                            albumCount: albumCount(for: date),
                             onClick: {
                                 onDateSelected(date)
                             }
@@ -90,6 +91,10 @@ struct CalendarMonthGrid: View {
     
     private func episodeCount(for date: LocalDate) -> Int {
         (state.episodes[date] ?? []).count
+    }
+    
+    private func albumCount(for date: LocalDate) -> Int {
+        (state.albums[date] ?? []).count
     }
 }
 
