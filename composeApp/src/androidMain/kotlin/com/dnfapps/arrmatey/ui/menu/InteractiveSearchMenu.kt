@@ -119,7 +119,7 @@ fun InteractiveSearchMenu(
                             selected = filter == selectedFilter,
                             onClick = { onFilterChanged(filter) },
                             shapes = MenuDefaults.itemShape(index, ReleaseFilterBy.entries.size),
-                            checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                            selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                         )
                     }
                 }
@@ -145,7 +145,7 @@ fun InteractiveSearchMenu(
                             }
                         },
                         shapes = MenuDefaults.itemShape(index, ReleaseSortBy.entries.size),
-                        checkedLeadingIcon = { when (selectedSortOrder) {
+                        selectedLeadingIcon = { when (selectedSortOrder) {
                             SortOrder.Asc -> Icon(Icons.Default.ArrowDropUp, null)
                             SortOrder.Desc -> Icon(Icons.Default.ArrowDropDown, null)
                         } }
@@ -188,7 +188,7 @@ private fun QualitiesMenu(
                     onClick = { onChange(null) },
                     shapes = MenuDefaults.itemShape(0, qualities.size+1),
                     colors = MenuDefaults.selectableItemVibrantColors(),
-                    checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                    selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                 )
                 qualities.forEachIndexed { index, info ->
                     DropdownMenuItem(
@@ -197,7 +197,7 @@ private fun QualitiesMenu(
                         selected = info == selected,
                         shapes = MenuDefaults.itemShape(index+1, qualities.size+1),
                         colors = MenuDefaults.selectableItemVibrantColors(),
-                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                     )
                 }
             }
@@ -237,7 +237,7 @@ private fun LanguageMenu(
                     onClick = { onChange(null) },
                     shapes = MenuDefaults.itemShape(0, languages.size+1),
                     colors = MenuDefaults.selectableItemVibrantColors(),
-                    checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                    selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                 )
                 languages.forEachIndexed { index, language ->
                     DropdownMenuItem(
@@ -246,7 +246,7 @@ private fun LanguageMenu(
                         selected = language == selected,
                         shapes = MenuDefaults.itemShape(index+1, languages.size+1),
                         colors = MenuDefaults.selectableItemVibrantColors(),
-                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                     )
                 }
             }
@@ -286,7 +286,7 @@ private fun IndexersMenu(
                     onClick = { onChange(null) },
                     shapes = MenuDefaults.itemShape(0, indexers.size+1),
                     colors = MenuDefaults.selectableItemVibrantColors(),
-                    checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                    selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                 )
                 indexers.forEachIndexed { index, indexer ->
                     DropdownMenuItem(
@@ -295,7 +295,7 @@ private fun IndexersMenu(
                         selected = indexer == selected,
                         shapes = MenuDefaults.itemShape(index+1, indexers.size+1),
                         colors = MenuDefaults.selectableItemVibrantColors(),
-                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                     )
                 }
             }
@@ -335,7 +335,7 @@ private fun ProtocolMenu(
                     onClick = { onChange(null) },
                     shapes = MenuDefaults.itemShape(0, protocols.size+1),
                     colors = MenuDefaults.selectableItemVibrantColors(),
-                    checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                    selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                 )
                 protocols.forEachIndexed { index, protocol ->
                     DropdownMenuItem(
@@ -344,7 +344,7 @@ private fun ProtocolMenu(
                         selected = protocol == selected,
                         shapes = MenuDefaults.itemShape(index+1, protocols.size+1),
                         colors = MenuDefaults.selectableItemVibrantColors(),
-                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                     )
                 }
             }
@@ -384,7 +384,7 @@ private fun CustomFormatMenu(
                     onClick = { onChange(null) },
                     shapes = MenuDefaults.itemShape(0, customFormats.size+1),
                     colors = MenuDefaults.selectableItemVibrantColors(),
-                    checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                    selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                 )
                 customFormats.forEachIndexed { index, format ->
                     DropdownMenuItem(
@@ -393,7 +393,7 @@ private fun CustomFormatMenu(
                         selected = format == selected,
                         shapes = MenuDefaults.itemShape(index+1, customFormats.size+1),
                         colors = MenuDefaults.selectableItemVibrantColors(),
-                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
                     )
                 }
             }

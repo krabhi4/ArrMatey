@@ -15,6 +15,7 @@ class NavigationManager: ObservableObject {
     @Published var musicPath = NavigationPath()
     
     @Published var selectedTab: TabItem = .shows
+    @Published var selectedDrawerTab: TabItem? = nil
     
     func go(to route: MediaRoute, of type: InstanceType) {
         switch type {
@@ -43,6 +44,10 @@ class NavigationManager: ObservableObject {
     
     func go(to route: SettingsRoute) {
         settingsPath.append(route)
+    }
+    
+    func setSelectedDrawerTab(_ tab: TabItem?) {
+        selectedDrawerTab = tab
     }
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CalendarViewDay
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,15 +18,15 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.arr.state.CalendarViewMode
 import com.dnfapps.arrmatey.arr.viewmodel.CalendarViewModel
 import com.dnfapps.arrmatey.datastore.PreferencesStore
-import com.dnfapps.arrmatey.entensions.copy
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.shared.MR
 import com.dnfapps.arrmatey.ui.calendar.CalendarListView
 import com.dnfapps.arrmatey.ui.calendar.CalendarMonthView
+import com.dnfapps.arrmatey.ui.components.navigation.NavigationDrawerButton
 import com.dnfapps.arrmatey.ui.menu.CalendarFilterMenu
 import com.dnfapps.arrmatey.utils.mokoString
 import org.koin.compose.koinInject
@@ -34,7 +35,8 @@ import org.koin.compose.koinInject
 @Composable
 fun CalendarTab(
     viewModel: CalendarViewModel = koinInject(),
-    preferencesStore: PreferencesStore = koinInject()
+    preferencesStore: PreferencesStore = koinInject(),
+    navigationManager: NavigationManager = koinInject()
 ) {
     val calendarState by viewModel.calendarState.collectAsStateWithLifecycle()
     val filterState by viewModel.filterState.collectAsStateWithLifecycle()
@@ -46,6 +48,9 @@ fun CalendarTab(
         topBar = {
             TopAppBar(
                 title = { Text(mokoString(MR.strings.schedule)) },
+                navigationIcon = {
+                    NavigationDrawerButton()
+                },
                 actions = {
                     IconButton(onClick = {
                         preferencesStore.toggleCalendarViewMode()

@@ -7,10 +7,11 @@
     <string name="settings">Settings</string>
     <string name="movies">Movies</string>
     <string name="music">Music</string>
+    <string name="home">Home</string>
 
-    <string name="series_type">series</string>
-    <string name="movie_type">movie</string>
-    <string name="artist_type">artist</string>
+    <string name="type_series">series</string>
+    <string name="type_movie">movie</string>
+    <string name="type_artist">artist</string>
 
     <!-- Titles -->
     <string name="add_instance">Add instance</string>
@@ -167,6 +168,7 @@
     <string name="size_on_disk">Size on disk</string>
     <string name="list_view">List</string>
     <string name="grid_view">Grid</string>
+    <string name="search_placeholder">Search %1$s</string>
 
     <!-- History Event Type -->
     <string name="grabbed">Grabbed</string>
@@ -240,9 +242,9 @@
     <string name="midseason_finale">Midseason finale</string>
 
     <!-- Empty Search Results -->
-    <string name="no_query_results">No results for \"%1$d\" in your library</string>
+    <string name="no_query_results">No results for \"%1$s\" in your library</string>
     <string name="no_query_results_label">Check your spelling or</string>
-    <string name="no_query_results_link">add a new %1%d</string>
+    <string name="no_query_results_link">add a new %1$s</string>
 
     <!-- Calendar -->
     <string name="calendar">Calendar</string>

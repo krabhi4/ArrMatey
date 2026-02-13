@@ -103,17 +103,17 @@ fun CalendarFilterMenu(
                                     text = { Text(mokoString(MR.strings.all)) },
                                     selected = filterState.instanceId == null,
                                     onClick = { onInstanceChanged(null) },
-                                    checkedLeadingIcon = { Icon(Icons.Default.Check, null) },
+                                    selectedLeadingIcon = { Icon(Icons.Default.Check, null) },
                                     shapes = MenuDefaults.itemShape(0, instances.size + 1),
                                     colors = MenuDefaults.selectableItemVibrantColors()
                                 )
-                                HorizontalDivider(Modifier.padding(horizontal = MenuDefaults.HorizontalDividerPadding))
+                                HorizontalDivider(Modifier.padding(MenuDefaults.HorizontalDividerPadding))
                                 instances.forEachIndexed { index, instance ->
                                     DropdownMenuItem(
                                         text = { Text(instance.label) },
                                         selected = filterState.instanceId == instance.id,
                                         onClick = { onInstanceChanged(instance.id) },
-                                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) },
+                                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) },
                                         shapes = MenuDefaults.itemShape(
                                             index + 1,
                                             instances.size + 1
@@ -140,7 +140,7 @@ fun CalendarFilterMenu(
                         shapes = MenuDefaults.itemShape(index, contentFilters.size),
                         selected = filterState.contentFilter == contentFilter,
                         onClick = { onContentFilterChanged(contentFilter) },
-                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) },
+                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) },
                         trailingIcon = { Icon(contentFilter.imageVector, null) }
                     )
                 }
@@ -177,7 +177,7 @@ fun CalendarFilterMenu(
                         shapes = MenuDefaults.itemShape(index, toggles.size),
                         selected = isChecked,
                         onClick = { action() },
-                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) },
+                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) },
                         trailingIcon = { Icon(icon, null) }
                     )
                 }

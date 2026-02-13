@@ -21,13 +21,14 @@ koin-bom = "4.1.1"
 room = "2.8.4"
 sqlite = "2.6.2"
 ksp = "2.3.2"
-foundationLayout = "1.9.5"
-navigation3 = "1.0.0"
-m3Alpha = "1.5.0-alpha09"
+foundationLayout = "1.10.3"
+navigation3 = "1.0.1"
+m3Alpha = "1.5.0-alpha14"
 coil = "3.3.0"
 datastore = "1.2.0"
 cloudy = "0.3.0"
 moko = "0.26.0"
+windowSize = "1.4.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -62,6 +63,8 @@ androidx-foundation-layout = { group = "androidx.compose.foundation", name = "fo
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 androidx-compose-material3-alpha = { module = "androidx.compose.material3:material3", version.ref = "m3Alpha" }
+androidx-compose-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "m3Alpha" }
+androidx-compose-window-size = { module = "androidx.compose.material3:material3-window-size-class-android", version.ref = "windowSize" }
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }

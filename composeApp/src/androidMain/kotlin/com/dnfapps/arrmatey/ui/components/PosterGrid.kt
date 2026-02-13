@@ -57,8 +57,5 @@ fun PosterGrid(
                 }
             )
         }
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Spacer(modifier = Modifier.height(0.dp))
-        }
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.dnfapps.arrmatey.compose.icons.Hard_drive
 import com.dnfapps.arrmatey.instances.model.Instance
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -40,52 +42,40 @@ fun InstancePicker(
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    var textWidth by remember { mutableStateOf(IntSize.Zero) }
     val interactionSource = remember { MutableInteractionSource() }
 
     val hasMultipleInstances = typeInstances.size > 1
 
-    Box(modifier = modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .onGloballyPositioned { textWidth = it.size }
-                .clickable(
-                    enabled = hasMultipleInstances,
-                    onClick = { isExpanded = !isExpanded }
-                )
-        ) {
-            Text(text = currentInstance?.label ?: "")
-            if (hasMultipleInstances) {
-                ExposedDropdownMenuDefaults.TrailingIcon(isExpanded)
-            }
-        }
-
-        DropdownMenuPopup(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-            modifier = Modifier.width(
-                with(LocalDensity.current) { (textWidth.width * 1.5f).toDp() }
-            )
-        ) {
-            DropdownMenuGroup(
-                shapes = MenuDefaults.groupShape(0, 1),
-                interactionSource = interactionSource,
-                containerColor = MenuDefaults.groupVibrantContainerColor
+    if (hasMultipleInstances) {
+        Box(modifier = modifier) {
+            IconButton(
+                onClick = { isExpanded = true }
             ) {
-                typeInstances.forEachIndexed { index, inst ->
-                    DropdownMenuItem(
-                        text = { Text(inst.label) },
-                        onClick = {
-                            isExpanded = false
-                            onInstanceSelected(inst)
-                        },
-                        selected = inst.id == currentInstance?.id,
-                        shapes = MenuDefaults.itemShape(index, typeInstances.size),
-                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) },
-                        colors = MenuDefaults.selectableItemVibrantColors()
-                    )
+                Icon(Hard_drive, null)
+            }
+
+            DropdownMenuPopup(
+                expanded = isExpanded,
+                onDismissRequest = { isExpanded = false },
+            ) {
+                DropdownMenuGroup(
+                    shapes = MenuDefaults.groupShape(0, 1),
+                    interactionSource = interactionSource,
+                    containerColor = MenuDefaults.groupVibrantContainerColor
+                ) {
+                    typeInstances.forEachIndexed { index, inst ->
+                        DropdownMenuItem(
+                            text = { Text(inst.label) },
+                            selected = inst.id == currentInstance?.id,
+                            shapes = MenuDefaults.itemShape(index, typeInstances.size),
+                            colors = MenuDefaults.selectableItemVibrantColors(),
+                            onClick = {
+                                isExpanded = false
+                                onInstanceSelected(inst)
+                            },
+                            selectedLeadingIcon = { Icon(Icons.Default.Check, null) }
+                        )
+                    }
                 }
             }
         }

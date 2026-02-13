@@ -1,7 +1,10 @@
 package com.dnfapps.arrmatey.entensions
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBarState
+import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarDuration
@@ -59,3 +62,11 @@ fun SafeSnackbar(snackbarData: SnackbarData) {
         contentColor = contentColor
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+fun SearchBarState.isExpanded() =
+    currentValue == SearchBarValue.Expanded
+
+@OptIn(ExperimentalMaterial3Api::class)
+fun SearchBarState.isCollapsed() =
+    currentValue == SearchBarValue.Collapsed

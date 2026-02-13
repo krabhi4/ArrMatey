@@ -94,17 +94,17 @@ fun ActivityFilterMenu(
                                     text = { Text(mokoString(MR.strings.all)) },
                                     selected = selectedInstanceId == null,
                                     onClick = { onInstanceChange(null) },
-                                    checkedLeadingIcon = { Icon(Icons.Default.Check, null) },
+                                    selectedLeadingIcon = { Icon(Icons.Default.Check, null) },
                                     shapes = MenuDefaults.itemShape(0, instances.size + 1),
                                     colors = MenuDefaults.selectableItemVibrantColors()
                                 )
-                                HorizontalDivider(Modifier.padding(horizontal = MenuDefaults.HorizontalDividerPadding))
+                                HorizontalDivider(Modifier.padding( MenuDefaults.HorizontalDividerPadding))
                                 instances.forEachIndexed { index, instance ->
                                     DropdownMenuItem(
                                         text = { Text(instance.label) },
                                         selected = selectedInstanceId == instance.id,
                                         onClick = { onInstanceChange(instance.id) },
-                                        checkedLeadingIcon = { Icon(Icons.Default.Check, null) },
+                                        selectedLeadingIcon = { Icon(Icons.Default.Check, null) },
                                         shapes = MenuDefaults.itemShape(
                                             index + 1,
                                             instances.size + 1
@@ -141,7 +141,7 @@ fun ActivityFilterMenu(
                                 onSortByChanged(sort)
                             }
                         },
-                        checkedLeadingIcon = {
+                        selectedLeadingIcon = {
                             if (sortOrder == SortOrder.Asc) Icon(Icons.Default.ArrowDropUp, null)
                             else Icon(Icons.Default.ArrowDropDown, null)
                         }

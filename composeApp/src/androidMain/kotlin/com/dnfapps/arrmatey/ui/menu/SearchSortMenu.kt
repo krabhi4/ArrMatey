@@ -70,7 +70,7 @@ fun SearchSortMenu(
                             }
                         },
                         selected = option == sortBy,
-                        checkedLeadingIcon = {
+                        selectedLeadingIcon = {
                             when (sortOrder) {
                                 SortOrder.Asc -> Icon(Icons.Default.ArrowDropUp, null)
                                 SortOrder.Desc -> Icon(Icons.Default.ArrowDropDown, null)

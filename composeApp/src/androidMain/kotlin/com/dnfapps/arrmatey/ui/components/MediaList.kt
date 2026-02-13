@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -62,14 +63,12 @@ fun <T: ArrMedia> MediaList(
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        userScrollEnabled = userScrollEnabled
+        userScrollEnabled = userScrollEnabled,
+        contentPadding = PaddingValues(vertical = 12.dp)
     ) {
         items(items) { item ->
             val isActive = itemIsActive(item)
             MediaItem(item, onItemClick, isActive)
-        }
-        item {
-            Spacer(modifier = Modifier.height(0.dp))
         }
     }
 }

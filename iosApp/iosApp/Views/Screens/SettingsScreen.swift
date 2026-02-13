@@ -42,7 +42,7 @@ struct SettingsScreen: View {
                     navigationManager.go(to: .newInstance())
                 }
             } header: {
-                Text(LocalizedStringResource("instances"))
+                Text(MR.strings().instances.localized())
             }
             if isDebug() {
                 Button("Dev settings") {

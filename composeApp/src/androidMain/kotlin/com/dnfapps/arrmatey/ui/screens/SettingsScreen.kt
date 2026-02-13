@@ -14,9 +14,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,8 +35,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dnfapps.arrmatey.arr.viewmodel.MoreScreenViewModel
 import com.dnfapps.arrmatey.entensions.getDrawableId
 import com.dnfapps.arrmatey.isDebug
+import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.navigation.SettingsNavigation
 import com.dnfapps.arrmatey.navigation.SettingsScreen
+import com.dnfapps.arrmatey.ui.components.navigation.NavigationDrawerButton
 import com.dnfapps.arrmatey.utils.mokoString
 import org.koin.compose.koinInject
 
@@ -42,7 +46,8 @@ import org.koin.compose.koinInject
 @Composable
 fun SettingsScreen(
     viewModel: MoreScreenViewModel = koinInject(),
-    settingsNav: SettingsNavigation = koinInject<SettingsNavigation>()
+    navigationManager: NavigationManager = koinInject(),
+    settingsNav: SettingsNavigation = navigationManager.settings()
 ) {
     val allInstances by viewModel.instances.collectAsStateWithLifecycle()
 
@@ -50,7 +55,12 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = mokoString(MR.strings.settings)) })
+            TopAppBar(
+                title = { Text(text = mokoString(MR.strings.settings)) },
+                navigationIcon = {
+                    NavigationDrawerButton(returnToHome = true)
+                }
+            )
         }
     ) {
         Box(modifier = Modifier.padding(it)) {

@@ -64,7 +64,7 @@ fun LibraryFilterMenu(
                         selected = type == viewType,
                         onClick = { onViewTypeChanged(type) },
                         shapes = MenuDefaults.itemShape(index, ViewType.entries.size),
-                        checkedLeadingIcon = {
+                        selectedLeadingIcon = {
                             Icon(Icons.Default.Check, null)
                         },
                         leadingIcon = { Icon(type.imageVector, null) }
@@ -84,7 +84,7 @@ fun LibraryFilterMenu(
                         selected = filterBy == filter,
                         onClick = { onFilterByChanged(filter) },
                         shapes = MenuDefaults.itemShape(index, filterOptions.size),
-                        checkedLeadingIcon = {
+                        selectedLeadingIcon = {
                             Icon(Icons.Default.Check, null)
                         }
                     )
@@ -113,7 +113,7 @@ fun LibraryFilterMenu(
                             }
                         },
                         shapes = MenuDefaults.itemShape(index, sortOptions.size),
-                        checkedLeadingIcon = { when(sortOrder) {
+                        selectedLeadingIcon = { when(sortOrder) {
                             SortOrder.Asc -> Icon(Icons.Default.ArrowDropUp, null)
                             SortOrder.Desc -> Icon(Icons.Default.ArrowDropDown, null)
                         } }

@@ -7,18 +7,21 @@ import Shared
 import SwiftUI
 
 struct BottomTabView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
     var tabItem: TabItem
 
     var body: some View {
         NavigationStack {
-            switch tabItem {
-            case .shows: SeriesTab()
-            case .movies: MoviesTab()
-            case .music: MusicTab()
-            case .activity: ActivityTab()
-            case .calendar: CalendarTab()
-            case .settings: SettingsTab()
-            }
+            TabItemContent(tabItem: tabItem)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            navigationManager.setSelectedDrawerTab(.settings)
+                        } label: {
+                            Image(systemName: "gear")
+                        }
+                    }
+                }
         }
     }
 }

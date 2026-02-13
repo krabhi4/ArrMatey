@@ -2,9 +2,8 @@ package com.dnfapps.arrmatey.ui.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,21 +12,23 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudQueue
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,21 +38,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -61,7 +62,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.ArrMediaViewModel
@@ -69,7 +69,8 @@ import com.dnfapps.arrmatey.arr.viewmodel.InstancesViewModel
 import com.dnfapps.arrmatey.compose.TabItem
 import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.SafeSnackbar
-import com.dnfapps.arrmatey.entensions.copy
+import com.dnfapps.arrmatey.entensions.isCollapsed
+import com.dnfapps.arrmatey.entensions.isExpanded
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
@@ -77,11 +78,11 @@ import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.navigation.SettingsScreen
 import com.dnfapps.arrmatey.shared.MR
 import com.dnfapps.arrmatey.ui.components.InstancePicker
-import com.dnfapps.arrmatey.ui.components.MediaList
-import com.dnfapps.arrmatey.ui.components.PosterGrid
+import com.dnfapps.arrmatey.ui.components.MediaView
+import com.dnfapps.arrmatey.ui.components.navigation.NavigationDrawerButton
 import com.dnfapps.arrmatey.ui.menu.LibraryFilterMenu
-import com.dnfapps.arrmatey.ui.theme.ViewType
 import com.dnfapps.arrmatey.utils.mokoString
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @SuppressLint("LocalContextGetResourceValueCall")
@@ -104,13 +105,47 @@ fun ArrLibraryScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val errorMessage by arrMediaViewModel.errorMessage.collectAsStateWithLifecycle()
 
-    var showSearchBar by remember { mutableStateOf(false) }
-    val searchQuery by arrMediaViewModel.searchQuery.collectAsStateWithLifecycle()
-
     LaunchedEffect(errorMessage) {
         errorMessage?.let { message ->
             snackbarHostState.showSnackbarImmediately(message)
         }
+    }
+
+    val textFieldState = rememberTextFieldState()
+    val searchBarState = rememberSearchBarState()
+    val scope = rememberCoroutineScope()
+    val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
+    val inputField =
+        @Composable {
+            SearchBarDefaults.InputField(
+                textFieldState = textFieldState,
+                searchBarState = searchBarState,
+                colors = SearchBarDefaults.inputFieldColors(),
+                onSearch = { scope.launch { searchBarState.animateToCollapsed() } },
+                placeholder = {
+                    Text(modifier = Modifier.clearAndSetSemantics {}, text = mokoString(MR.strings.search_placeholder, instancesState.selectedInstance?.label ?: ""))
+                },
+                leadingIcon = {
+                    if (searchBarState.isExpanded()) {
+                        IconButton(onClick = { scope.launch { searchBarState.animateToCollapsed() } }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    } else {
+                        Icon(Icons.Default.Search, null)
+                    }
+                },
+                trailingIcon = {
+                    if (textFieldState.text.isNotEmpty()) {
+                        IconButton(onClick = { textFieldState.clearText() }) {
+                            Icon(Icons.Default.Close, null)
+                        }
+                    }
+                }
+            )
+        }
+
+    LaunchedEffect(textFieldState.text) {
+        arrMediaViewModel.updateSearchQuery(textFieldState.text.toString())
     }
 
     Scaffold(
@@ -129,39 +164,54 @@ fun ArrLibraryScreen(
             }
         },
         topBar = {
-            TopAppBar(
-                title = {
-                    InstancePicker(
-                        currentInstance = instancesState.selectedInstance,
-                        typeInstances = instancesState.instances,
-                        onInstanceSelected = { instancesViewModel.setInstanceActive(it) }
-                    )
-                },
-                actions = {
-                    instancesState.selectedInstance?.let {
-                        IconButton(
-                            onClick = { showSearchBar = !showSearchBar }
+            instancesState.selectedInstance?.let {
+                AppBarWithSearch(
+                    state = searchBarState,
+                    scrollBehavior = scrollBehavior,
+                    colors = SearchBarDefaults.appBarWithSearchColors(),
+                    inputField = inputField,
+                    modifier = Modifier.fillMaxWidth(),
+                    navigationIcon = {
+                        AnimatedVisibility(
+                            visible = searchBarState.isCollapsed(),
+                            enter = expandIn(),
+                            exit = shrinkOut()
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = mokoString(MR.strings.search)
+                            NavigationDrawerButton()
+                        }
+                    },
+                    actions = {
+                        AnimatedVisibility(
+                            visible = searchBarState.isCollapsed(),
+                            enter = expandIn(),
+                            exit = shrinkOut()
+                        ) {
+                            InstancePicker(
+                                currentInstance = instancesState.selectedInstance,
+                                typeInstances = instancesState.instances,
+                                onInstanceSelected = { instancesViewModel.setInstanceActive(it) }
                             )
                         }
-
-                        LibraryFilterMenu(
-                            type = type,
-                            filterBy = preferences.filterBy,
-                            onFilterByChanged = { arrMediaViewModel.updateFilterBy(it) },
-                            sortBy = preferences.sortBy,
-                            onSortByChanged = { arrMediaViewModel.updateSortBy(it) },
-                            sortOrder = preferences.sortOrder,
-                            onSortOrderChanged = { arrMediaViewModel.updateSortOrder(it) },
-                            viewType = preferences.viewType,
-                            onViewTypeChanged = { arrMediaViewModel.updateViewType(it) }
-                        )
+                        AnimatedVisibility(
+                            visible = searchBarState.isCollapsed(),
+                            enter = expandIn(),
+                            exit = shrinkOut()
+                        ) {
+                            LibraryFilterMenu(
+                                type = type,
+                                filterBy = preferences.filterBy,
+                                onFilterByChanged = { arrMediaViewModel.updateFilterBy(it) },
+                                sortBy = preferences.sortBy,
+                                onSortByChanged = { arrMediaViewModel.updateSortBy(it) },
+                                sortOrder = preferences.sortOrder,
+                                onSortOrderChanged = { arrMediaViewModel.updateSortOrder(it) },
+                                viewType = preferences.viewType,
+                                onViewTypeChanged = { arrMediaViewModel.updateViewType(it) }
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         },
         contentWindowInsets = WindowInsets.statusBars
     ) { paddingValues ->
@@ -200,61 +250,28 @@ fun ArrLibraryScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             val items = state.items
-                            if (items.isEmpty() && searchQuery.isEmpty()) {
+                            if (items.isEmpty() && textFieldState.text.isEmpty()) {
                                 EmptyLibraryView(modifier = Modifier.align(Alignment.Center))
-                            } else {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    AnimatedVisibility(
-                                        visible = showSearchBar,
-                                        enter = expandVertically(),
-                                        exit = shrinkVertically()
-                                    ) {
-                                        OutlinedTextField(
-                                            value = searchQuery,
-                                            onValueChange = { arrMediaViewModel.updateSearchQuery(it) },
-                                            modifier = Modifier
-                                                .padding(horizontal = 18.dp, vertical = 12.dp)
-                                                .fillMaxWidth(),
-                                            trailingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.Close,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.clickable {
-                                                        arrMediaViewModel.updateSearchQuery("")
-                                                        showSearchBar = false
-                                                    }
-                                                )
-                                            },
-                                            placeholder = { Text(mokoString(MR.strings.search)) },
-                                            shape = RoundedCornerShape(10.dp),
-                                            singleLine = true
-                                        )
-                                    }
-
-                                    if (items.isNotEmpty()) {
-                                        MediaView(
-                                            type = type,
-                                            items = items,
-                                            onItemClick = {
-                                                it.id?.let { id ->
-                                                    navigation.navigateTo(
-                                                        ArrScreen.Details(id = id)
-                                                    )
-                                                }
-                                            },
-                                            viewType = preferences.viewType,
-                                            itemIsActive = { item ->
-                                                queueItems.any { it.mediaId == item.id }
-                                            }
-                                        )
-                                    } else {
-                                        EmptySearchResultsView(type, searchQuery) {
-                                            val destination = ArrScreen.Search(searchQuery)
-                                            navigation.navigateTo(destination)
+                            } else if (items.isNotEmpty()) {
+                                MediaView(
+                                    type = type,
+                                    items = items,
+                                    onItemClick = {
+                                        it.id?.let { id ->
+                                            navigation.navigateTo(
+                                                ArrScreen.Details(id = id)
+                                            )
                                         }
+                                    },
+                                    viewType = preferences.viewType,
+                                    itemIsActive = { item ->
+                                        queueItems.any { it.mediaId == item.id }
                                     }
+                                )
+                            } else {
+                                EmptySearchResultsView(type, textFieldState.text.toString()) {
+                                    val destination = ArrScreen.Search(textFieldState.text.toString())
+                                    navigation.navigateTo(destination)
                                 }
                             }
                         }
@@ -272,9 +289,9 @@ private fun EmptySearchResultsView(
     onShouldSearch: () -> Unit
 ) {
     val mediaType = when (type) {
-        InstanceType.Sonarr -> mokoString(MR.strings.series_type)
-        InstanceType.Radarr -> mokoString(MR.strings.movie_type)
-        InstanceType.Lidarr -> mokoString(MR.strings.artist_type)
+        InstanceType.Sonarr -> mokoString(MR.strings.type_series)
+        InstanceType.Radarr -> mokoString(MR.strings.type_movie)
+        InstanceType.Lidarr -> mokoString(MR.strings.type_artist)
     }
     Column(
         verticalArrangement = Arrangement.Center,
@@ -291,6 +308,7 @@ private fun EmptySearchResultsView(
         Text(
             text = buildAnnotatedString {
                 append(mokoString(MR.strings.no_query_results_label))
+                append(" ")
                 withLink(
                     link = LinkAnnotation.Clickable(tag = "new_entry") {
                         onShouldSearch()
@@ -408,33 +426,5 @@ private fun InstanceErrorView(
         Button(onClick = onRefresh) {
             Text(text = mokoString(MR.strings.retry))
         }
-    }
-}
-
-@Composable
-fun MediaView(
-    type: InstanceType,
-    items: List<ArrMedia>,
-    onItemClick: (ArrMedia) -> Unit,
-    itemIsActive: (ArrMedia) -> Boolean,
-    viewType: ViewType
-) {
-    when (viewType) {
-        ViewType.List -> MediaList(
-            items = items,
-            onItemClick = onItemClick,
-            itemIsActive = itemIsActive,
-            modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .fillMaxSize()
-        )
-        ViewType.Grid -> PosterGrid(
-            aspectRatio = type.aspectRatio,
-            items = items,
-            onItemClick = onItemClick,
-            itemIsActive = itemIsActive,
-            modifier = Modifier
-                .fillMaxSize()
-        )
     }
 }
