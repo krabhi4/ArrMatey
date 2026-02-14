@@ -5,11 +5,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -18,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dnfapps.arrmatey.database.dao.ConflictField
@@ -68,7 +75,7 @@ fun ArrConfigurationScreen(
 
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         AMOutlinedTextField(
             label = mokoString(MR.strings.label),
@@ -108,62 +115,107 @@ fun ArrConfigurationScreen(
             singleLine = true
         )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Card(
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            ),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Button(
-                onClick = onTestConnection,
-                enabled = !isTesting && apiEndpoint.isNotBlank() && apiKey.isNotBlank()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                if (isTesting) {
-                    CircularProgressIndicator()
-                } else {
+                FilledTonalButton(
+                    onClick = onTestConnection,
+                    enabled = !isTesting && apiEndpoint.isNotBlank() && apiKey.isNotBlank()
+                ) {
+                    if (isTesting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.padding(end = 8.dp),
+                            strokeWidth = 2.dp
+                        )
+                    }
                     Text(text = mokoString(MR.strings.test))
                 }
-            }
 
-            testResult?.let { result ->
-                if (result) {
-                    Text(
-                        text = "✅ ${mokoString(MR.strings.success)}",
-                        color = Color.Green
-                    )
-                } else {
-                    Text(
-                        text = "❌ ${mokoString(MR.strings.failure)}",
-                        color = MaterialTheme.colorScheme.error
-                    )
+                testResult?.let { result ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if (result) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = mokoString(MR.strings.success),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                text = mokoString(MR.strings.failure),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                 }
             }
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .toggleable(
-                    value = isSlowInstance,
-                    onValueChange = onIsSlowInstanceChanged
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Card(
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            ),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = mokoString(MR.strings.slow_instance))
-            Switch(
-                checked = isSlowInstance,
-                onCheckedChange = null
-            )
-        }
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .toggleable(
+                            value = isSlowInstance,
+                            onValueChange = onIsSlowInstanceChanged
+                        ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = mokoString(MR.strings.slow_instance),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Switch(
+                        checked = isSlowInstance,
+                        onCheckedChange = null
+                    )
+                }
 
-        AMOutlinedTextField(
-            value = customTimeout?.toString() ?: "",
-            onValueChange = { onCustomTimeoutChanged(it.toLongOrNull()) },
-            modifier = Modifier.fillMaxWidth(),
-            label = mokoString(MR.strings.custom_timeout_seconds),
-            enabled = isSlowInstance,
-            placeholder = "300",
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
+                AMOutlinedTextField(
+                    value = customTimeout?.toString() ?: "",
+                    onValueChange = { onCustomTimeoutChanged(it.toLongOrNull()) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = mokoString(MR.strings.custom_timeout_seconds),
+                    enabled = isSlowInstance,
+                    placeholder = "300",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+        }
     }
 }

@@ -1,9 +1,11 @@
 package com.dnfapps.arrmatey.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.shrinkOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +54,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -69,6 +72,7 @@ import com.dnfapps.arrmatey.arr.viewmodel.InstancesViewModel
 import com.dnfapps.arrmatey.compose.TabItem
 import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.SafeSnackbar
+import com.dnfapps.arrmatey.entensions.getDrawableId
 import com.dnfapps.arrmatey.entensions.isCollapsed
 import com.dnfapps.arrmatey.entensions.isExpanded
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
@@ -135,9 +139,19 @@ fun ArrLibraryScreen(
                     }
                 },
                 trailingIcon = {
-                    if (textFieldState.text.isNotEmpty()) {
-                        IconButton(onClick = { textFieldState.clearText() }) {
-                            Icon(Icons.Default.Close, null)
+                    AnimatedContent(
+                        targetState = textFieldState.text.isNotEmpty()
+                    ) { isNotEmpty ->
+                        if (isNotEmpty) {
+                            IconButton(onClick = { textFieldState.clearText() }) {
+                                Icon(Icons.Default.Close, null)
+                            }
+                        } else {
+                            Image(
+                                painter = painterResource(getDrawableId(type.iconKey)),
+                                contentDescription = mokoString(type.resource),
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     }
                 }

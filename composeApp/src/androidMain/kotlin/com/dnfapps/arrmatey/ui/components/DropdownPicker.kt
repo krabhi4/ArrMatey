@@ -11,7 +11,10 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.dnfapps.arrmatey.shared.MR
 import com.dnfapps.arrmatey.utils.mokoString
 
@@ -47,7 +49,7 @@ fun <T> DropdownPicker(
         onExpandedChange = { isDropDownExpanded = it }
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             label()
             OutlinedTextField(
@@ -62,32 +64,46 @@ fun <T> DropdownPicker(
                 },
                 onValueChange = {},
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isDropDownExpanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                ),
+                shape = MaterialTheme.shapes.large,
                 singleLine = true
             )
         }
         ExposedDropdownMenu(
             expanded = isDropDownExpanded,
-            onDismissRequest = { isDropDownExpanded = false }
+            onDismissRequest = { isDropDownExpanded = false },
+            shape = MaterialTheme.shapes.extraLarge,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         ) {
             if (includeAllOption) {
                 DropdownMenuItem(
-                    text = { Text(allLabel) },
+                    text = {
+                        Text(
+                            allLabel,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    },
                     onClick = {
                         isDropDownExpanded = false
                         onAllSelected()
                     },
-                    modifier = Modifier.padding(horizontal = 6.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    colors = MenuDefaults.itemColors(
+                        textColor = MaterialTheme.colorScheme.onSurface
+                    )
                 )
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 6.dp))
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
             }
             options.forEach { t ->
                 DropdownMenuItem(
-                    modifier = Modifier.padding(horizontal = 6.dp),
+                    modifier = Modifier.padding(horizontal = 8.dp),
                     text = {
                         Text(
                             text = getOptionLabel(t),
-                            fontSize = 16.sp
+                            style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     leadingIcon = getOptionIcon?.let {
@@ -101,7 +117,10 @@ fun <T> DropdownPicker(
                     onClick = {
                         isDropDownExpanded = false
                         onOptionSelected(t)
-                    }
+                    },
+                    colors = MenuDefaults.itemColors(
+                        textColor = MaterialTheme.colorScheme.onSurface
+                    )
                 )
             }
         }
