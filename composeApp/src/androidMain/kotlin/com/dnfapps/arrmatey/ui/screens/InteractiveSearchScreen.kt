@@ -1,8 +1,5 @@
 package com.dnfapps.arrmatey.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,31 +15,25 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
@@ -64,7 +55,6 @@ import com.dnfapps.arrmatey.di.koinInjectParams
 import com.dnfapps.arrmatey.entensions.Bullet
 import com.dnfapps.arrmatey.entensions.SafeSnackbar
 import com.dnfapps.arrmatey.entensions.bullet
-import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.entensions.showErrorImmediately
 import com.dnfapps.arrmatey.entensions.showSnackbarImmediately
 import com.dnfapps.arrmatey.extensions.formatAgeMinutes
@@ -73,9 +63,12 @@ import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
 import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.shared.MR
+import com.dnfapps.arrmatey.ui.components.ArrAppBarWithSearch
 import com.dnfapps.arrmatey.ui.components.ProgressBox
+import com.dnfapps.arrmatey.ui.components.navigation.BackButton
 import com.dnfapps.arrmatey.ui.menu.InteractiveSearchMenu
 import com.dnfapps.arrmatey.utils.mokoString
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
@@ -92,15 +85,22 @@ fun InteractiveSearchScreen(
     val downloadState by viewModel.downloadReleaseState.collectAsStateWithLifecycle()
     val downloadStatus by viewModel.downloadStatus.collectAsStateWithLifecycle()
     val filterState by viewModel.filterUiState.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
+    val textFieldState = rememberTextFieldState()
     var confirmRelease by remember { mutableStateOf<ArrRelease?>( null) }
-    var showSearch by remember { mutableStateOf(false) }
 
     val downloadQueueSuccessMessage = mokoString(MR.strings.download_queue_success)
     val downloadQueueErrorMessage = mokoString(MR.strings.download_queue_error)
 
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { textFieldState.text.toString() }
+            .distinctUntilChanged()
+            .collect { query ->
+                viewModel.updateSearchQuery(query)
+            }
+    }
 
     LaunchedEffect(releaseParams) {
         viewModel.getRelease(releaseParams)
@@ -121,30 +121,10 @@ fun InteractiveSearchScreen(
             }
         },
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navigation.popBackStack() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = mokoString(MR.strings.back)
-                        )
-                    }
-                },
-                title = {},
+            ArrAppBarWithSearch(
+                textFieldState = textFieldState,
+                navigationIcon =  { BackButton(navigation) },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            showSearch = !showSearch
-                            if (!showSearch) viewModel.updateSearchQuery("")
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = mokoString(MR.strings.search)
-                        )
-                    }
                     InteractiveSearchMenu(
                         type = instanceType,
                         selectedSortBy = filterState.sortBy,
@@ -184,70 +164,39 @@ fun InteractiveSearchScreen(
                     )
                 }
                 is ReleaseLibrary.Success -> {
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 18.dp)
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
+                        verticalArrangement = Arrangement.spacedBy(18.dp)
                     ) {
-                        AnimatedVisibility(
-                            visible = showSearch,
-                            enter = expandVertically(),
-                            exit = shrinkVertically()
-                        ) {
-                            OutlinedTextField(
-                                value = searchQuery,
-                                onValueChange = { viewModel.updateSearchQuery(it) },
-                                modifier = Modifier
-                                    .padding(vertical = 12.dp)
-                                    .fillMaxWidth(),
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = null,
-                                        modifier = Modifier.clickable {
-                                            viewModel.updateSearchQuery("")
-                                            showSearch = false
-                                        }
-                                    )
+                        items(state.items) { item ->
+                            val shouldAnimate =
+                                (downloadState as? DownloadState.Loading)?.guid == item.guid
+                            ReleaseItem(
+                                item = item,
+                                onItemClick = {
+                                    if (item.downloadAllowed) {
+                                        viewModel.downloadRelease(item)
+                                    } else {
+                                        confirmRelease = item
+                                    }
                                 },
-                                placeholder = { Text(mokoString(MR.strings.search)) },
-                                shape = RoundedCornerShape(10.dp),
-                                singleLine = true
+                                animate = shouldAnimate
                             )
                         }
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(18.dp)
-                        ) {
-                            items(state.items) { item ->
-                                val shouldAnimate =
-                                    (downloadState as? DownloadState.Loading)?.guid == item.guid
-                                ReleaseItem(
-                                    item = item,
-                                    onItemClick = {
-                                        if (item.downloadAllowed) {
-                                            viewModel.downloadRelease(item)
-                                        } else {
-                                            confirmRelease = item
-                                        }
-                                    },
-                                    animate = shouldAnimate
-                                )
-                            }
-                            if (state.items.isEmpty()) {
-                                item {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "No results found"
-                                        )
-                                    }
+                        if (state.items.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "No results found"
+                                    )
                                 }
                             }
-                            item {
-                                Spacer(modifier = Modifier.height(0.dp))
-                            }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(0.dp))
                         }
                     }
                 }

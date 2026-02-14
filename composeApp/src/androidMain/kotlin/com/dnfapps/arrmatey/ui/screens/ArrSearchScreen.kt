@@ -1,35 +1,21 @@
 package com.dnfapps.arrmatey.ui.screens
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,13 +25,14 @@ import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.ArrSearchViewModel
 import com.dnfapps.arrmatey.di.koinInjectParams
-import com.dnfapps.arrmatey.entensions.copy
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.Navigation
 import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.shared.MR
+import com.dnfapps.arrmatey.ui.components.ArrAppBarWithSearch
 import com.dnfapps.arrmatey.ui.components.MediaList
+import com.dnfapps.arrmatey.ui.components.navigation.BackButton
 import com.dnfapps.arrmatey.ui.menu.SearchSortMenu
 import com.dnfapps.arrmatey.utils.mokoString
 import kotlinx.coroutines.FlowPreview
@@ -65,17 +52,16 @@ fun ArrSearchScreen(
     navigationManager: NavigationManager = koinInject(),
     navigation: Navigation<ArrScreen> = navigationManager.arr(type)
 ) {
-
-    var searchQuery by rememberSaveable { mutableStateOf(initialQuery) }
-
     val sortBy by viewModel.sortBy.collectAsStateWithLifecycle()
     val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
 
     val lookupState by viewModel.lookupUiState.collectAsStateWithLifecycle()
     val queueItems by activityQueueViewModel.queueItems.collectAsStateWithLifecycle()
 
+    val textFieldState = rememberTextFieldState(initialQuery)
+
     LaunchedEffect(Unit) {
-        snapshotFlow { searchQuery }
+        snapshotFlow { textFieldState.text.toString() }
             .debounce(500)
             .distinctUntilChanged()
             .collect { query ->
@@ -89,18 +75,9 @@ fun ArrSearchScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navigation.popBackStack() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = mokoString(MR.strings.back)
-                        )
-                    }
-                },
-                title = {},
+            ArrAppBarWithSearch(
+                textFieldState = textFieldState,
+                navigationIcon = { BackButton(navigation) },
                 actions = {
                     SearchSortMenu(
                         sortBy = sortBy,
@@ -117,68 +94,42 @@ fun ArrSearchScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .padding(horizontal = 12.dp)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier
-                        .padding(horizontal = 18.dp, vertical = 12.dp)
-                        .fillMaxWidth(),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                            modifier = Modifier.clickable { searchQuery = "" }
+            when (val state = lookupState) {
+                is ArrLibrary.Initial -> {}
+                is ArrLibrary.Loading -> {
+                    LoadingIndicator(
+                        modifier = Modifier
+                            .size(96.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+
+                is ArrLibrary.Success -> {
+                    if (state.items.isEmpty()) {
+                        Text(
+                            text = mokoString(MR.strings.empty_library),
+                            modifier = Modifier.align(Alignment.Center)
                         )
-                    },
-                    placeholder = { Text(mokoString(MR.strings.search)) },
-                    shape = RoundedCornerShape(10.dp),
-                    singleLine = true
-                )
-
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp)
-                ) {
-                    when (val state = lookupState) {
-                        is ArrLibrary.Initial -> {}
-                        is ArrLibrary.Loading -> {
-                            LoadingIndicator(
-                                modifier = Modifier
-                                    .size(96.dp)
-                                    .align(Alignment.Center)
-                            )
-                        }
-
-                        is ArrLibrary.Success -> {
-                            if (state.items.isEmpty()) {
-                                Text(
-                                    text = mokoString(MR.strings.empty_library),
-                                    modifier = Modifier.align(Alignment.Center)
-                                )
-                            } else {
-                                MediaList(
-                                    items = state.items,
-                                    onItemClick = { item ->
-                                        val destination = if (item.id == null) {
-                                            ArrScreen.Preview(item)
-                                        } else {
-                                            ArrScreen.Details(item.id!!)
-                                        }
-                                        navigation.navigateTo(destination)
-                                    },
-                                    itemIsActive = { item -> queueItems.any { it.mediaId == item.id } },
-                                )
-                            }
-                        }
-
-                        is ArrLibrary.Error -> {
-                            Text("An error occurred")
-                        }
+                    } else {
+                        MediaList(
+                            items = state.items,
+                            onItemClick = { item ->
+                                val destination = if (item.id == null) {
+                                    ArrScreen.Preview(item)
+                                } else {
+                                    ArrScreen.Details(item.id!!)
+                                }
+                                navigation.navigateTo(destination)
+                            },
+                            itemIsActive = { item -> queueItems.any { it.mediaId == item.id } },
+                        )
                     }
+                }
+
+                is ArrLibrary.Error -> {
+                    Text("An error occurred")
                 }
             }
         }

@@ -81,6 +81,7 @@ import com.dnfapps.arrmatey.navigation.ArrScreen
 import com.dnfapps.arrmatey.navigation.NavigationManager
 import com.dnfapps.arrmatey.navigation.SettingsScreen
 import com.dnfapps.arrmatey.shared.MR
+import com.dnfapps.arrmatey.ui.components.ArrAppBarWithSearch
 import com.dnfapps.arrmatey.ui.components.InstancePicker
 import com.dnfapps.arrmatey.ui.components.MediaView
 import com.dnfapps.arrmatey.ui.components.navigation.NavigationDrawerButton
@@ -116,47 +117,6 @@ fun ArrLibraryScreen(
     }
 
     val textFieldState = rememberTextFieldState()
-    val searchBarState = rememberSearchBarState()
-    val scope = rememberCoroutineScope()
-    val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
-    val inputField =
-        @Composable {
-            SearchBarDefaults.InputField(
-                textFieldState = textFieldState,
-                searchBarState = searchBarState,
-                colors = SearchBarDefaults.inputFieldColors(),
-                onSearch = { scope.launch { searchBarState.animateToCollapsed() } },
-                placeholder = {
-                    Text(modifier = Modifier.clearAndSetSemantics {}, text = mokoString(MR.strings.search_placeholder, instancesState.selectedInstance?.label ?: ""))
-                },
-                leadingIcon = {
-                    if (searchBarState.isExpanded()) {
-                        IconButton(onClick = { scope.launch { searchBarState.animateToCollapsed() } }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                        }
-                    } else {
-                        Icon(Icons.Default.Search, null)
-                    }
-                },
-                trailingIcon = {
-                    AnimatedContent(
-                        targetState = textFieldState.text.isNotEmpty()
-                    ) { isNotEmpty ->
-                        if (isNotEmpty) {
-                            IconButton(onClick = { textFieldState.clearText() }) {
-                                Icon(Icons.Default.Close, null)
-                            }
-                        } else {
-                            Image(
-                                painter = painterResource(getDrawableId(type.iconKey)),
-                                contentDescription = mokoString(type.resource),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                }
-            )
-        }
 
     LaunchedEffect(textFieldState.text) {
         arrMediaViewModel.updateSearchQuery(textFieldState.text.toString())
@@ -179,50 +139,34 @@ fun ArrLibraryScreen(
         },
         topBar = {
             instancesState.selectedInstance?.let {
-                AppBarWithSearch(
-                    state = searchBarState,
-                    scrollBehavior = scrollBehavior,
-                    colors = SearchBarDefaults.appBarWithSearchColors(),
-                    inputField = inputField,
-                    modifier = Modifier.fillMaxWidth(),
-                    navigationIcon = {
-                        AnimatedVisibility(
-                            visible = searchBarState.isCollapsed(),
-                            enter = expandIn(),
-                            exit = shrinkOut()
-                        ) {
-                            NavigationDrawerButton()
-                        }
+                ArrAppBarWithSearch(
+                    textFieldState = textFieldState,
+                    searchPlaceholder = mokoString(MR.strings.search_placeholder, instancesState.selectedInstance?.label ?: ""),
+                    trailingIcon = {
+                        Image(
+                            painter = painterResource(getDrawableId(type.iconKey)),
+                            contentDescription = mokoString(type.resource),
+                            modifier = Modifier.size(24.dp)
+                        )
                     },
+                    navigationIcon = { NavigationDrawerButton() },
                     actions = {
-                        AnimatedVisibility(
-                            visible = searchBarState.isCollapsed(),
-                            enter = expandIn(),
-                            exit = shrinkOut()
-                        ) {
-                            InstancePicker(
-                                currentInstance = instancesState.selectedInstance,
-                                typeInstances = instancesState.instances,
-                                onInstanceSelected = { instancesViewModel.setInstanceActive(it) }
-                            )
-                        }
-                        AnimatedVisibility(
-                            visible = searchBarState.isCollapsed(),
-                            enter = expandIn(),
-                            exit = shrinkOut()
-                        ) {
-                            LibraryFilterMenu(
-                                type = type,
-                                filterBy = preferences.filterBy,
-                                onFilterByChanged = { arrMediaViewModel.updateFilterBy(it) },
-                                sortBy = preferences.sortBy,
-                                onSortByChanged = { arrMediaViewModel.updateSortBy(it) },
-                                sortOrder = preferences.sortOrder,
-                                onSortOrderChanged = { arrMediaViewModel.updateSortOrder(it) },
-                                viewType = preferences.viewType,
-                                onViewTypeChanged = { arrMediaViewModel.updateViewType(it) }
-                            )
-                        }
+                        InstancePicker(
+                            currentInstance = instancesState.selectedInstance,
+                            typeInstances = instancesState.instances,
+                            onInstanceSelected = { instancesViewModel.setInstanceActive(it) }
+                        )
+                        LibraryFilterMenu(
+                            type = type,
+                            filterBy = preferences.filterBy,
+                            onFilterByChanged = { arrMediaViewModel.updateFilterBy(it) },
+                            sortBy = preferences.sortBy,
+                            onSortByChanged = { arrMediaViewModel.updateSortBy(it) },
+                            sortOrder = preferences.sortOrder,
+                            onSortOrderChanged = { arrMediaViewModel.updateSortOrder(it) },
+                            viewType = preferences.viewType,
+                            onViewTypeChanged = { arrMediaViewModel.updateViewType(it) }
+                        )
                     }
                 )
             }
