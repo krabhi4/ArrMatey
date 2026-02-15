@@ -9,6 +9,7 @@ import com.dnfapps.arrmatey.instances.usecase.TestInstanceConnectionUseCase
 import com.dnfapps.arrmatey.instances.usecase.UpdateInstanceUseCase
 import com.dnfapps.arrmatey.database.dao.InsertResult
 import com.dnfapps.arrmatey.instances.model.Instance
+import com.dnfapps.arrmatey.instances.model.InstanceHeader
 import com.dnfapps.arrmatey.utils.isValidUrl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +45,8 @@ class EditInstanceViewModel(
                         apiKey = instance.apiKey,
                         isSlowInstance = instance.slowInstance,
                         customTimeout = instance.customTimeout,
-                        instanceLabel = instance.label
+                        instanceLabel = instance.label,
+                        headers = instance.headers
                     )
                 }
             }
@@ -82,6 +84,12 @@ class EditInstanceViewModel(
                 instanceLabel = value,
                 saveButtonEnabled = it.saveButtonEnabled && value.isNotEmpty()
             )
+        }
+    }
+
+    fun updateHeaders(headers: List<InstanceHeader>) {
+        _uiState.update {
+            it.copy(headers = headers)
         }
     }
 
@@ -123,7 +131,8 @@ class EditInstanceViewModel(
             url = s.apiEndpoint,
             apiKey = s.apiKey,
             slowInstance = s.isSlowInstance,
-            customTimeout = if (s.isSlowInstance) s.customTimeout else null
+            customTimeout = if (s.isSlowInstance) s.customTimeout else null,
+            headers = s.headers.filter { it.key.isNotEmpty() && it.value.isNotEmpty() }
         ) ?: run {
             _uiState.update { it.copy(
                 editResult = InsertResult.Error("Instance doesn't exist")

@@ -128,6 +128,7 @@ fun EditInstanceScreen(
                     onInstanceLabelChanged = { viewModel.setInstanceLabel(it) },
                     onIsSlowInstanceChanged = { viewModel.setIsSlowInstance(it) },
                     onCustomTimeoutChanged = { viewModel.setCustomTimeout(it) },
+                    onHeadersChanged = { viewModel.updateHeaders(it) },
                     onTestConnection = { viewModel.testConnection() },
                 )
 

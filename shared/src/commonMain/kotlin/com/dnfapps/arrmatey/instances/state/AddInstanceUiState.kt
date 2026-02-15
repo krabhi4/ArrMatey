@@ -1,6 +1,7 @@
 package com.dnfapps.arrmatey.instances.state
 
 import com.dnfapps.arrmatey.database.dao.InsertResult
+import com.dnfapps.arrmatey.instances.model.InstanceHeader
 import com.dnfapps.arrmatey.instances.model.InstanceType
 
 data class AddInstanceUiState(
@@ -15,7 +16,12 @@ data class AddInstanceUiState(
     val saveButtonEnabled: Boolean = false,
     val createResult: InsertResult? = null,
     val editResult: InsertResult? = null,
-    val infoCardMaps: Map<InstanceType, Boolean> = emptyMap()
+    val infoCardMaps: Map<InstanceType, Boolean> = emptyMap(),
+    val headers: List<InstanceHeader> = emptyList()
 ) {
-    constructor(): this("", "", "", false, null, false, false, null, false, null, null, emptyMap())
+    constructor(): this(
+        "", "", "", false,
+        null, false, false, null,
+        false, null, null,
+        emptyMap(), emptyList())
 }

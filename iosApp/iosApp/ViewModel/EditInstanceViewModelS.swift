@@ -52,6 +52,10 @@ class EditInstanceViewModelS: ObservableObject {
         viewModel.setInstanceLabel(value: instanceLabel)
     }
     
+    func updateHeaders(_ headers: [InstanceHeader]) {
+        viewModel.updateHeaders(headers: headers)
+    }
+    
     func reset() {
         viewModel.reset()
     }

@@ -23,7 +23,8 @@ data class Instance(
     val enabled: Boolean = true,
     val slowInstance: Boolean = false,
     val customTimeout: Long? = null,
-    val selected: Boolean = false
+    val selected: Boolean = false,
+    val headers: List<InstanceHeader> = emptyList()
 )
 
 enum class InstanceType(

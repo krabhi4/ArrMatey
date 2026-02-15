@@ -169,6 +169,11 @@
     <string name="list_view">List</string>
     <string name="grid_view">Grid</string>
     <string name="search_placeholder">Search %1$s</string>
+    <string name="custom_headers">Custom Headers</string>
+    <string name="custom_headers_description">Add custom HTTP headers to be sent with every request to this instance</string>
+    <string name="add_header">Add header</string>
+    <string name="header_name">Header Name</string>
+    <string name="header_value">Header Value</string>
 
     <!-- History Event Type -->
     <string name="grabbed">Grabbed</string>

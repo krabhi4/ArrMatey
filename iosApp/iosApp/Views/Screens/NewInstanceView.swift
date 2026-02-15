@@ -50,6 +50,7 @@ struct NewInstanceView: View {
             onInstanceLabelChanged: { viewModel.setInstanceLabel($0) },
             onIsSlowInstanceChanged: { viewModel.setIsSlowInstance($0) },
             onCustomTimeoutChanged: { viewModel.setCustomTimeout($0) },
+            onHeadersChanged: { viewModel.updateHeaders($0) },
             onTestConnection: { viewModel.testConnection() },
             onDismissInfoCard: { viewModel.dismissInfoCard($0) },
             showInfoCard: showInfoCard,

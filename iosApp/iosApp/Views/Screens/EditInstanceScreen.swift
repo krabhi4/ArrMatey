@@ -63,6 +63,7 @@ struct EditInstanceScreen: View {
             onInstanceLabelChanged: { viewModel.setInstanceLabel($0) },
             onIsSlowInstanceChanged: { viewModel.setIsSlowInstance($0) },
             onCustomTimeoutChanged: { viewModel.setCustomTimeout($0) },
+            onHeadersChanged: { viewModel.updateHeaders($0) },
             onTestConnection: { viewModel.testConnection() },
             onDismissInfoCard: { _ in },
             showInfoCard: false,

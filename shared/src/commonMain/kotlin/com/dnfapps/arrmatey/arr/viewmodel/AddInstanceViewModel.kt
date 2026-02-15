@@ -8,6 +8,7 @@ import com.dnfapps.arrmatey.instances.usecase.DismissInfoCardUseCase
 import com.dnfapps.arrmatey.instances.usecase.TestInstanceConnectionUseCase
 import com.dnfapps.arrmatey.datastore.PreferencesStore
 import com.dnfapps.arrmatey.instances.model.Instance
+import com.dnfapps.arrmatey.instances.model.InstanceHeader
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.utils.isValidUrl
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,6 +69,12 @@ class AddInstanceViewModel(
         }
     }
 
+    fun updateHeaders(headers: List<InstanceHeader>) {
+        _uiState.update {
+            it.copy(headers = headers)
+        }
+    }
+
     fun reset() {
         _uiState.value = AddInstanceUiState(
             infoCardMaps = _uiState.value.infoCardMaps
@@ -114,7 +121,8 @@ class AddInstanceViewModel(
             url = s.apiEndpoint,
             apiKey = s.apiKey,
             slowInstance = s.isSlowInstance,
-            customTimeout = if (s.isSlowInstance) s.customTimeout else null
+            customTimeout = if (s.isSlowInstance) s.customTimeout else null,
+            headers = s.headers.filter { it.key.isNotEmpty() && it.value.isNotEmpty() }
         )
 
         viewModelScope.launch {

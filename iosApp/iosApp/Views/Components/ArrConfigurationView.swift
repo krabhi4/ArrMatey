@@ -15,6 +15,7 @@ struct ArrConfigurationView: View {
     let onInstanceLabelChanged: (String) -> Void
     let onIsSlowInstanceChanged: (Bool) -> Void
     let onCustomTimeoutChanged: (Int64?) -> Void
+    let onHeadersChanged: ([InstanceHeader]) -> Void
     let onTestConnection: () -> Void
     let onDismissInfoCard: (InstanceType) -> Void
     let showInfoCard: Bool
@@ -26,6 +27,7 @@ struct ArrConfigurationView: View {
     @State private var apiKey: String = ""
     @State private var instanceLabel: String = ""
     @State private var customTimeoutText: String = ""
+    @State private var headers: [InstanceHeader] = []
     
     @Environment(\.openURL) var openURL
     
@@ -56,10 +58,14 @@ struct ArrConfigurationView: View {
             instanceSection
             testSection
             slowInstanceSection
+            headersSection
         }
         .onChange(of: instanceType, initial: true) { _, newValue in
             instanceLabel = newValue.name
             onInstanceLabelChanged(newValue.name)
+        }
+        .onChange(of: uiState.headers) { _, newHeaders in
+            headers = newHeaders
         }
         .alert(MR.strings().error.localized(), isPresented: $showError) {
             Button(MR.strings().ok.localized()) { showError = false }
@@ -252,7 +258,7 @@ struct ArrConfigurationView: View {
                             if !customTimeoutText.isEmpty {
                                 return customTimeoutText
                             }
-                            return "\(uiState.customTimeout?.int64Value, default: "")"
+                            return "\(uiState.customTimeout?.int64Value ?? 0)"
                         },
                         set: { newValue in
                             customTimeoutText = newValue
@@ -270,4 +276,40 @@ struct ArrConfigurationView: View {
             }
         }
     }
+    
+    @ViewBuilder
+    private var headersSection: some View {
+        Section {
+            ForEach(headers.indices, id: \.self) { index in
+                HeaderItemView(
+                    header: Binding(
+                        get: { headers[index] },
+                        set: { newValue in
+                            headers[index] = newValue
+                            onHeadersChanged(headers)
+                        }
+                    )
+                )
+                .swipeActions {
+                    Button(MR.strings().delete.localized()) {
+                        headers.remove(at: index)
+                        onHeadersChanged(headers)
+                    }
+                    .tint(.red)
+                }
+            }
+            
+            Button(action: {
+                headers.append(InstanceHeader(key: "", value: ""))
+                onHeadersChanged(headers)
+            }) {
+                Label(MR.strings().add_header.localized(), systemImage: "plus")
+            }
+        } header: {
+            Text(MR.strings().custom_headers.localized())
+        } footer: {
+            Text(MR.strings().custom_headers_description.localized())
+        }
+    }
 }
+

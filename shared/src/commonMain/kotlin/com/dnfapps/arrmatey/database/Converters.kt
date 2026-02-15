@@ -12,6 +12,7 @@ import com.dnfapps.arrmatey.arr.api.model.Season
 import com.dnfapps.arrmatey.arr.api.model.SeriesAddOptions
 import com.dnfapps.arrmatey.arr.api.model.SeriesRatings
 import com.dnfapps.arrmatey.arr.api.model.SeriesStatistics
+import com.dnfapps.arrmatey.instances.model.InstanceHeader
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -176,5 +177,23 @@ class Converters: KoinComponent {
 
     @TypeConverter
     fun retrieveInstant(millis: Long) = Instant.fromEpochMilliseconds(millis)
+
+    @TypeConverter
+    fun fromHeaderList(headers: List<InstanceHeader>): String {
+        return Json.encodeToString(headers)
+    }
+
+    @TypeConverter
+    fun toHeaderList(headersString: String): List<InstanceHeader> {
+        return if (headersString.isEmpty()) {
+            emptyList()
+        } else {
+            try {
+                Json.decodeFromString(headersString)
+            } catch (e: Exception) {
+                emptyList()
+            }
+        }
+    }
 
 }
