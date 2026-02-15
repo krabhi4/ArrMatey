@@ -105,6 +105,7 @@ struct ArrTab: View {
         
         ToolbarItem(placement: .topBarLeading) {
             InstancePickerMenu(
+                type: type,
                 instances: instanceState.instances,
                 onChangeInstance: { instancesViewModel.setInstanceActive($0) }
             )
@@ -124,6 +125,7 @@ struct ArrTab: View {
             
             Menu {
                 viewTypeToggle
+                
                 FilterByPickerMenu(
                     type: type,
                     filterBy: preferences.filterBy,
@@ -199,10 +201,7 @@ struct ArrTab: View {
             }
             
             Button(action: {
-                navigation.selectedTab = .settings
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    navigation.go(to: .newInstance(type))
-                }
+                navigation.goToNewInstance(of: type)
             }) {
                 HStack {
                     Image(systemName: "plus.circle.fill")

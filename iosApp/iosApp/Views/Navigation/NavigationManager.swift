@@ -49,6 +49,11 @@ class NavigationManager: ObservableObject {
     func setSelectedDrawerTab(_ tab: TabItem?) {
         selectedDrawerTab = tab
     }
+    
+    func goToNewInstance(of type: InstanceType) {
+        setSelectedDrawerTab(.settings)
+        go(to: .newInstance(type))
+    }
 }
 
 enum MediaRoute: Hashable {

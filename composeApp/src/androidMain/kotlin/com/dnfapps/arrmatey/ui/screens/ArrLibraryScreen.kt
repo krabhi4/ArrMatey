@@ -152,6 +152,7 @@ fun ArrLibraryScreen(
                     navigationIcon = { NavigationDrawerButton() },
                     actions = {
                         InstancePicker(
+                            type = type,
                             currentInstance = instancesState.selectedInstance,
                             typeInstances = instancesState.instances,
                             onInstanceSelected = { instancesViewModel.setInstanceActive(it) }
@@ -311,9 +312,7 @@ private fun NoInstanceView(
 
         Button(
             onClick = {
-                navigationManager.setSelectedTab(TabItem.SETTINGS)
-                navigationManager.settings()
-                    .navigateTo(SettingsScreen.AddInstance(type))
+                navigationManager.openNewInstanceScreen(type)
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
