@@ -18,11 +18,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dnfapps.arrmatey.entensions.getDrawableId
+import com.dnfapps.arrmatey.entensions.openLink
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import com.dnfapps.arrmatey.shared.MR
 import com.dnfapps.arrmatey.utils.mokoString
@@ -32,6 +34,7 @@ fun InstanceInfoCard(
     instanceType: InstanceType,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -77,13 +80,17 @@ fun InstanceInfoCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
-                    onClick = {},
+                    onClick = {
+                        context.openLink(instanceType.github)
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(text = mokoString(MR.strings.github))
                 }
                 Button(
-                    onClick = {},
+                    onClick = {
+                        context.openLink(instanceType.website)
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(text = mokoString(MR.strings.website))

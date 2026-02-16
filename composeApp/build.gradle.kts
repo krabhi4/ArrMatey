@@ -28,6 +28,7 @@ kotlin {
             implementation(libs.coil.network)
             implementation(libs.androidx.compose.adaptive.navigation.suite)
             implementation(libs.androidx.compose.window.size)
+            implementation(libs.androidx.browser)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
