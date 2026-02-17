@@ -1,6 +1,9 @@
 <resources>
     <!-- General -->
     <string name="app_name">ArrMatey</string>
+    <string name="app_link">https://github.com/owenlejeune/ArrMatey</string>
+    <string name="bmac_link">https://buymeacoffee.com/owenlejeune</string>
+    <string name="version_label">Version %1$s</string>
 
     <!-- Tabs -->
     <string name="series">Series</string>
@@ -174,6 +177,8 @@
     <string name="add_header">Add header</string>
     <string name="header_name">Header Name</string>
     <string name="header_value">Header Value</string>
+    <string name="donate">Donate</string>
+    <string name="libraries">Libraries</string>
 
     <!-- History Event Type -->
     <string name="grabbed">Grabbed</string>

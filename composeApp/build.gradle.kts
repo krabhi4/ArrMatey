@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.aboutLibraries)
 }
 
 kotlin {
@@ -29,6 +30,7 @@ kotlin {
             implementation(libs.androidx.compose.adaptive.navigation.suite)
             implementation(libs.androidx.compose.window.size)
             implementation(libs.androidx.browser)
+            implementation(libs.aboutlibraries.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -51,6 +53,8 @@ kotlin {
 
             implementation(libs.moko.resources)
             implementation(libs.moko.resources.compose)
+
+            implementation(libs.aboutlibraries)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -83,9 +87,36 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
     debugImplementation(compose.uiTooling)
 }
 
+aboutLibraries {
+    export {
+        outputFile = file(layout.projectDirectory.file("../shared/src/commonMain/resources/aboutLibraries.json"))
+        prettyPrint = true
+    }
+}
+
+tasks.register<Copy>("exportLibrariesToIOS") {
+    group = "build"
+    description = "Copy AboutLibraries JSON from shared to iOS"
+
+    dependsOn("exportLibraryDefinitions")
+
+    from(layout.projectDirectory.dir("../shared/src/commonMain/resources"))
+    into(layout.projectDirectory.dir("../iosApp/iosApp/Resources"))
+    include("aboutLibraries.json")
+}
+
+afterEvaluate {
+    tasks.matching { it.name.startsWith("compile") && it.name.contains("Kotlin") }
+        .configureEach {
+            finalizedBy(tasks.named("exportLibrariesToIOS"))
+        }
+}

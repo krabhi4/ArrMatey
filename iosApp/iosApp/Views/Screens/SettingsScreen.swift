@@ -10,9 +10,12 @@ import Shared
 
 struct SettingsScreen: View {
     
+    @Environment(\.openURL) private var openURL
     @EnvironmentObject private var navigationManager: NavigationManager
     
     @ObservedObject private var viewModel = MoreScreenViewModelS()
+    
+    @State private var showLibrariesSheet: Bool = false
     
     private var instances: [Instance] {
         viewModel.instances
@@ -44,12 +47,28 @@ struct SettingsScreen: View {
             } header: {
                 Text(MR.strings().instances.localized())
             }
-            if isDebug() {
-                Button("Dev settings") {
-                    navigationManager.go(to: .dev)
+            
+            AboutCard(
+                onGitHubClick: { if let url = URL(string: MR.strings().app_link.localized()) {
+                    openURL(url)
+                } },
+                onDonateClick: { if let url = URL(string: MR.strings().bmac_link.localized()) {
+                    openURL(url)
+                } },
+                onLibrariesClick: { showLibrariesSheet = true }
+            )
+            
+            Section {
+                if isDebug() {
+                    Button("Dev settings") {
+                        navigationManager.go(to: .dev)
+                    }
                 }
             }
         }
         .navigationTitle(MR.strings().settings.localized())
+        .sheet(isPresented: $showLibrariesSheet) {
+            LibrariesSheet()
+        }
     }
 }

@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         // This makes the plugin available to all modules manually
-        classpath("dev.icerock.moko:resources-generator:0.26.0")
+        classpath(libs.resources.generator)
     }
 }
 
@@ -18,4 +18,5 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
+    alias(libs.plugins.aboutLibraries) apply false
 }

@@ -30,6 +30,7 @@ datastore = "1.2.0"
 cloudy = "0.3.0"
 moko = "0.26.0"
 windowSize = "1.4.0"
+aboutLibraries = "13.2.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -76,7 +77,8 @@ cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }
 moko-resources = { module = "dev.icerock.moko:resources", version.ref = "moko" }
 moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko" }
 resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "moko" }
-
+aboutlibraries = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
+aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -88,3 +90,4 @@ skie = { id = "co.touchlab.skie", version.ref = "skie" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
 moko-resources = { id = "dev.icerock.moko.multiplatform-resources", version.ref = "moko" }
+aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
