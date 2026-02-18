@@ -131,9 +131,11 @@ class CalendarViewModel(
             emptyMap()
         } else {
             episodesMap.mapValues { (_, episodes) ->
-                episodes.filter { episode ->
-                    filterEpisode(episode, filter)
-                }
+                episodes
+                    .filter { episode ->
+                        filterEpisode(episode, filter)
+                    }
+                    .sortedBy { it.airDateUtc }
             }
         }
 
@@ -159,6 +161,7 @@ class CalendarViewModel(
                         null
                     }
                 }
+                    .sortedBy { it.first.airDateUtc }
             }
         }
 
