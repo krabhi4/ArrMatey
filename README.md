@@ -58,6 +58,7 @@
 - [ ] Tablet/Large screen support
 - [ ] Home screen widgets
 - [ ] Schedule notifications
+- [ ] bulk library actions
 - [ ] Additional instances types
   - [ ] Seer
   - [ ] Readarr/Chaptarr
@@ -65,7 +66,7 @@
   - [ ] Kapowarr
   - [ ] tautulli
   - [ ] prowlarr
-- and more to com
+- and more to come
 
 ## Screenshots
 
