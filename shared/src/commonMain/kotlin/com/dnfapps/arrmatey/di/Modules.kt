@@ -24,7 +24,7 @@ import com.dnfapps.arrmatey.arr.usecase.PerformLookupUseCase
 import com.dnfapps.arrmatey.instances.usecase.SetInstanceActiveUseCase
 import com.dnfapps.arrmatey.instances.usecase.TestInstanceConnectionUseCase
 import com.dnfapps.arrmatey.instances.usecase.UpdateInstanceUseCase
-import com.dnfapps.arrmatey.instances.usecase.UpdatePreferencesUseCase
+import com.dnfapps.arrmatey.instances.usecase.UpdateInstancePreferencesUseCase
 import com.dnfapps.arrmatey.arr.viewmodel.ActivityQueueViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.AddInstanceViewModel
 import com.dnfapps.arrmatey.arr.viewmodel.ArrMediaDetailsViewModel
@@ -61,6 +61,7 @@ import com.dnfapps.arrmatey.datastore.DataStoreFactory
 import com.dnfapps.arrmatey.datastore.InstancePreferenceStoreRepository
 import com.dnfapps.arrmatey.datastore.PreferencesStore
 import com.dnfapps.arrmatey.instances.model.InstanceType
+import com.dnfapps.arrmatey.instances.usecase.UpdateCalendarFilterPreferenceUseCase
 import com.dnfapps.arrmatey.utils.MokoStrings
 import com.dnfapps.arrmatey.utils.NetworkConnectivityObserverFactory
 import com.dnfapps.arrmatey.utils.NetworkConnectivityRepository
@@ -68,7 +69,6 @@ import io.ktor.client.plugins.logging.Logger
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import kotlin.math.sin
 
 val databaseModule = module {
     single { getRoomDatabase(get()) }
@@ -114,7 +114,7 @@ val useCaseModule = module {
     factory { GetInstanceRepositoryUseCase(get()) }
     factory { GetLibraryUseCase(get(), get()) }
     factory { GetMediaDetailsUseCase(get()) }
-    factory { UpdatePreferencesUseCase(get()) }
+    factory { UpdateInstancePreferencesUseCase(get()) }
     factory { AddMediaItemUseCase(get()) }
     factory { GetActivityTasksUseCase(get()) }
     factory { ObserveAllInstancesByTypeUseCase(get()) }
@@ -145,6 +145,7 @@ val useCaseModule = module {
     factory { PerformRefreshUseCase() }
     factory { GetCalendarUseCase(get()) }
     factory { DeleteAlbumFilesUseCase() }
+    factory { UpdateCalendarFilterPreferenceUseCase(get()) }
 }
 
 val viewModelModule = module {
@@ -178,7 +179,7 @@ val viewModelModule = module {
     factory { (instanceId: Long) ->
         EditInstanceViewModel(instanceId, get(), get(), get(), get())
     }
-    factory { CalendarViewModel(get(), get()) }
+    factory { CalendarViewModel(get(), get(), get(), get()) }
 }
 
 val resourcesModule = module {

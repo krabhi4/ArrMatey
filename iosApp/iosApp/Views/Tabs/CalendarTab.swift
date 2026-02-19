@@ -11,12 +11,15 @@ import SwiftUI
 struct CalendarTab: View {
     
     @ObservedObject private var viewModel = CalendarViewModelS()
-    @ObservedObject private var preferences = PreferencesViewModel()
+    
+    private var viewModeIcon: String {
+        viewModel.calendarState.filterState.viewMode == .list ? "calendar" : "list.bullet"
+    }
     
     var body: some View {
         NavigationStack {
             ZStack {
-                if preferences.calendarViewMode == .list {
+                if viewModel.calendarState.filterState.viewMode == .list {
                     CalendarListView(state: viewModel.calendarState, onLoadMore: { viewModel.loadMore() })
                 } else {
                     CalendarMonthView(state: viewModel.calendarState)
@@ -38,34 +41,32 @@ struct CalendarTab: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItemGroup(placement: .topBarTrailing) {
             Button(action: {
-                preferences.toggleCalendarViewMode()
+                viewModel.toggleViewMode()
             }) {
-                Image(systemName: preferences.calendarViewMode == .list ? "calendar" : "list.bullet")
+                Image(systemName: viewModeIcon)
             }
-        }
         
-        ToolbarItem(placement: .topBarTrailing) {
             CalendarFilterMenu(
                 instanceId: Binding(
-                    get: { viewModel.filterState.instanceId?.int64Value },
+                    get: { viewModel.calendarState.filterState.instanceId?.int64Value },
                     set: { viewModel.setFilterInstanceId($0) }
                 ),
                 contentFilter: Binding(
-                    get: { viewModel.filterState.contentFilter },
+                    get: { viewModel.calendarState.filterState.contentFilter },
                     set: { viewModel.setContentFilter($0) }
                 ),
                 onlyMonitored: Binding(
-                    get: { viewModel.filterState.showMonitoredOnly },
+                    get: { viewModel.calendarState.filterState.showMonitoredOnly },
                     set: { _ in viewModel.toggleShowMonitoredOnly() }
                 ),
                 onlyPremiers: Binding(
-                    get: { viewModel.filterState.showPremiersOnly },
+                    get: { viewModel.calendarState.filterState.showPremiersOnly },
                     set: { _ in viewModel.toggleShowPremiersOnly() }
                 ),
                 onlyFinales: Binding(
-                    get: { viewModel.filterState.showFinalesOnly },
+                    get: { viewModel.calendarState.filterState.showFinalesOnly },
                     set: { _ in viewModel.toggleShowFinalesOnly() }
                 ),
                 instances: viewModel.instances

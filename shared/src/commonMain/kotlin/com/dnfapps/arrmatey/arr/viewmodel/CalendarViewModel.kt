@@ -8,9 +8,12 @@ import com.dnfapps.arrmatey.arr.api.model.Episode
 import com.dnfapps.arrmatey.arr.api.model.EpisodeGroup
 import com.dnfapps.arrmatey.arr.state.CalendarFilterState
 import com.dnfapps.arrmatey.arr.state.CalendarState
+import com.dnfapps.arrmatey.arr.state.CalendarViewMode
 import com.dnfapps.arrmatey.arr.state.ContentFilter
 import com.dnfapps.arrmatey.arr.usecase.GetCalendarUseCase
 import com.dnfapps.arrmatey.database.InstanceRepository
+import com.dnfapps.arrmatey.datastore.PreferencesStore
+import com.dnfapps.arrmatey.instances.usecase.UpdateCalendarFilterPreferenceUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,17 +26,17 @@ import kotlinx.datetime.LocalDate
 
 class CalendarViewModel(
     private val getCalendarUseCase: GetCalendarUseCase,
+    private val updateCalendarFilterStateUseCase: UpdateCalendarFilterPreferenceUseCase,
+    preferencesStore: PreferencesStore,
     instanceRepository: InstanceRepository
 ) : ViewModel() {
 
-    private val _filterState = MutableStateFlow(CalendarFilterState())
-    val filterState: StateFlow<CalendarFilterState> = _filterState.asStateFlow()
-
     val calendarState = combine(
         getCalendarUseCase(),
-        _filterState
+        preferencesStore.observeCalendarFilterState()
     ) { calendar, filter ->
         CalendarState(
+            filterState = filter,
             movies = filterMovies(calendar.movies, filter),
             episodes = filterEpisodes(calendar.episodes, filter),
             groupedEpisodes = filterEpisodeGroups(calendar.groupedEpisodes, filter),
@@ -77,35 +80,58 @@ class CalendarViewModel(
         getCalendarUseCase.reset()
     }
 
+    fun toggleViewMode() {
+        val current = calendarState.value.filterState.viewMode
+        val new = when (current) {
+            CalendarViewMode.List -> CalendarViewMode.Month
+            CalendarViewMode.Month -> CalendarViewMode.List
+        }
+        safeSaveFilter { it.copy(viewMode = new) }
+    }
+
     fun setContentFilter(contentFilter: ContentFilter) {
-        _filterState.update {
+        safeSaveFilter {
             it.copy(contentFilter = contentFilter)
         }
     }
 
     fun toggleShowMonitoredOnly() {
-        _filterState.update {
+        safeSaveFilter {
             it.copy(showMonitoredOnly = !it.showMonitoredOnly)
         }
     }
 
     fun toggleShowPremiersOnly() {
-        val current = _filterState.value.showPremiersOnly
-        _filterState.update {
-            it.copy(showPremiersOnly = !current, showFinalesOnly = if (!current) false else it.showFinalesOnly)
+        val current = calendarState.value.filterState.showPremiersOnly
+        safeSaveFilter {
+            it.copy(
+                showPremiersOnly = !current,
+                showFinalesOnly = if (!current) false else it.showFinalesOnly
+            )
         }
     }
 
     fun toggleShowFinalesOnly() {
-        val current = _filterState.value.showFinalesOnly
-        _filterState.update {
-            it.copy(showFinalesOnly = !current, showPremiersOnly = if (!current) false else it.showPremiersOnly)
+        val current = calendarState.value.filterState.showFinalesOnly
+        safeSaveFilter {
+            it.copy(
+                showFinalesOnly = !current,
+                showPremiersOnly = if (!current) false else it.showPremiersOnly
+            )
         }
     }
 
     fun setFilterInstanceId(id: Long?) {
-        _filterState.update {
+        safeSaveFilter {
             it.copy(instanceId = id)
+        }
+    }
+
+    private fun safeSaveFilter(transform: (CalendarFilterState) -> CalendarFilterState) {
+        viewModelScope.launch {
+            val filterState = calendarState.value.filterState
+            val updatedState = transform(filterState)
+            updateCalendarFilterStateUseCase(updatedState)
         }
     }
 
@@ -113,7 +139,11 @@ class CalendarViewModel(
         movieMap: Map<LocalDate, List<ArrMovie>>,
         filter: CalendarFilterState
     ): Map<LocalDate, List<ArrMovie>> =
-        if (filter.contentFilter == ContentFilter.EpisodesOnly || filter.showFinalesOnly) {
+        if (
+            (filter.contentFilter != ContentFilter.MoviesOnly &&
+                    filter.contentFilter != ContentFilter.All)
+            || filter.showFinalesOnly
+        ) {
             emptyMap()
         } else {
             movieMap.mapValues { (_, movies) ->
@@ -127,7 +157,10 @@ class CalendarViewModel(
         episodesMap: Map<LocalDate, List<Episode>>,
         filter: CalendarFilterState
     ): Map<LocalDate, List<Episode>> =
-        if (filter.contentFilter == ContentFilter.MoviesOnly) {
+        if (
+            filter.contentFilter != ContentFilter.EpisodesOnly &&
+            filter.contentFilter != ContentFilter.All
+        ) {
             emptyMap()
         } else {
             episodesMap.mapValues { (_, episodes) ->
@@ -143,7 +176,10 @@ class CalendarViewModel(
         episodeGroups: Map<LocalDate, List<EpisodeGroup>>,
         filter: CalendarFilterState
     ): Map<LocalDate, List<EpisodeGroup>> =
-        if (filter.contentFilter == ContentFilter.MoviesOnly) {
+        if (
+            filter.contentFilter != ContentFilter.EpisodesOnly &&
+            filter.contentFilter != ContentFilter.All
+        ) {
             emptyMap()
         } else {
             episodeGroups.mapValues { (_, groups) ->
@@ -169,7 +205,9 @@ class CalendarViewModel(
         albumsMap: Map<LocalDate, List<ArrAlbum>>,
         filter: CalendarFilterState
     ): Map<LocalDate, List<ArrAlbum>> =
-        if (filter.contentFilter != ContentFilter.All && filter.contentFilter != ContentFilter.AlbumsOnly) {
+        if (filter.contentFilter != ContentFilter.All &&
+            filter.contentFilter != ContentFilter.AlbumsOnly
+        ) {
             emptyMap()
         } else {
             albumsMap.mapValues { (_, albums) ->

@@ -9,6 +9,7 @@ import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
 data class CalendarState(
+    val filterState: CalendarFilterState = CalendarFilterState(),
     val movies: Map<LocalDate, List<ArrMovie>> = emptyMap(),
     val episodes: Map<LocalDate, List<Episode>> = emptyMap(),
     val groupedEpisodes: Map<LocalDate, List<EpisodeGroup>> = emptyMap(),
@@ -19,5 +20,5 @@ data class CalendarState(
     val error: String? = null,
     val today: LocalDate = Clock.localToday()
 ) {
-    constructor(): this(emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyList(), false, false, null, Clock.localToday())
+    constructor(): this(CalendarFilterState(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyList(), false, false, null, Clock.localToday())
 }

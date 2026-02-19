@@ -12,7 +12,6 @@ import SwiftUI
 class CalendarViewModelS: ObservableObject {
     private let viewModel: CalendarViewModel
     
-    @Published private(set) var filterState: CalendarFilterState = CalendarFilterState()
     @Published private(set) var calendarState: CalendarState = CalendarState()
     @Published private(set) var instances: [Instance] = []
     
@@ -22,7 +21,6 @@ class CalendarViewModelS: ObservableObject {
     }
     
     private func startObserving() {
-        viewModel.filterState.observeAsync { self.filterState = $0 }
         viewModel.calendarState.observeAsync { self.calendarState = $0 }
         viewModel.instances.observeAsync { self.instances = $0 }
     }
@@ -37,6 +35,10 @@ class CalendarViewModelS: ObservableObject {
     
     func reset() {
         viewModel.reset()
+    }
+    
+    func toggleViewMode() {
+        viewModel.toggleViewMode()
     }
     
     func setContentFilter(_ contentFilter: ContentFilter) {

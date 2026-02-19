@@ -35,13 +35,9 @@ import org.koin.compose.koinInject
 @Composable
 fun CalendarTab(
     viewModel: CalendarViewModel = koinInject(),
-    preferencesStore: PreferencesStore = koinInject(),
-    navigationManager: NavigationManager = koinInject()
+    preferencesStore: PreferencesStore = koinInject()
 ) {
     val calendarState by viewModel.calendarState.collectAsStateWithLifecycle()
-    val filterState by viewModel.filterState.collectAsStateWithLifecycle()
-    val viewMode by preferencesStore.calendarViewMode.collectAsStateWithLifecycle(CalendarViewMode.List)
-
     val instances by viewModel.instances.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -53,10 +49,10 @@ fun CalendarTab(
                 },
                 actions = {
                     IconButton(onClick = {
-                        preferencesStore.toggleCalendarViewMode()
+                        viewModel.toggleViewMode()
                     }) {
                         Icon(
-                            imageVector = when (viewMode) {
+                            imageVector = when (calendarState.filterState.viewMode) {
                                 CalendarViewMode.List -> Icons.Default.CalendarMonth
                                 CalendarViewMode.Month -> Icons.Default.CalendarViewDay
                             },
@@ -66,7 +62,7 @@ fun CalendarTab(
 
                     CalendarFilterMenu(
                         instances = instances,
-                        filterState = filterState,
+                        filterState = calendarState.filterState,
                         onInstanceChanged = { viewModel.setFilterInstanceId(it) },
                         onContentFilterChanged = { viewModel.setContentFilter(it) },
                         onToggleFilterMonitored = { viewModel.toggleShowMonitoredOnly() },
@@ -85,7 +81,7 @@ fun CalendarTab(
             isRefreshing = calendarState.isLoading,
             onRefresh = { viewModel.load() }
         ) {
-            when (viewMode) {
+            when (calendarState.filterState.viewMode) {
                 CalendarViewMode.List -> {
                     CalendarListView(
                         state = calendarState,

@@ -3,7 +3,7 @@ package com.dnfapps.arrmatey.instances.usecase
 import com.dnfapps.arrmatey.datastore.InstancePreferenceStoreRepository
 import com.dnfapps.arrmatey.datastore.InstancePreferences
 
-class UpdatePreferencesUseCase(
+class UpdateInstancePreferencesUseCase(
     private val instancePreferencesStoreRepository: InstancePreferenceStoreRepository
 ) {
     suspend operator fun invoke(instanceId: Long, preferences: InstancePreferences) {

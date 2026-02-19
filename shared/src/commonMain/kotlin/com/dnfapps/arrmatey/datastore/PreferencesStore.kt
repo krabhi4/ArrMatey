@@ -4,14 +4,18 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.dnfapps.arrmatey.arr.api.client.LoggerLevel
+import com.dnfapps.arrmatey.arr.state.CalendarFilterState
 import com.dnfapps.arrmatey.arr.state.CalendarViewMode
+import com.dnfapps.arrmatey.arr.state.ContentFilter
 import com.dnfapps.arrmatey.instances.model.InstanceType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -25,6 +29,11 @@ class PreferencesStore(
     private val radarrInfoCardKey = booleanPreferencesKey("radarrInfoCard")
     private val lidarrInfoCardKey = booleanPreferencesKey("lidarrInfoCard")
     private val calendarViewTypeKey = stringPreferencesKey("calendarViewType")
+    private val calendarContentFilterKey = stringPreferencesKey("calendarContentFilter")
+    private val calendarMonitorOnlyKey = booleanPreferencesKey("calendarMonitorOnly")
+    private val calendarPremiersOnlyKey = booleanPreferencesKey("calendarPremiersOnly")
+    private val calendarFinalesOnlyKey = booleanPreferencesKey("calendarFinalesOnly")
+    private val calendarInstanceIdKey = longPreferencesKey("calendarInstanceId")
     private val activityPollingKey = booleanPreferencesKey("enableActivityPolling")
     private val httpLogLevelKey = stringPreferencesKey("httpLogLevel")
     private val useDynamicThemeKey = booleanPreferencesKey("useDynamicTheme")
@@ -71,12 +80,61 @@ class PreferencesStore(
             preferences[useClearLogoKey] ?: true
         }
 
-    val calendarViewMode: Flow<CalendarViewMode> = dataStore.data
+    private val calendarViewMode: Flow<CalendarViewMode> = dataStore.data
         .map { preferences ->
             preferences[calendarViewTypeKey]?.let { type ->
                 CalendarViewMode.valueOf(type)
             } ?: CalendarViewMode.List
         }
+
+    private val calendarContentFilter: Flow<ContentFilter> = dataStore.data
+        .map { preferences ->
+            preferences[calendarContentFilterKey]?.let { cf ->
+                ContentFilter.valueOf(cf)
+            } ?: ContentFilter.All
+        }
+
+    private val calendarShowMonitorOnly: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[calendarMonitorOnlyKey] ?: false
+        }
+
+    private val calendarShowPremiersOnly: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[calendarPremiersOnlyKey] ?: false
+        }
+
+    private val calendarShowFinalesOnly: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[calendarFinalesOnlyKey] ?: false
+        }
+
+    private val calendarInstanceId: Flow<Long?> = dataStore.data
+        .map { preferences ->
+            preferences[calendarInstanceIdKey]?.takeIf { it > 0 }
+        }
+
+    fun observeCalendarFilterState(): Flow<CalendarFilterState> = combine(
+        combine(
+        calendarViewMode, calendarContentFilter, calendarShowMonitorOnly
+        ) { viewMode, contentFiler, monitorOnly ->
+            Triple(viewMode, contentFiler, monitorOnly)
+        },
+        calendarShowPremiersOnly, calendarShowFinalesOnly, calendarInstanceId
+    ) { (viewMode, contentFilter, monitorOnly), premiersOnly, finalesOnly, instanceId ->
+        CalendarFilterState(viewMode, contentFilter, monitorOnly, premiersOnly, finalesOnly, instanceId)
+    }
+
+    suspend fun saveCalendarFilterState(state: CalendarFilterState) {
+        dataStore.edit { preferences ->
+            preferences[calendarViewTypeKey] = state.viewMode.name
+            preferences[calendarContentFilterKey] = state.contentFilter.name
+            preferences[calendarMonitorOnlyKey] = state.showMonitoredOnly
+            preferences[calendarPremiersOnlyKey] = state.showPremiersOnly
+            preferences[calendarFinalesOnlyKey] = state.showFinalesOnly
+            preferences[calendarInstanceIdKey] = state.instanceId ?: -1
+        }
+    }
 
     fun dismissInfoCard(type: InstanceType) {
         setInfoCardVisibility(type, false)
@@ -121,20 +179,6 @@ class PreferencesStore(
             dataStore.edit { preferences ->
                 val current = preferences[useClearLogoKey] ?: true
                 preferences[useClearLogoKey] = !current
-            }
-        }
-    }
-
-    fun toggleCalendarViewMode() {
-        scope.launch {
-            dataStore.edit { preferences ->
-                val current = preferences[calendarViewTypeKey]?.let { type ->
-                    CalendarViewMode.valueOf(type)
-                } ?: CalendarViewMode.List
-                preferences[calendarViewTypeKey] = when (current) {
-                    CalendarViewMode.Month -> CalendarViewMode.List.name
-                    CalendarViewMode.List -> CalendarViewMode.Month.name
-                }
             }
         }
     }
