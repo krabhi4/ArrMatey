@@ -1,6 +1,8 @@
 package com.dnfapps.arrmatey.arr.usecase
 
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
+import com.dnfapps.arrmatey.arr.api.model.ArrMovie
+import com.dnfapps.arrmatey.arr.api.model.ArrSeries
 import com.dnfapps.arrmatey.arr.state.ArrLibrary
 import com.dnfapps.arrmatey.client.ErrorType
 import com.dnfapps.arrmatey.client.NetworkResult
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlin.time.Instant
 
 class GetLibraryUseCase(
     private val instanceManager: InstanceManager,
@@ -60,7 +63,14 @@ class GetLibraryUseCase(
         val comparator: Comparator<ArrMedia> = when (preferences.sortBy) {
             SortBy.Title -> compareBy { it.sortTitle }
             SortBy.Year -> compareBy { it.year }
-            else -> compareBy { it.sortTitle }
+            SortBy.Added -> compareBy { it.added }
+            SortBy.Rating -> compareBy { it.ratingScore() }
+            SortBy.FileSize -> compareBy { it.fileSize }
+            SortBy.NextAiring -> compareBy { (it as? ArrSeries)?.nextAiring ?: Instant.DISTANT_FUTURE }
+            SortBy.PreviousAiring -> compareBy { (it as? ArrSeries)?.previousAiring ?: Instant.DISTANT_PAST }
+            SortBy.Grabbed -> compareBy { (it as? ArrMovie)?.grabbed ?: Instant.DISTANT_PAST }
+            SortBy.DigitalRelease -> compareBy { (it as? ArrMovie)?.digitalRelease ?: Instant.DISTANT_PAST }
+            SortBy.Relevance -> compareBy { it.sortTitle } // should never happen for library sorting
         }
 
         return items.orderedSortedWith(preferences.sortOrder, comparator)

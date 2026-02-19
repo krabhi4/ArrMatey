@@ -75,6 +75,9 @@ data class ArrMovie(
             else -> false
         }
 
+    val grabbed: Instant?
+        get() = movieFile?.dateAdded
+
     override fun ratingScore(): Double {
         val imdb = ratings?.imdb?.value
         val rt = ratings?.rottenTomatoes?.value?.apply { this/10 }

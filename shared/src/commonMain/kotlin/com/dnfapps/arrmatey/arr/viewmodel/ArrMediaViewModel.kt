@@ -39,12 +39,6 @@ class ArrMediaViewModel(
     private val updatePreferencesUseCase: UpdatePreferencesUseCase
 ): ViewModel() {
 
-//    private val _uiState = MutableStateFlow<ArrLibrary>(ArrLibrary.Initial)
-//    val uiState: StateFlow<ArrLibrary> = _uiState.asStateFlow()
-//
-//    private val _instanceData = MutableStateFlow<InstanceData?>(null)
-//    val instanceData: StateFlow<InstanceData?> = _instanceData.asStateFlow()
-
     private val _addItemStatus = MutableStateFlow<OperationStatus>(OperationStatus.Idle)
     val addItemStatus: StateFlow<OperationStatus> = _addItemStatus.asStateFlow()
 
