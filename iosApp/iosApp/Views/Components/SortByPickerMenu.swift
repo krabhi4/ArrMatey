@@ -11,13 +11,13 @@ import SwiftUI
 struct SortByPickerMenu: View {
     private let type: InstanceType
     
+    private let sortBy: SortBy
+    private let sortOrder: Shared.SortOrder
+    
     private let changeSortBy: (SortBy) -> Void
     private let changeSortOrder: (Shared.SortOrder) -> Void
     
     private let sortByOptions: [SortBy]
-    
-    @State private var sortedBy: SortBy
-    @State private var sortOrder: Shared.SortOrder
     
     init(
         type: InstanceType,
@@ -28,7 +28,7 @@ struct SortByPickerMenu: View {
         limitToLookup: Bool = false
     ) {
         self.type = type
-        self.sortedBy = sortBy
+        self.sortBy = sortBy
         self.sortOrder = sortOrder
         self.changeSortBy = changeSortBy
         self.changeSortOrder = changeSortOrder
@@ -40,13 +40,13 @@ struct SortByPickerMenu: View {
         Menu {
             ForEach(sortByOptions, id: \.self) { sortOption in
                 Button(action: {
-                    if sortedBy == sortOption {
+                    if sortBy == sortOption {
                         changeSortOrder((sortOrder == .asc) ? .desc : .asc)
                     } else {
                         changeSortBy(sortOption)
                     }
                 }) {
-                    if sortedBy == sortOption {
+                    if sortBy == sortOption {
                         Label(sortOption.resource.localized(), systemImage: sortOrder == .asc ? "chevron.up" : "chevron.down")
                     } else {
                         Text(sortOption.resource.localized())
@@ -54,13 +54,7 @@ struct SortByPickerMenu: View {
                 }
             }
         } label: {
-            Label(sortedBy.resource.localized(), systemImage: "arrow.up.arrow.down")
+            Label(sortBy.resource.localized(), systemImage: "arrow.up.arrow.down")
         }
-        .onChange(of: sortedBy, { _, newValue in
-            changeSortBy(newValue)
-        })
-        .onChange(of: sortOrder, { _, newValue in
-            changeSortOrder(newValue)
-        })
     }
 }

@@ -82,8 +82,9 @@ class ArrMediaViewModel(
                 .combine(_searchQuery) { state, query ->
                     when (state) {
                         is ArrLibrary.Success -> {
-                            _preferences.value = state.preferences
-                            filterSuccessState(state, query)
+                            val filtered = filterSuccessState(state, query)
+                            _preferences.value = filtered.preferences
+                            filtered
                         }
                         is ArrLibrary.Error -> {
                             handleErrorState(state)
