@@ -13,6 +13,7 @@ class NavigationManager: ObservableObject {
     @Published var seriesPath = NavigationPath()
     @Published var moviePath = NavigationPath()
     @Published var musicPath = NavigationPath()
+    @Published var launcherPath = NavigationPath()
     
     @Published var selectedTab: TabItem = .shows
     @Published var selectedDrawerTab: TabItem? = nil
@@ -78,4 +79,5 @@ enum SettingsRoute : Hashable {
     case newInstance(_ : InstanceType = .sonarr)
     case dev
     case editInstance(Int64)
+    case navigationConfig
 }

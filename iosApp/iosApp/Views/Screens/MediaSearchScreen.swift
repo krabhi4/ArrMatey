@@ -72,22 +72,9 @@ struct MediaSearchScreen: View {
     @ViewBuilder
     private func resultsArea(_ state: ArrLibrarySuccess) -> some View {
         ScrollView {
-            let columns = [GridItem(.adaptive(minimum: 120), spacing: 16)]
-            
-            LazyVGrid(columns: columns, spacing: 16) {
+            LazyVStack(spacing: 12) {
                 ForEach(state.items, id: \.guid) { item in
-                    ZStack {
-                        MediaItemView(item: item, isActive: queueItems.contains(where: { $0.mediaId == item.id }))
-//                        PosterItem(item: item) {
-//                            VStack {
-//                                Spacer()
-//                                if item.id != nil {
-//                                    ProgressView(value: Double(item.statusProgress))
-//                                        .tint(queueItems.contains(where: { $0.mediaId == item.id }) ? Color.blue : Color(argb: item.statusColor))
-//                                        .padding(8)
-//                                }
-//                            }
-//                        }
+                    MediaItemView(item: item, isActive: queueItems.contains(where: { $0.mediaId == item.id }))
                         .id(item.guid)
                         .onTapGesture {
                             if let id = item.id?.int64Value {
@@ -97,7 +84,6 @@ struct MediaSearchScreen: View {
                                 navigation.go(to: .preview(json), of: type)
                             }
                         }
-                    }
                 }
             }
             .padding(16)

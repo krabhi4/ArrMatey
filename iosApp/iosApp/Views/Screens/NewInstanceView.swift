@@ -16,7 +16,7 @@ struct NewInstanceView: View {
     
     @State private var instanceType: InstanceType// = .sonarr
     
-    init(initialType: InstanceType) {
+    init(initialType: InstanceType = .sonarr) {
         self.instanceType = initialType
     }
     
