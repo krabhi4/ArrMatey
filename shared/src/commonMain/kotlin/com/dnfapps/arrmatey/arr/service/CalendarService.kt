@@ -146,7 +146,8 @@ class CalendarService(
     ) {
         val currentList = map[date]?.toMutableList() ?: mutableListOf()
 
-        val existingIndex = currentList.indexOfFirst { it.id == movie.id }
+        // Use tmdbId for deduplication (same across Radarr instances)
+        val existingIndex = currentList.indexOfFirst { it.tmdbId == movie.tmdbId }
         if (existingIndex >= 0) {
             currentList[existingIndex] = movie
         } else {
@@ -187,7 +188,18 @@ class CalendarService(
     ) {
         val currentList = map[date]?.toMutableList() ?: mutableListOf()
 
-        val existingIndex = currentList.indexOfFirst { it.id == episode.id }
+        // Use tvdbId for deduplication (same across Sonarr instances)
+        // Fallback to series tvdbId + season + episode if tvdbId is null
+        val existingIndex = currentList.indexOfFirst { existing ->
+            when {
+                existing.tvdbId != null && episode.tvdbId != null -> existing.tvdbId == episode.tvdbId
+                existing.series?.tvdbId != null && episode.series?.tvdbId != null ->
+                    existing.series?.tvdbId == episode.series?.tvdbId &&
+                    existing.seasonNumber == episode.seasonNumber &&
+                    existing.episodeNumber == episode.episodeNumber
+                else -> existing.id == episode.id && existing.instanceId == episode.instanceId
+            }
+        }
         if (existingIndex >= 0) {
             currentList[existingIndex] = episode
         } else {
@@ -251,7 +263,8 @@ class CalendarService(
     ) {
         val currentList = map[date]?.toMutableList() ?: mutableListOf()
 
-        val existingIndex = currentList.indexOfFirst { it.id == album.id }
+        // Use foreignAlbumId (MusicBrainz ID) for deduplication (same across Lidarr instances)
+        val existingIndex = currentList.indexOfFirst { it.foreignAlbumId == album.foreignAlbumId }
         if (existingIndex >= 0) {
             currentList[existingIndex] = album
         } else {
