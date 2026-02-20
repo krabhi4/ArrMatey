@@ -13,6 +13,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.dnfapps.arrmatey.arr.api.model.ArrMedia
 import com.dnfapps.arrmatey.ui.theme.ArrPurple
@@ -27,9 +31,14 @@ fun PosterGrid(
     modifier: Modifier = Modifier,
     userScrollEnabled: Boolean = true
 ) {
+    val windowInfo = LocalWindowInfo.current
+    val screenWidth = windowInfo.containerDpSize.width
+
+    // divide by 4 for min 3 columns + spacing
+    val minPosterSize = minOf(120.dp, screenWidth/4)
     LazyVerticalGrid(
         modifier = modifier,
-        columns = GridCells.Adaptive(minSize = 120.dp),
+        columns = GridCells.Adaptive(minSize = minPosterSize),
         contentPadding = PaddingValues(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         userScrollEnabled = userScrollEnabled
