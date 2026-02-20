@@ -164,6 +164,8 @@ Any new strings should be added to strings.xml, or plurals.xml for plural string
 6. Tap **Test Connection** to verify
 7. Save your instance
 
+If you use **Tailscale Funnel's** or **CloudFlare Tunnels**, additional setup steps can be found [here](https://github.com/owenlejeune/ArrMatey/issues/19)
+
 ### Custom Headers
 
 Custom headers are useful for:
