@@ -24,5 +24,8 @@ enum class CoverType(val defaultFileName: String) {
     @SerialName("disc")
     Disc("disc.jpg"),
 
+    @SerialName("logo")
+    Logo("logo.jpg"),
+
     Undefined("")
 }
